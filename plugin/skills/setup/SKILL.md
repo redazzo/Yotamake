@@ -18,6 +18,11 @@ repository root:
 bash "<this skill's directory>/../../install.sh" "$(git rev-parse --show-toplevel)"
 ```
 
+If the repository already has its own version of a template file (most often a docs linter
+or records-index script), list the harness path in `.claude/yotamake/skip`, one per line,
+before running. The installer never writes a listed path, on this run or later ones. Then
+point `scripts/check` at the repository's own script.
+
 If the working tree has uncommitted changes, ask before running it. If the repository has
 commits and is on its main branch, cut `chore/yotamake-harness` first: the plugin's hook
 blocks edits on the main branch, so filling in the facts below would fail there.
@@ -31,8 +36,9 @@ On a fresh install, offer to fill in the `FILL IN` placeholders. Work from the r
 from guesses:
 
 - **`scripts/check`** — find the project's real type-check, lint and test commands (package
-  scripts, a Makefile, CI config). Add each as a `run` line. Run `scripts/check --all` and
-  show the result.
+  scripts, a Makefile, CI config). Add each as a `run` line. Put a check that takes more than
+  a few seconds (usually the test suite) behind `full`, so the pre-commit hook skips it. Run
+  `scripts/check --all` and show the result.
 - **`CLAUDE.md`** — Project overview, Commands, Branching and releases. Fill in Migrations and
   Deploying only from what the repository shows; if it shows nothing, ask whether to delete
   those sections.

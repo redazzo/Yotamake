@@ -71,7 +71,8 @@ ADR in `docs/decisions/`; ask before writing one. The `write-doc` skill covers t
 ## 4. Run the checks
 
 Run `scripts/check`. It picks the checks that match what changed, and prints one `PASS` or
-`FAIL` line per check. If the project has no `scripts/check`, run the commands CLAUDE.md's
+`FAIL` line per check. Run it even though a pre-commit hook exists: the hook runs only the
+fast checks (`--staged`), and this runs the slow ones too. If the project has no `scripts/check`, run the commands CLAUDE.md's
 **Checks** section lists instead, and say in the report that the project has no single gate.
 
 Do not add, skip or weaken a check to get a pass. Report only the summary lines.

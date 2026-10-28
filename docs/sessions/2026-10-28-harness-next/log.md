@@ -64,3 +64,31 @@
 - All steps run locally: pass (`s2-checks.log`). The first real CI run is still to watch.
 - No plugin change, so no version bump.
 - Next: S3 (installer). Ask D2 first.
+
+## 2026-10-28 — S3: installer opt-out, hook tools, fast/full checks
+
+- D2 answered: skip file, as recommended.
+- **Opt-out (F8).** `install.sh` reads `.claude/yotamake/skip`: one template path per line,
+  `#` comments, leading `./` and spaces trimmed. A listed path is never written, managed or
+  not, and the run lists it under "did not install". `setup` skill says when to use it.
+- **Hook tools (F5).** With `core.hooksPath` unset, the installer now leaves it alone when it
+  finds `.pre-commit-config.yaml`, a lefthook config (`lefthook.*` or `.lefthook.*`, yml/yaml/
+  json/toml), or an existing `.git/hooks/pre-commit` (found via `git rev-parse --git-path`, so
+  worktrees work). It prints the snippet that calls `.githooks/pre-commit` from that tool.
+  Husky still hits the "already set" branch.
+- **Fast/full (F7).** `scripts/check` template gains `full()` (false only under `--staged`);
+  slow checks go behind it, so the pre-commit hook skips them. Plain `scripts/check` and
+  `--all` run everything. Updated the template CLAUDE.md Checks section, `simple-session`
+  step 4, `setup` step 2, README. Existing installs keep their own `scripts/check` (project-
+  owned), so nothing changes for them until they add `full &&`.
+- Side fix from the S1 note: the installer warns when there is no `README.md` and CLAUDE.md
+  links to it, since the docs check fails until one exists.
+- Install tests (scratchpad): plain repo, re-run, skip file, pre-commit config, `lefthook.yml`,
+  `.lefthook.yaml`, existing `.git/hooks/pre-commit`, husky-style `core.hooksPath`, no README;
+  `--staged` runs fast only, plain and `--all` run full; a real commit runs the hook. All as
+  expected. First lefthook attempt used `ls a b`, which fails when either glob misses; fixed.
+- Checks: both `validate --strict` pass, `bash -n` and `node --check` clean, install test
+  passes (`s3-checks.log`).
+- Version 0.3.0 → 0.4.0.
+- For S4: video-vault's skip file needs both `scripts/docs/*.mjs` paths; its `scripts/check`
+  then calls `pnpm run lint:docs`. Per D5 its checks all go in the fast block.

@@ -2,15 +2,16 @@
 # The one check entry point. Claude's skills, the pre-commit hook and CI all run
 # this, so a change passes the same gate whoever makes it.
 #
-#   scripts/check          checks for what changed since the main branch, plus uncommitted work
-#   scripts/check --staged checks for what is staged (the pre-commit hook uses this)
+#   scripts/check          full checks for what changed since the main branch, plus
+#                          uncommitted work (Claude runs this before proposing a commit)
+#   scripts/check --staged fast checks for what is staged (the pre-commit hook uses this)
 #   scripts/check --all    every check, whatever changed (CI uses this)
 #
 # Prints one PASS/FAIL line per check, and the tail of a failing check's output.
 # Exit 0 when everything passes.
 #
-# Edit the two FILL IN blocks below. This file belongs to the project: the
-# harness installer never overwrites it.
+# Edit the FILL IN blocks below. This file belongs to the project: the harness
+# installer never overwrites it.
 
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)" || exit 2
@@ -41,18 +42,23 @@ run() {
 }
 # touches <regex>: true when a changed path matches, or always under --all.
 touches() { [[ "$mode" == --all ]] || grep -qE "$1" <<<"$changed"; }
+# full: true except in the pre-commit hook. Put slow checks behind it.
+full() { [[ "$mode" != --staged ]]; }
 
-# --- Always ------------------------------------------------------------------
-# FILL IN, e.g.:
+# --- Fast: every run, including the pre-commit hook ---------------------------
+# Keep these to a few seconds. FILL IN, e.g.:
 # run type-check  pnpm run type-check
 # run lint        pnpm run lint
-# run tests       pnpm run test --run
 
 run docs node scripts/docs/lint-docs.mjs
 
-# --- When the diff touches ---------------------------------------------------
+# --- Full: not in the pre-commit hook -----------------------------------------
+# Slow checks. They still run before Claude proposes a commit, and in CI. FILL IN, e.g.:
+# full && run tests  pnpm run test --run
+
+# --- When the diff touches ----------------------------------------------------
 # FILL IN, e.g.:
-# touches '^db/migrations/' && run db-lint pnpm run lint:db
-# touches '^proxy/'         && run proxy-tests bash -c 'cd proxy && npm test'
+# touches '^db/migrations/'         && run db-lint     pnpm run lint:db
+# full && touches '^proxy/'         && run proxy-tests bash -c 'cd proxy && npm test'
 
 exit $failed

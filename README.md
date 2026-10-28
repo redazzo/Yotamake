@@ -28,6 +28,15 @@ run it by hand from a clone of this repo:
 The repo's `.claude/settings.json` then names this marketplace and enables the plugin, so
 teammates who open the repo in Claude Code are prompted to install it.
 
+The installer points git at `.githooks/` (`core.hooksPath`). It leaves that setting alone when
+the repo already uses another hook tool (a `.pre-commit-config.yaml`, a lefthook config, or a
+hook in `.git/hooks/`), because git would stop running that tool's hooks. It then prints the
+lines that call `.githooks/pre-commit` from the other tool.
+
+If the repo already has its own version of a template file, such as a docs linter, list the
+harness path in `.claude/yotamake/skip` (one per line). The installer never writes a listed
+path.
+
 **Updating.** `claude plugin update yotamake@yotamake` updates the method for every repo at
 once. Re-run `/yotamake:setup` (or `install.sh`) in a repo to refresh its harness-owned
 scripts; it never overwrites the files that belong to the project.
@@ -70,12 +79,13 @@ plugin/
 ```
 CLAUDE.md                       facts the skills read, by section name
 scripts/check                   the one gate: skills, the pre-commit hook and CI all run it
-.githooks/pre-commit            runs scripts/check --staged
+.githooks/pre-commit            runs scripts/check --staged (fast checks only)
 .github/workflows/check.yml     runs scripts/check --all
 .claude/settings.json           enables the plugin; "ask" rules for commit, merge, push, …
 .claude/yotamake/
   protected-paths.conf          files Claude may not edit
   post-edit-checks.conf         glob → per-file check command
+  skip                          optional: template paths the installer must never write
 docs/                           README (rulebook and index), backlog, decisions, records, …
 scripts/docs/                   docs linter and records index generator
 ```
@@ -88,8 +98,9 @@ unfilled, the skill says so and uses a stated default, or stops and asks. It nev
 deploy or migration command.
 
 **One gate, run by everyone.** `scripts/check` is the only list of checks. Claude runs it
-before proposing a commit. The pre-commit hook runs it on staged changes. CI runs all of it.
-A person's commit passes the same gate as Claude's.
+before proposing a commit. The pre-commit hook runs its fast checks on staged changes; slow
+ones (usually tests) sit behind `full` in the script and wait for Claude's run and CI. CI runs
+all of it. A person's commit passes the same gate as Claude's.
 
 **Stop points are enforced, not just asked for.** The skills stop before commit, version
 bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `push`,

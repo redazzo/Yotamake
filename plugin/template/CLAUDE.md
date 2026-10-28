@@ -35,9 +35,11 @@ doc and which doc owns what) · [README.md](./README.md) (setup) ·
 **`scripts/check` is the one gate.** Claude's skills, the pre-commit hook and CI all run it.
 Add a check by editing that script, not by listing it here.
 
-- `scripts/check` — checks for what changed since the main branch, plus uncommitted work.
-- `scripts/check --staged` — what the pre-commit hook runs.
-- `scripts/check --all` — what CI runs.
+- `scripts/check` — full checks for what changed since the main branch, plus uncommitted
+  work. Claude runs this before proposing a commit.
+- `scripts/check --staged` — fast checks only, for what is staged. The pre-commit hook runs
+  this. Slow checks sit behind `full` in the script and are left out.
+- `scripts/check --all` — every check. CI runs this.
 
 It prints one `PASS`/`FAIL` line per check. A person can skip the git hook once with
 `git commit --no-verify`. Claude never does unless the user asks.

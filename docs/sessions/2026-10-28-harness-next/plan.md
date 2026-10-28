@@ -46,7 +46,7 @@ User involvement: approve the commit; watch the first CI run.
 
 ✂ **Clear context.**
 
-## S3 — Installer: opt-out, hook tools, fast/full checks (F5, F7, F8) — `todo`
+## S3 — Installer: opt-out, hook tools, fast/full checks (F5, F7, F8) — `done`
 
 Ask D2 first.
 
