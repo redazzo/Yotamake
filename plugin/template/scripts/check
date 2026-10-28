@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# The one check entry point. Claude's skills, the pre-commit hook and CI all run
+# this, so a change passes the same gate whoever makes it.
+#
+#   scripts/check          checks for what changed since the main branch, plus uncommitted work
+#   scripts/check --staged checks for what is staged (the pre-commit hook uses this)
+#   scripts/check --all    every check, whatever changed (CI uses this)
+#
+# Prints one PASS/FAIL line per check, and the tail of a failing check's output.
+# Exit 0 when everything passes.
+#
+# Edit the two FILL IN blocks below. This file belongs to the project: the
+# harness installer never overwrites it.
+
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+MAIN_BRANCH=${CHECK_BASE:-main}
+mode=${1:-changed}
+
+case "$mode" in
+    --all) changed="" ;;
+    --staged) changed=$(git diff --cached --name-only) ;;
+    changed)
+        base=$(git merge-base HEAD "$MAIN_BRANCH" 2>/dev/null || echo HEAD)
+        changed=$( { git diff --name-only "$base" 2>/dev/null; git ls-files --others --exclude-standard; } | sort -u) ;;
+    *) echo "usage: scripts/check [--staged|--all]" >&2; exit 2 ;;
+esac
+
+failed=0
+run() {
+    local name=$1; shift
+    local out
+    if out=$("$@" 2>&1); then
+        echo "PASS  $name"
+    else
+        echo "FAIL  $name"
+        tail -n 40 <<<"$out" | sed 's/^/      /'
+        failed=1
+    fi
+}
+# touches <regex>: true when a changed path matches, or always under --all.
+touches() { [[ "$mode" == --all ]] || grep -qE "$1" <<<"$changed"; }
+
+# --- Always ------------------------------------------------------------------
+# FILL IN, e.g.:
+# run type-check  pnpm run type-check
+# run lint        pnpm run lint
+# run tests       pnpm run test --run
+
+run docs node scripts/docs/lint-docs.mjs
+
+# --- When the diff touches ---------------------------------------------------
+# FILL IN, e.g.:
+# touches '^db/migrations/' && run db-lint pnpm run lint:db
+# touches '^proxy/'         && run proxy-tests bash -c 'cd proxy && npm test'
+
+exit $failed

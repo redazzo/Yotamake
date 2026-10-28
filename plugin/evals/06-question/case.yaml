@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 06-question
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  The run answers the question and starts no session: no branch, no edits, no harness skill.

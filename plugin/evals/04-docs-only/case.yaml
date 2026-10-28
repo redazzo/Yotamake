@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 04-docs-only
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  Work stays on the assigned branch; the guide corrected to npm test with its updated date bumped; the docs check run; no version bump planned; no commit.

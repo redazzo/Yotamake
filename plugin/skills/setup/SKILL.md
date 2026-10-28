@@ -1,0 +1,46 @@
+---
+name: setup
+description: Set up the current repository for the Yotamake harness, or refresh its harness files after a plugin update — installs CLAUDE.md sections, scripts/check, the pre-commit hook, the docs skeleton and settings, then helps fill in the project facts. Use when the user says "set up yotamake", "install the harness", or "update the harness files".
+disable-model-invocation: true
+---
+
+# Set up the harness in this repository
+
+The method comes from this plugin. Each repository keeps its own facts and gates. This skill
+installs those per-repo files with the plugin's `install.sh`.
+
+## 1. Install
+
+Run the installer that sits two directories above this skill (the plugin root), against the
+repository root:
+
+```bash
+bash "<this skill's directory>/../../install.sh" "$(git rev-parse --show-toplevel)"
+```
+
+If the working tree has uncommitted changes, ask before running it.
+
+Report what it printed: files copied, harness files refreshed, project files kept. Do not
+re-run with `--force` unless the user asks; it overwrites project-owned files.
+
+## 2. Fill in the facts
+
+On a fresh install, offer to fill in the `FILL IN` placeholders. Work from the repository, not
+from guesses:
+
+- **`scripts/check`** — find the project's real type-check, lint and test commands (package
+  scripts, a Makefile, CI config). Add each as a `run` line. Run `scripts/check --all` and
+  show the result.
+- **`CLAUDE.md`** — Project overview, Commands, Branching and releases. Fill in Migrations and
+  Deploying only from what the repository shows; if it shows nothing, ask whether to delete
+  those sections.
+- **`.github/workflows/check.yml`** — the toolchain setup steps, or ask whether to delete it.
+- **`.claude/yotamake/post-edit-checks.conf`** — one fast per-file linter line per language.
+
+Leave a placeholder in place, and list it in the report, wherever the repository does not
+answer the question.
+
+## 3. Report
+
+List what was installed, what you filled in, and what is still `FILL IN`. Propose a commit
+message, then ask before committing.

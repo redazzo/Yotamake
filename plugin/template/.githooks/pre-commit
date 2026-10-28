@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Runs the project checks on what is staged. Installed by the Yotamake harness
+# (git config core.hooksPath .githooks). Skip once with: git commit --no-verify
+exec "$(git rev-parse --show-toplevel)/scripts/check" --staged

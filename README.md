@@ -1,114 +1,147 @@
 # Yotamake
 
-A generic development harness for Claude Code. It gives any repository the same working
-method: small sessions on branches, checks before every commit, nothing committed or deployed
-without a "yes", and a docs system that stays true.
+A development harness for Claude Code. It gives any repository the same working method:
+small sessions on branches, one check command that everyone runs, nothing committed or
+deployed without a "yes", and a docs system that stays true.
 
-It started as the `.claude/` setup and docs rules of a single application project. Those
-were tied to one stack (pnpm, Supabase, Cloudflare). Here the method lives in the skills, and
-everything project-specific lives in named sections of the target project's `CLAUDE.md`.
+It started as the `.claude/` setup and docs rules of a single application project.
 
 ## Install
 
+**1. Add the plugin** (once per machine), in Claude Code:
+
+```
+/plugin install yotamake --marketplace redazzo/Yotamake
+```
+
+or from a shell: `claude plugin marketplace add redazzo/Yotamake`, then
+`claude plugin install yotamake@yotamake`.
+
+**2. Set up each repository.** In Claude Code, inside the repo, run `/yotamake:setup`. It runs
+the plugin's `install.sh` and then helps fill in the project facts from the repo itself. Or
+run it by hand from a clone of this repo:
+
 ```bash
-./install.sh /path/to/your/repo          # keeps any file that already exists
-./install.sh /path/to/your/repo --force  # overwrites
+./plugin/install.sh /path/to/your/repo
 ```
 
-Then, in the target repo:
+The repo's `.claude/settings.json` then names this marketplace and enables the plugin, so
+teammates who open the repo in Claude Code are prompted to install it.
 
-1. Fill in each `FILL IN` comment in `CLAUDE.md`. Delete the **Migrations** or **Deploying**
-   section if the project has none.
-2. Uncomment the lines in `.claude/hooks/post-edit-checks.conf` that fit the stack.
-3. Check `.claude/hooks/protected-paths.conf` covers your secret files.
-4. Run `node scripts/docs/lint-docs.mjs`.
+**Updating.** `claude plugin update yotamake@yotamake` updates the method for every repo at
+once. Re-run `/yotamake:setup` (or `install.sh`) in a repo to refresh its harness-owned
+scripts; it never overwrites the files that belong to the project.
 
-If the repo already has docs with broken links, run
-`node scripts/docs/lint-docs.mjs --update-baseline` once to record them as known debt. After
-that the linter fails on new problems and on fixed ones that are still listed.
+## How it is split
 
-## What you get
+| Lives in | What | Who changes it |
+|---|---|---|
+| The plugin (`plugin/`) | Skills, hooks, output style, the installer and template | This repo; reaches every project on update |
+| Each repository | `CLAUDE.md` facts, `scripts/check`, `docs/`, hook config, CI workflow | The project |
+| Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit` | Refreshed by the installer |
+
+### The plugin
 
 ```
-CLAUDE.md                         project facts the skills read, by section name
-.claude/
-  settings.json                   hooks, output style, a few read-only permissions
-  hooks/
-    pre-edit-protect.sh           blocks edits to files in protected-paths.conf
-    protected-paths.conf          .env files, keys, certificates by default
-    post-edit-check.sh            runs a per-file check after each edit
-    post-edit-checks.conf         glob → command map (all commented out)
-  output-styles/plain-english.md  short sentences, plain words
+plugin/
+  .claude-plugin/plugin.json
   skills/
-    simple-session/               one change: branch, work, docs, checks, stop and ask
-    multi-session/                work across several contexts, with a working folder
-    write-doc/                    pick the doc kind, write it, link it, lint it
-    release-check/                guided deploy with pre-flight and gotchas (manual only)
-    new-migration/                scaffold a timestamped migration file (manual only)
-    drawio/                       draw.io diagrams, unchanged from the source
-docs/
-  README.md                       the docs rulebook and index
-  backlog.md                      the one register of open work
-  decisions/README.md             ADR register and template
-  records/README.md               generated index of dated work records
-  reference/ guides/ backlog/     empty, ready to fill
-scripts/docs/
-  lint-docs.mjs                   broken links, orphans, front-matter, stale index
-  generate-records-index.mjs      rebuilds docs/records/README.md
+    simple-session/   one change: size check, branch, work, docs, scripts/check, stop and ask
+    multi-session/    work across several contexts, with a working folder that survives /clear
+    write-doc/        pick the doc kind, write it, link it, lint it
+    release-check/    guided deploy with pre-flight and gotchas      (manual: /yotamake:release-check)
+    new-migration/    scaffold a timestamped migration file         (manual: /yotamake:new-migration)
+    setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
+    drawio/           draw.io diagrams
+  hooks/
+    hooks.json                     registers the two hooks below
+    pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
+    post-edit-check.sh             runs a fast per-file check after each edit
+    protected-paths.default.conf   used when a repo has no list of its own
+  output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
+  install.sh                       installs template/ into a repo
+  template/                        the per-repo files
+  evals/                           the eval suite (see below)
 ```
 
-`release-check` and `new-migration` set `disable-model-invocation`, so they run only when you
-type `/release-check` or `/new-migration`.
+### Each repository
 
-## How the pieces fit
+```
+CLAUDE.md                       facts the skills read, by section name
+scripts/check                   the one gate: skills, the pre-commit hook and CI all run it
+.githooks/pre-commit            runs scripts/check --staged
+.github/workflows/check.yml     runs scripts/check --all
+.claude/settings.json           enables the plugin; "ask" rules for commit, merge, push, …
+.claude/yotamake/
+  protected-paths.conf          files Claude may not edit
+  post-edit-checks.conf         glob → per-file check command
+docs/                           README (rulebook and index), backlog, decisions, records, …
+scripts/docs/                   docs linter and records index generator
+```
 
-**Skills hold the method. `CLAUDE.md` holds the facts.** Each skill names the `CLAUDE.md`
-section it reads:
+## The three ideas
 
-| Skill | Reads |
+**Skills hold the method. `CLAUDE.md` holds the facts.** Skills read named sections
+(Checks, Branching and releases, Migrations, Deploying, Conventions). If one is missing or
+unfilled, the skill says so and uses a stated default, or stops and asks. It never guesses a
+deploy or migration command.
+
+**One gate, run by everyone.** `scripts/check` is the only list of checks. Claude runs it
+before proposing a commit. The pre-commit hook runs it on staged changes. CI runs all of it.
+A person's commit passes the same gate as Claude's.
+
+**Stop points are enforced, not just asked for.** The skills stop before commit, version
+bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `push`,
+`rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks every time, whatever a
+skill says. Add your deploy command there too.
+
+## Sessions
+
+A session is one branch and one merge that fits in one context. `simple-session` first checks
+the size against concrete tests (a schema change plus other code, more than one new
+interface, more than one service, needs an ADR). If the change is too big, it offers
+`multi-session`, which keeps `plan.md`, `findings.md`, `decisions.md` and `log.md` in a
+git-ignored `.scratchpad/<date>-<slug>/`. You `/clear` between sessions and resume with:
+"Read .scratchpad/<folder>/README.md and start the next session."
+
+## Docs
+
+Four kinds, each maintained differently: reference (corrected in place), guides (corrected
+in place), decisions (never edited, only superseded) and records (written once). When they
+disagree: code > decisions > reference > records. Each subject has one owning doc, named in
+the "Owns" table in `docs/README.md`. The linter fails on broken links, docs nothing links to,
+bad front-matter and a stale records index.
+
+For a repo with existing link debt, run `node scripts/docs/lint-docs.mjs --update-baseline`
+once. After that the linter fails on new problems, and on fixed ones still listed.
+
+## Evals
+
+`plugin/evals/` holds six cases. Each runs against a small Node project built fresh by
+`evals/_fixture/setup.sh` with the harness installed:
+
+| Case | Checks that Claude… |
 |---|---|
-| `simple-session`, `multi-session` | **Checks**, **Branching and releases**, **Conventions** |
-| `release-check` | **Deploying**, plus **Checks**, **Migrations**, **Branching and releases** |
-| `new-migration` | **Migrations** |
-| `write-doc` | `docs/README.md` |
+| 01-branches-first | tries to branch before editing, and edits nothing on `main` |
+| 02-small-change | changes code, test and the owning doc, runs `scripts/check`, proposes a commit and asks |
+| 03-too-big | refuses to start a four-part feature and offers a multi-session plan |
+| 04-docs-only | fixes a guide, runs the docs check, plans no version bump |
+| 05-work-record | writes a valid record and regenerates the index |
+| 06-question | answers a question without starting a session (should not fire) |
 
-If a section is missing or unfilled, the skill says so and either uses a stated default or
-stops and asks. It does not guess a deploy or migration command.
+Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
+account, about $3.50 for the full suite with the baseline arm):
 
-**The session model.** A session is one branch and one merge that fits in one context.
-`simple-session` runs one. If the work is bigger, it says so and offers `multi-session`,
-which keeps `plan.md`, `findings.md`, `decisions.md` and `log.md` in a git-ignored
-`.scratchpad/<date>-<slug>/` folder. You `/clear` between sessions and resume with:
-"Read .scratchpad/<folder>/README.md and start the next session." At the end, anything
-worth keeping moves into the docs and the folder is deleted.
+```bash
+cd plugin
+claude plugin eval . --scaffold --allow-tools Bash Write Edit --ablation with-without
+```
 
-**The stop points.** Skills stop and ask before commit, version bump, merge and deploy.
-Deploying is always the user's call.
-
-**The docs model.** Four kinds, each maintained differently: reference (corrected in
-place), guides (corrected in place), decisions (never edited, only superseded) and records
-(written once). When they disagree: code > decisions > reference > records. Each subject has
-one owning doc, named in the "Owns" table in `docs/README.md`. The linter keeps links
-working and every doc reachable from the index.
-
-**The hooks.** Both read the tool call as JSON on stdin. Exit code 2 blocks an edit
-(pre-edit) or shows a failed check to Claude so it can fix it (post-edit).
+The headline number is Δ: the score with the plugin minus the score without it. The eval
+sandbox does not let Claude write inside `.git`, so cases that need work done start on a
+pre-made branch (as an assigned branch would in a cloud session).
 
 ## Requirements
 
-`bash`, `python3` (hooks parse JSON with it), `git`, and Node 18+ for the docs scripts. The
-docs scripts have no npm dependencies.
-
-## Changes from the source
-
-- Project details (pnpm commands, Supabase, Cloudflare deploy order, version-bump file) moved
-  out of the skills into `CLAUDE.md` sections.
-- `deploy-check` became `release-check`; `create-migration` became `new-migration`.
-- `write-doc` is new. It condenses the source's `docs/README.md` rules into a skill with
-  templates.
-- The source hooks read the file path from a `CLAUDE_TOOL_INPUT` environment variable. As far
-  as I know, Claude Code sends hook input as JSON on stdin, so those hooks may never have
-  fired. These read stdin. The lint hook now exits 2 on failure so Claude sees the output.
-- The `.env.local` block became a configurable list of protected paths.
-- The `simple-session` evals were left out. Their cases and graders refer to that project's
-  files and features.
+`bash`, `git`, `python3` (the hooks and installer use it to read JSON) and Node 18+ (docs
+scripts). The docs scripts have no npm dependencies.
