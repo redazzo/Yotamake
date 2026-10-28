@@ -16,7 +16,7 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 
 ---
 
-## S1 — Enforcement: main-branch hook, permission precedence (F1, F2) — `todo`
+## S1 — Enforcement: main-branch hook, permission precedence (F1, F2) — `done`
 
 Ask D1 first.
 

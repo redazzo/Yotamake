@@ -18,7 +18,9 @@ repository root:
 bash "<this skill's directory>/../../install.sh" "$(git rev-parse --show-toplevel)"
 ```
 
-If the working tree has uncommitted changes, ask before running it.
+If the working tree has uncommitted changes, ask before running it. If the repository has
+commits and is on its main branch, cut `chore/yotamake-harness` first: the plugin's hook
+blocks edits on the main branch, so filling in the facts below would fail there.
 
 Report what it printed: files copied, harness files refreshed, project files kept. Do not
 re-run with `--force` unless the user asks; it overwrites project-owned files.

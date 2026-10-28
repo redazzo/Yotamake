@@ -54,8 +54,9 @@ plugin/
     setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
     drawio/           draw.io diagrams
   hooks/
-    hooks.json                     registers the two hooks below
+    hooks.json                     registers the three hooks below
     pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
+    pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
     post-edit-check.sh             runs a fast per-file check after each edit
     protected-paths.default.conf   used when a repo has no list of its own
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
@@ -93,7 +94,16 @@ A person's commit passes the same gate as Claude's.
 **Stop points are enforced, not just asked for.** The skills stop before commit, version
 bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `push`,
 `rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks every time, whatever a
-skill says. Add your deploy command there too.
+skill says. Add your deploy command there too. An `ask` rule wins over a matching `allow`
+rule, including a broad one such as `Bash(git:*)` and one from a higher-priority settings
+source (tested 2026-10-28 with Claude Code 2.1.312, in the same file and across sources).
+
+**No edits on the main branch.** A hook refuses Edit and Write while the file's repository is
+on its main branch (the `Main branch` line in `CLAUDE.md`, else `main` or `master`). Claude
+has to cut a branch first, even when a skill did not fire. Files outside a repository are not
+affected. A repository that works on main on purpose opts out with an empty file at
+`.claude/yotamake/allow-edits-on-main`. The protected-paths list stops Claude creating it
+with Edit or Write; a person makes it.
 
 ## Sessions
 

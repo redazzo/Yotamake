@@ -45,6 +45,7 @@ It prints one `PASS`/`FAIL` line per check. A person can skip the git hook once 
 ## Branching and releases
 
 - **Main branch:** `main`. Feature work happens on branches cut from it, never on it directly.
+  A hook blocks edits while this branch is checked out; it reads the name from this line.
 - **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`.
 - **Commits:** Conventional Commits, `type(scope): summary`.
 - **Integration:** <!-- FILL IN: "local `git merge --no-ff` into main" (default) or "push and open a pull request" -->
