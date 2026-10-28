@@ -89,6 +89,6 @@
   expected. First lefthook attempt used `ls a b`, which fails when either glob misses; fixed.
 - Checks: both `validate --strict` pass, `bash -n` and `node --check` clean, install test
   passes (`s3-checks.log`).
-- Version 0.3.0 → 0.4.0.
+- Version 0.3.0 → 0.4.0. Commit: `0018b5a`, pushed.
 - For S4: video-vault's skip file needs both `scripts/docs/*.mjs` paths; its `scripts/check`
   then calls `pnpm run lint:docs`. Per D5 its checks all go in the fast block.
