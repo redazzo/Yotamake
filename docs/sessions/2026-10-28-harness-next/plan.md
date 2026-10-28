@@ -35,7 +35,7 @@ User involvement: approve the commit.
 
 ✂ **Clear context.**
 
-## S2 — CI for this repository (F3) — `todo`
+## S2 — CI for this repository (F3) — `done`
 
 1. Add `.github/workflows/ci.yml`: both `claude plugin validate --strict` commands (installs
    the Claude Code CLI), the scratch-repo install test, and `bash -n` on every script.

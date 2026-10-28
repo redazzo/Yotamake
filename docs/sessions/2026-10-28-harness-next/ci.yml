@@ -1,0 +1,40 @@
+# The checks in CLAUDE.md, "Before committing", run on every push and pull request.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Syntax-check the scripts
+        run: |
+          git ls-files -z '*.sh' 'plugin/template/.githooks/*' 'plugin/template/scripts/check' \
+            | xargs -0 -n1 bash -n
+          git ls-files -z '*.mjs' | xargs -0 -n1 node --check
+
+      # validate needs no login. Pinned so a new CLI release cannot turn CI red on its own;
+      # bump it on purpose.
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2.1.312
+
+      - name: Validate the plugin and the marketplace
+        run: |
+          claude plugin validate plugin --strict
+          claude plugin validate . --strict
+
+      - name: Install into a scratch repo and run its checks
+        run: |
+          scratch=$(mktemp -d)
+          git -C "$scratch" init -q -b main
+          # The template CLAUDE.md links ./README.md, so the docs check needs one.
+          echo "# Scratch" > "$scratch/README.md"
+          ./plugin/install.sh "$scratch"
+          cd "$scratch" && scripts/check --all

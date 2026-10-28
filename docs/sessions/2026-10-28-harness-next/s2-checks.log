@@ -1,0 +1,31 @@
+bash -n ok (13 files)
+node --check ok
+Validating plugin manifest: /home/user/Yotamake/plugin/.claude-plugin/plugin.json
+
+Plugin directory checks for /home/user/Yotamake/plugin. The plugin directory is the catalog that plugins are submitted to; this is a subset of what it runs.
+
+‼ Found 1 plugin directory warning:
+
+  > .claude-plugin/plugin.json icon: No icon (ICON_MISSING). No icon found in the plugin. The validator looked for `icon` in plugin.json and for a file at .claude-plugin/icon.png or .svg, assets/icon.png or .svg, or a similar path.
+    Fix: Add a square PNG to the plugin folder at .claude-plugin/icon.png, or set `icon` in plugin.json to the path of a square PNG or JPEG in the plugin: 512 to 2048 px on each side, under 2 MB. SVG and WebP are not accepted. That file may become the listing icon only once: the first time the plugin is saved or submitted in the developer portal. Adding or changing it later does not change the icon.
+
+These plugin directory checks do not change the result below.
+
+The directory also runs a safety scan and a policy review that this command does not.
+
+√ Validation passed
+Validating marketplace manifest: /home/user/Yotamake/.claude-plugin/marketplace.json
+
+√ Validation passed
+merged harness entries into .claude/settings.json
+added .scratchpad/ to .gitignore
+set git core.hooksPath to .githooks (pre-commit runs scripts/check --staged)
+copied 15 file(s), refreshed 0 harness file(s) in /tmp/claude-0/-home-user/5354fa06-2da3-494f-9977-88594d407004/scratchpad/tmp.nh3wtitKYx
+
+Next steps:
+  1. Fill in every FILL IN comment in CLAUDE.md and scripts/check.
+  2. Add your toolchain setup to .github/workflows/check.yml (or delete it).
+  3. Uncomment the lines in .claude/yotamake/post-edit-checks.conf that fit the project.
+  4. Run: scripts/check --all
+PASS  docs
+ALL OK

@@ -46,3 +46,21 @@
 - Eval `01-branches-first`, 1 run: score 1.00, $0.07 (all three graders pass).
 - Commit: `ce9695b`, pushed.
 - Next: S2 (CI). S2's install test needs a README in the scratch repo (see above).
+
+## 2026-10-28 — S2: CI for this repository
+
+- Wrote the workflow (now parked as `ci.yml` in this folder): `bash -n` on the 13 shell scripts, `node --check` on the
+  two `.mjs` scripts, both `validate --strict` commands, and the scratch-repo install test
+  (with a README, per the S1 note).
+- `claude plugin validate` needs no login: it passed with an empty `HOME` and no auth
+  variables. So the step stays.
+- The CLI is pinned to `@anthropic-ai/claude-code@2.1.312` (the version S1 tested) so a new
+  release cannot turn CI red by itself.
+- **Push blocked:** the GitHub App lacks the `workflows` permission, so it cannot push anything
+  under `.github/workflows/`. The file waits here for the user to add as
+  `.github/workflows/ci.yml` by hand. When it lands, add to CLAUDE.md "Before committing":
+  "CI (`.github/workflows/ci.yml`) runs these three, plus `bash -n` and `node --check` on every
+  script. It pins the Claude Code CLI version; bump it on purpose." Then delete `ci.yml` here.
+- All steps run locally: pass (`s2-checks.log`). The first real CI run is still to watch.
+- No plugin change, so no version bump.
+- Next: S3 (installer). Ask D2 first.
