@@ -44,4 +44,5 @@
   before this change too. With a README added it passes. Worth fixing in S3 (installer) or
   noting in the install-test instructions.
 - Eval `01-branches-first`, 1 run: score 1.00, $0.07 (all three graders pass).
+- Commit: `ce9695b`, pushed.
 - Next: S2 (CI). S2's install test needs a README in the scratch repo (see above).
