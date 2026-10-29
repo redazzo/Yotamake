@@ -66,6 +66,7 @@ plugin/
     simple-session/   one change: size check, branch, work, docs, scripts/check, stop and ask
     multi-session/    work across several contexts, with a working folder that survives /clear
     write-doc/        pick the doc kind, write it, link it, lint it
+    spec/             agree scope and acceptance criteria before code  (manual: /yotamake:spec)
     release-check/    guided deploy with pre-flight and gotchas      (manual: /yotamake:release-check)
     new-migration/    scaffold a timestamped migration file         (manual: /yotamake:new-migration)
     setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
@@ -147,6 +148,19 @@ In an ephemeral environment (a cloud container), or when the environment assigns
 the folder is committed at `.sessions/<date>-<slug>/` instead, and each session is a set of
 commits on that branch, pushed at the end of the session.
 
+**Specs.** For a new feature, or a behaviour change where "done" is unclear, run
+`/yotamake:spec` first. It asks one question at a time, then writes one short `spec.md`: the
+problem, scope, what is not in scope, and numbered acceptance criteria (A1, A2, …). It edits
+no code until you approve it. Then it hands over to `simple-session` (the report lists how
+each criterion was checked) or `multi-session` (the spec lives in the working folder and each
+session names the criteria it delivers). A multi-session effort that builds new behaviour
+writes the spec in S0 without the command. A spec written before any session is one file,
+`spec-<date>-<slug>.md`, in `.scratchpad/` (or committed in `.sessions/` in an ephemeral
+environment), so it is never mistaken for a working folder. The spec is deleted when the
+work is done; behaviour that lasts goes into the reference doc that owns it, so there is no
+second, drifting copy. Fixes, renames and refactors skip it. The skill is manual so that it
+does not compete with `simple-session` for the trigger.
+
 Before it stops and reports, `simple-session` runs the built-in `/code-review` at low effort
 when the branch changes code (docs-only branches skip it). When the `Integration` line in
 `CLAUDE.md` says the project works through pull requests, the last step pushes the branch and
@@ -165,7 +179,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds eleven cases. Each runs against a small Node project built fresh by
+`plugin/evals/` holds twelve cases. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
@@ -181,6 +195,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 09-release-check-no-section | refuses to deploy when CLAUDE.md has no Deploying section, and guesses no command |
 | 10-new-migration | names the migration with the next sequence number and warns about the remote command |
 | 11-setup-fill-in | fills in `scripts/check` and CLAUDE.md after an install, runs the check, asks before committing |
+| 12-spec-first | writes a `spec-*.md` file with numbered acceptance criteria, edits no code, asks for approval |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):
@@ -194,7 +209,7 @@ The headline number is Δ: the score with the plugin minus the score without it.
 sandbox does not let Claude write inside `.git`, so cases that need work done start on a
 pre-made branch (as an assigned branch would in a cloud session). It also keeps `.claude/`
 read-only, so `install.sh` cannot run inside a case; case 11's scaffold runs it instead.
-Cases 09–11 start with a slash command, since those skills are not model-invoked.
+Cases 09–12 start with a slash command, since those skills are not model-invoked.
 
 ## Open work
 
@@ -207,6 +222,9 @@ Cases 09–11 start with a slash command, since those skills are not model-invok
   skill description and says the same in the template `CLAUDE.md`. It then fired in 10 of 10
   runs (2026-10-29, Claude Code 2.1.312, one model). Likely fixed; re-check on the next full
   suite run.
+- **`spec` is only partly tested.** Case 12 passed 3 of 3 runs (2026-10-29, Claude Code
+  2.1.312, one model). Nothing yet tests the question-at-a-time path (an eval case is one
+  prompt) or the hand-over to a session.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).

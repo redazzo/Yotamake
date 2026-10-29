@@ -10,6 +10,7 @@ The user resumes with: **"Read <folder path>/README.md and start the next sessio
 
 ## Files
 
+- `spec.md` — what must be true when the work is done (only for new behaviour).
 - `plan.md` — sessions, their tasks, status, and where to clear context.
 - `findings.md` — what the analysis found, with file:line references. Why each task exists.
 - `decisions.md` — questions for the user and their answers. Check before asking again.

@@ -13,7 +13,7 @@ Then run `/yotamake:setup` inside each repository to install its per-repo files
 (`CLAUDE.md` sections, `scripts/check`, the pre-commit hook, the docs skeleton and settings).
 Lite mode (`install.sh --lite`) leaves out the docs skeleton.
 
-Skills: `simple-session`, `multi-session`, `write-doc`, `release-check`, `new-migration`,
+Skills: `simple-session`, `multi-session`, `spec`, `write-doc`, `release-check`, `new-migration`,
 `setup`, `drawio`. Hooks: protect secret files from edits; block edits on the main branch; run
 a per-file check after each edit. Output style: `plain-english`.
 

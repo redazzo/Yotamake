@@ -36,6 +36,11 @@ there. Otherwise carry on without comment.
 If the request is ambiguous in a way that changes what you build, ask now. Do not ask about
 things the code or CLAUDE.md already answer.
 
+Look for a spec from `/yotamake:spec`: a `spec-*.md` file in `.scratchpad/` or `.sessions/`.
+If one matches this change, read it now; its acceptance criteria (A1, A2, …) are what done
+means. If more than one might match, ask which. If the change is too big and you offer
+`multi-session`, say that the spec moves into its folder.
+
 ## 2. Branch
 
 If the user or the environment names a branch to work on, and you are on it, stay there and
@@ -99,6 +104,8 @@ Do not commit yet. Tell the user:
 
 - what changed, by file, in a few lines;
 - which docs you updated, or why none needed it;
+- with a spec: each criterion and how it was checked (test name or manual step), and
+  whether to delete the spec file once this is merged;
 - the check results (one line each);
 - the review: what it found and fixed, what you left and why, or that it was skipped;
 - any side-fixes and any suggestions you left out;

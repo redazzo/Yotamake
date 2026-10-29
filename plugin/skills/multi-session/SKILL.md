@@ -47,19 +47,29 @@ The user resumes with: **"Read <folder>/README.md and start the next session."**
    name the wrong file and slip into a permanent record.
 
 If the user says "start the next session" without naming a folder, look in `.scratchpad/`
-and `.sessions/`. If several folders exist, list them and ask which.
+and `.sessions/`. If several folders exist, list them and ask which. A `spec-*.md` file
+there is a standalone spec from `/yotamake:spec`, not an effort.
 
 ## Starting a new effort
 
 1. Create the folder (see above) and copy the templates from `templates/` in this skill's
-   directory. Fill them in, including the setup and the resume line in `README.md`.
+   directory. Fill them in, including the setup and the resume line in `README.md`. Copy
+   `spec.md` only when the effort builds a new feature or changes behaviour users see; a
+   review, a migration or a refactor leaves it out. If the user already wrote one with
+   `/yotamake:spec` (a `spec-*.md` file in `.scratchpad/` or `.sessions/`), move it into the
+   folder as `spec.md` instead, and move its open questions into `decisions.md`.
 2. Do the analysis once, in the first session (S0). Record what you found in `findings.md`
-   with file:line references. Each finding gets an ID (F1, F2, …) and a severity.
+   with file:line references. Each finding gets an ID (F1, F2, …) and a severity. With a
+   spec, agree it first: ask the questions that change scope or a criterion, one at a time,
+   write the acceptance criteria (A1, A2, …, rules in the `spec` skill, step 3), and get the
+   user's approval before writing `plan.md`. Questions about how to build it wait in
+   `decisions.md` for the session that needs them (step 4).
 3. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
    (or, on an assigned branch, one set of commits) that fits in one context**, so a `/clear`
    never lands mid-change. Order them so each makes
    the next one easier (bugs first, then deletions, then refactors, docs last so they describe
-   the final state).
+   the final state). With a spec, each session names the criteria it delivers, and every
+   criterion is in some session.
 4. Put every question for the user in `decisions.md`, tagged with the session that needs the
    answer. Give a recommendation with each. Ask at the start of that session, not all up front:
    by then the earlier sessions may have changed the question.
@@ -89,7 +99,8 @@ then the folder is deleted:
 - how the system works now → the reference docs that own each changed subject (the "Owns"
   table in `docs/README.md`) and CLAUDE.md. Grep `docs/reference/` for every table, column,
   file and function the effort renamed or removed, and fix each hit. Bump `updated:` on each
-  doc you change;
+  doc you change. If there is a `spec.md`, check each criterion is met, and put the behaviour
+  it describes in those docs, not in a copy of the spec;
 - what was built and why → a record in `docs/records/` (then run
   `node scripts/docs/generate-records-index.mjs`);
 - follow-ups and out-of-scope findings → `docs/backlog.md`, each with a trigger to act;
