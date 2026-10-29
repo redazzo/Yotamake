@@ -110,14 +110,15 @@ scripts/docs/                   docs linter and records index generator
 missing or unfilled, the skill says so and uses a stated default, or stops and asks. It never
 guesses a deploy or migration command.
 
-**Design comes before code.** The `Architecture` section of `CLAUDE.md` has four lines the
+**Design comes before code.** The `Architecture` section of `CLAUDE.md` has five lines the
 skills read: **Modules** (the main parts and what each owns), **Boundaries** (rules a change
 must not break), **Shared code** (where reusable code lives) and **Patterns** (the one way the
-project does errors, config, logging and other recurring things). In a full install it also
+project does errors, config, logging and other recurring things) and **Constraints** (limits
+from outside the code, such as runtime versions, size budgets, licences or data rules). In a full install it also
 points at the accepted ADRs. `/yotamake:setup` proposes these lines from the repo. Before
 writing code, `simple-session` looks for existing code to reuse, starting in Shared code, and
-puts the change in the module that owns it. If a change would break a boundary, go against
-an ADR, bring in a pattern the project does not use, or add a dependency that overlaps one it
+puts the change in the module that owns it. If a change would break a boundary or a constraint, go
+against an ADR, bring in a pattern the project does not use, or add a dependency that overlaps one it
 already has, it stops before any edit and asks, with options. Other new dependencies go ahead
 and are named in the report. It does this even when the user asked for exactly that change or said not to
 ask: changing the rule is a separate decision. The report says what was reused and why any
@@ -186,7 +187,7 @@ branch's own code), design (the diff against Architecture), and bugs (the built-
 `/code-review` at low effort). It runs for any branch that changes code, however small, but
 never after each edit, and fixing its findings does not start a second review. Docs-only
 branches skip it. A `multi-session` plan for code has a Design section (modules touched, code
-reused, new interfaces, boundaries at risk), agreed before S1. When the `Integration` line in
+reused, new interfaces, boundaries and constraints at risk), agreed before S1. When the `Integration` line in
 `CLAUDE.md` says the project works through pull requests, the last step pushes the branch and
 opens a pull request instead of merging locally.
 

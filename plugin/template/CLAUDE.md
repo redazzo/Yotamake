@@ -122,11 +122,11 @@ work around this with other commands that have the same effect.
 ## Architecture
 
 The design every change follows. Before writing code, look in **Shared code** for something
-to reuse or extend. A change that would cross a **Boundary**, go against an accepted ADR, or
-bring in a way of doing things that **Patterns** does not list stops before any edit and is
-raised with the user, whoever asked for it.
+to reuse or extend. A change that would cross a **Boundary**, break a **Constraint**, go
+against an accepted ADR, or bring in a way of doing things that **Patterns** does not list
+stops before any edit and is raised with the user, whoever asked for it.
 
-<!-- FILL IN each line. Keep the four labels: the skills read them. Link to detailed docs
+<!-- FILL IN each line. Keep the five labels: the skills read them. Link to detailed docs
   rather than repeating them here. -->
 
 - **Modules:** <!-- FILL IN: the main parts and what each owns, e.g. "`api/` HTTP handlers;
@@ -137,6 +137,9 @@ raised with the user, whoever asked for it.
   `ui/components/` shared UI". -->
 - **Patterns:** <!-- FILL IN: the one way the project does recurring things, e.g. errors,
   config, logging, validation, data access. -->
+- **Constraints:** <!-- FILL IN: limits from outside the code that a change must stay within,
+  e.g. "runs on Node 20 and later"; "the bundle stays under 200 KB"; "no GPL dependencies";
+  "personal data stays in the EU". -->
 <!-- yotamake:docs begin -->
 - **Decisions:** accepted ADRs in [docs/decisions/](./docs/decisions/README.md) are part of
   the design. A change that needs a different one gets a new ADR first.

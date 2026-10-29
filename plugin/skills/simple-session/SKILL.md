@@ -15,7 +15,7 @@ Project specifics live in `CLAUDE.md`, not here. This skill reads these sections
 - **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
   merge or a pull request), and whether code changes get a version bump.
 - **Architecture** — the design a change follows: its `Modules`, `Boundaries`,
-  `Shared code` and `Patterns` lines, and the accepted ADRs (step 3).
+  `Shared code`, `Patterns` and `Constraints` lines, and the accepted ADRs (step 3).
 
 If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
 report and use the defaults given below.
@@ -77,11 +77,13 @@ of CLAUDE.md and decide how the change fits before you write it.
 3. **Stop on a design conflict.** Stop before any edit and ask the user when the change
    would:
    - break a rule in **Boundaries**;
+   - break a limit in **Constraints** (a runtime or platform version, a size or speed
+     budget, a licence, a security or data rule);
    - go against an accepted ADR (`docs/decisions/`);
    - bring in a way of doing a recurring thing (errors, config, logging, validation, data
      access) that **Patterns** does not list and the code does not already use;
    - add a dependency that overlaps or replaces one the project already uses, or that
-     **Boundaries** or **Patterns** rule out. Any other new dependency goes ahead, and the
+     **Boundaries**, **Patterns** or **Constraints** rule out. Any other new dependency goes ahead, and the
      report names it.
 
    Say what conflicts and quote the rule. Give options with a recommendation, for example: a
@@ -142,8 +144,8 @@ Otherwise review the branch's diff against the main branch in three parts:
    `git checkout`, which would also drop your own uncommitted work) and list them in the
    report as suggestions. If `/simplify` is not available, check by hand: for each new
    function or block, search for code that already does the same, and reuse it.
-2. **Design.** Read the diff against **Architecture** (step 3): a broken boundary, a clash
-   with an accepted ADR, a pattern the project does not use, or logic copied from elsewhere.
+2. **Design.** Read the diff against **Architecture** (step 3): a broken boundary or constraint,
+   a clash with an accepted ADR, a pattern the project does not use, or logic copied from elsewhere.
    Fix what lies inside this change. A conflict you only see now gets the same stop as in
    step 3: ask before going on.
 3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a

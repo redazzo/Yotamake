@@ -19,7 +19,7 @@ reads **Project overview** and **Architecture** for context only; if they are un
 code answers instead. Whether the repository has a docs system is read from `docs/README.md`,
 not from `CLAUDE.md`. The session it hands over to reads its own sections: its design step
 checks the work against **Architecture**, so the spec does not repeat the design. If a
-criterion could only be met by breaking a boundary or an accepted ADR, raise that as a
+criterion could only be met by breaking a boundary, a constraint or an accepted ADR, raise that as a
 question in step 2.
 
 ## 1. Read first

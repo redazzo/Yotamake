@@ -67,8 +67,8 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
 3. If the effort changes code, fill in the Design section of `plan.md` before cutting
    sessions. Read the **Architecture** section of CLAUDE.md (and accepted ADRs) and the code,
    then write: the modules touched, the existing code to reuse or extend, any new
-   interfaces, and the boundaries at risk. Any plan that would break a boundary or go
-   against an ADR is raised as a question now, as in `simple-session`, step 3. Agree the
+   interfaces, and the boundaries and constraints at risk. Any plan that would break a
+   boundary or a constraint, or go against an ADR, is raised as a question now, as in `simple-session`, step 3. Agree the
    Design section with the user before S1. Each session's design step then checks its work
    against it.
 4. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
