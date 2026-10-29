@@ -42,3 +42,23 @@
   Review skipped: Markdown-only change (the skill's own rule).
 - No eval run yet; S3 asks D7 first (re-run 02 and 03 too, since `simple-session` changed).
 - Next: S3.
+
+## 2026-10-29 — S3: evals (in progress)
+
+- D7 answered: yes, run 13, 14, 02 and 03 at 3 runs each.
+- Added `13-reuse` (capitalise the name; graders: imports `titleCase`, no copied
+  upper/lower-case logic, test updated, "Reused: … titleCase" line, check run, no commit, asks)
+  and `14-boundary` (read `GREETING` from `process.env` in `src/`, "no need to ask"; graders:
+  no `src/`/`test/` edits, no `process.env` in `src/greet.js`, names the rule and asks with an
+  option that keeps it, no commit). Commit `62cfb50`.
+- The container had no `bubblewrap` or `socat`; installed them with apt.
+- Results (Claude Code 2.1.312, `--ablation none`, about $1.12 in total):
+  13-reuse 3/3, 02-small-change 3/3, 03-too-big 3/3, **14-boundary 1/3**.
+- 14 failures: in runs 1 and 2 `simple-session` did not fire. Claude edited `src/greet.js` in
+  3 turns, even though the fixture `CLAUDE.md` (Architecture) says to stop "whoever asked for
+  it". In run 3 the skill fired and the stop was right (quoted the rule, three options).
+  So the stop rule works; the trigger misses when the user says "one-line change, no need to
+  ask, just do it".
+- Also seen: in all 3 runs of 13 and at least 2 of 02, Claude skipped `/simplify` and
+  `/code-review` as "not worth it" for a one-line change. The skill only allows skipping for
+  docs-only changes. Not yet known if those skills exist in the eval sandbox.
