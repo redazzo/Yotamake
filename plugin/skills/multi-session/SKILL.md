@@ -47,7 +47,8 @@ The user resumes with: **"Read <folder>/README.md and start the next session."**
    name the wrong file and slip into a permanent record.
 
 If the user says "start the next session" without naming a folder, look in `.scratchpad/`
-and `.sessions/`. If several folders exist, list them and ask which.
+and `.sessions/`. If several folders exist, list them and ask which. A `spec-*.md` file
+there is a standalone spec from `/yotamake:spec`, not an effort.
 
 ## Starting a new effort
 
@@ -55,12 +56,14 @@ and `.sessions/`. If several folders exist, list them and ask which.
    directory. Fill them in, including the setup and the resume line in `README.md`. Copy
    `spec.md` only when the effort builds a new feature or changes behaviour users see; a
    review, a migration or a refactor leaves it out. If the user already wrote one with
-   `/yotamake:spec`, move it into the folder instead.
+   `/yotamake:spec` (a `spec-*.md` file in `.scratchpad/` or `.sessions/`), move it into the
+   folder as `spec.md` instead, and move its open questions into `decisions.md`.
 2. Do the analysis once, in the first session (S0). Record what you found in `findings.md`
    with file:line references. Each finding gets an ID (F1, F2, …) and a severity. With a
-   spec, agree it first: ask its questions one at a time, write the acceptance criteria
-   (A1, A2, …, rules in the `spec` skill, step 3), and get the user's approval before
-   writing `plan.md`.
+   spec, agree it first: ask the questions that change scope or a criterion, one at a time,
+   write the acceptance criteria (A1, A2, …, rules in the `spec` skill, step 3), and get the
+   user's approval before writing `plan.md`. Questions about how to build it wait in
+   `decisions.md` for the session that needs them (step 4).
 3. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
    (or, on an assigned branch, one set of commits) that fits in one context**, so a `/clear`
    never lands mid-change. Order them so each makes

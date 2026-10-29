@@ -33,9 +33,16 @@ Copy `../multi-session/templates/spec.md` (relative to this skill's directory) a
 Where it goes:
 
 - If a `multi-session` folder for this work exists (`.scratchpad/` or `.sessions/`), put it
-  there. Move the open questions into that folder's `decisions.md`.
-- Otherwise put it in `.scratchpad/<yyyy-mm-dd>-<slug>/spec.md`. That folder is git-ignored,
-  so writing it needs no branch.
+  there as `spec.md`. Move the open questions into that folder's `decisions.md`.
+- Otherwise it is a standalone spec: a single file named `spec-<yyyy-mm-dd>-<slug>.md`, not a
+  folder, so it is never mistaken for a multi-session effort. Use the same rule as
+  `multi-session` for where:
+  - **Local** (the default): `.scratchpad/spec-<yyyy-mm-dd>-<slug>.md`. It is git-ignored,
+    so writing it needs no branch.
+  - **Committed**, when the work runs in an ephemeral environment (such as a cloud
+    container) or the environment assigns a branch: `.sessions/spec-<yyyy-mm-dd>-<slug>.md`
+    on that branch. When you stop for approval, also ask whether to commit and push it, so
+    a later session can find it.
 
 Rules for the criteria:
 
@@ -52,14 +59,10 @@ code yet.
 
 ## 5. On approval: hand over
 
-Run the size check from `simple-session`, step 1.
-
-- **Fits one session:** run `simple-session`. Read `spec.md` first. Write a test for each
-  criterion where the project has tests. In the report, list each criterion and how it was
-  checked (test name, or the manual step).
-- **Too big:** offer `multi-session`. Its folder keeps this `spec.md`, and its `plan.md` tasks
-  cite the criteria each session delivers.
+Run `simple-session`. Its size check decides whether the work fits one session; if not, it
+offers `multi-session`, which moves the spec into its folder. In the session, write a test
+for each criterion where the project has tests.
 
 The spec does not outlive the work. When the work is done, behaviour that lasts goes into the
 reference doc that owns it (or CLAUDE.md or `README.md` in a lite install). Then the spec is
-deleted with its folder; ask before deleting it.
+deleted; ask before deleting it.

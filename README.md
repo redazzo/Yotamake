@@ -154,10 +154,12 @@ problem, scope, what is not in scope, and numbered acceptance criteria (A1, A2, 
 no code until you approve it. Then it hands over to `simple-session` (the report lists how
 each criterion was checked) or `multi-session` (the spec lives in the working folder and each
 session names the criteria it delivers). A multi-session effort that builds new behaviour
-writes the spec in S0 without the command. The spec is deleted with its folder; behaviour that
-lasts goes into the reference doc that owns it, so there is no second, drifting copy. Fixes,
-renames and refactors skip it. The skill is manual so that it does not compete with
-`simple-session` for the trigger.
+writes the spec in S0 without the command. A spec written before any session is one file,
+`spec-<date>-<slug>.md`, in `.scratchpad/` (or committed in `.sessions/` in an ephemeral
+environment), so it is never mistaken for a working folder. The spec is deleted when the
+work is done; behaviour that lasts goes into the reference doc that owns it, so there is no
+second, drifting copy. Fixes, renames and refactors skip it. The skill is manual so that it
+does not compete with `simple-session` for the trigger.
 
 Before it stops and reports, `simple-session` runs the built-in `/code-review` at low effort
 when the branch changes code (docs-only branches skip it). When the `Integration` line in
@@ -193,7 +195,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 09-release-check-no-section | refuses to deploy when CLAUDE.md has no Deploying section, and guesses no command |
 | 10-new-migration | names the migration with the next sequence number and warns about the remote command |
 | 11-setup-fill-in | fills in `scripts/check` and CLAUDE.md after an install, runs the check, asks before committing |
-| 12-spec-first | writes a `spec.md` with numbered acceptance criteria, edits no code, asks for approval |
+| 12-spec-first | writes a `spec-*.md` file with numbered acceptance criteria, edits no code, asks for approval |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):
@@ -221,8 +223,9 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
   runs (2026-10-29, Claude Code 2.1.312, one model). Likely fixed; re-check on the next full
   suite run.
 - **`spec` is only partly tested.** Case 12 passed 3 of 3 runs (2026-10-29, Claude Code
-  2.1.312, one model). Nothing yet tests the question-at-a-time path (an eval case is one
-  prompt) or the hand-over to a session.
+  2.1.312, one model), before its prompt named the failure case and the spec moved to a
+  `spec-*.md` file. Re-run it. Nothing yet tests the question-at-a-time path (an eval case
+  is one prompt) or the hand-over to a session.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).
