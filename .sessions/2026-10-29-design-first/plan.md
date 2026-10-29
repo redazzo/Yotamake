@@ -60,7 +60,7 @@ Ask D7 first.
 
 ✂ **Clear context.**
 
-## S4 — Docs, version, close-out (F10; A10) — `todo`
+## S4 — Docs, version, close-out (F10; A10) — `done`
 
 Ask D8 first.
 

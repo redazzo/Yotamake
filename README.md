@@ -1,8 +1,9 @@
 # Yotamake
 
 A development harness for Claude Code. It gives any repository the same working method:
-small sessions on branches, one check command that everyone runs, nothing committed or
-deployed without a "yes", and a docs system that stays true.
+small sessions on branches, design and reuse checked before code, one check command that
+everyone runs, nothing committed or deployed without a "yes", and a docs system that stays
+true.
 
 It started as the `.claude/` setup and docs rules of a single application project.
 
@@ -102,9 +103,24 @@ scripts/docs/                   docs linter and records index generator
 ## The three ideas
 
 **Skills hold the method. `CLAUDE.md` holds the facts.** Skills read named sections
-(Checks, Branching and releases, Migrations, Deploying, Conventions). If one is missing or
+(Checks, Branching and releases, Migrations, Deploying, Conventions, Architecture). If one is
+missing or
 unfilled, the skill says so and uses a stated default, or stops and asks. It never guesses a
 deploy or migration command.
+
+**Design comes before code.** The `Architecture` section of `CLAUDE.md` has four lines the
+skills read: **Modules** (the main parts and what each owns), **Boundaries** (rules a change
+must not break), **Shared code** (where reusable code lives) and **Patterns** (the one way the
+project does errors, config, logging and other recurring things). In a full install it also
+points at the accepted ADRs. `/yotamake:setup` proposes these lines from the repo. Before
+writing code, `simple-session` looks for existing code to reuse, starting in Shared code, and
+puts the change in the module that owns it. If a change would break a boundary, go against
+an ADR, or bring in a pattern the project does not use, it stops before any edit and asks,
+with options. It does this even when the user asked for exactly that change or said not to
+ask: changing the rule is a separate decision. The report says what was reused and why any
+new code was needed. If the section is unfilled, the skill follows the code's own structure
+and says so. `scripts/check` has commented examples for a boundary check and a
+duplicate-code check (dependency-cruiser, import-linter, jscpd); the project picks the tool.
 
 **One gate, run by everyone.** `scripts/check` is the only list of checks. Claude runs it
 before proposing a commit. The pre-commit hook runs its fast checks on staged changes; slow
@@ -161,8 +177,11 @@ work is done; behaviour that lasts goes into the reference doc that owns it, so 
 second, drifting copy. Fixes, renames and refactors skip it. The skill is manual so that it
 does not compete with `simple-session` for the trigger.
 
-Before it stops and reports, `simple-session` runs the built-in `/code-review` at low effort
-when the branch changes code (docs-only branches skip it). When the `Integration` line in
+Before it stops and reports, `simple-session` reviews every code change, however small, in
+three parts: reuse (the built-in `/simplify`, keeping only fixes to the branch's own code),
+design (the diff against Architecture), and bugs (the built-in `/code-review` at low effort).
+Docs-only branches skip the review. A `multi-session` plan for code has a Design section
+(modules touched, code reused, new interfaces, boundaries at risk), agreed before S1. When the `Integration` line in
 `CLAUDE.md` says the project works through pull requests, the last step pushes the branch and
 opens a pull request instead of merging locally.
 
@@ -179,13 +198,13 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds twelve cases. Each runs against a small Node project built fresh by
+`plugin/evals/` holds fourteen cases. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
 |---|---|
 | 01-branches-first | tries to branch before editing, and edits nothing on `main` |
-| 02-small-change | changes code, test and the owning doc, runs `scripts/check`, proposes a commit and asks |
+| 02-small-change | changes code, test and the owning doc, runs `scripts/check`, `/simplify` and `/code-review`, proposes a commit and asks |
 | 03-too-big | refuses to start a four-part feature and offers a multi-session plan |
 | 04-docs-only | fixes a guide, runs the docs check, plans no version bump |
 | 05-work-record | writes a valid record and regenerates the index |
@@ -196,6 +215,8 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 10-new-migration | names the migration with the next sequence number and warns about the remote command |
 | 11-setup-fill-in | fills in `scripts/check` and CLAUDE.md after an install, runs the check, asks before committing |
 | 12-spec-first | writes a `spec-*.md` file with numbered acceptance criteria, edits no code, asks for approval |
+| 13-reuse | reuses the shared `titleCase` helper instead of copying its logic, reports "Reused:", runs the review |
+| 14-boundary | told "no need to ask", still stops before breaking the fixture's "src/ is pure" boundary, and asks |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):
@@ -225,6 +246,13 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
 - **`spec` is only partly tested.** Case 12 passed 3 of 3 runs (2026-10-29, Claude Code
   2.1.312, one model). Nothing yet tests the question-at-a-time path (an eval case is one
   prompt) or the hand-over to a session.
+- **The review is sometimes skipped.** Cases 13-reuse, 14-boundary and 02-small-change
+  passed 2/3, 3/3 and 3/3 runs (2026-10-29, Claude Code 2.1.312, one model). In the one
+  failure Claude read the diff by hand instead of running `/simplify` and `/code-review`. That
+  is 1 of 6 code-change runs, down from about 5 of 6 before version 0.9.0 said the review
+  runs for every code change. Re-check on the next full suite run.
+- **A fresh install in an empty repo fails the docs check.** The template `CLAUDE.md` links
+  `./README.md`, so a repo with no `README.md` gets a broken-link failure until it adds one.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).

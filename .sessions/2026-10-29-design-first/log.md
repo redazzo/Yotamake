@@ -73,3 +73,22 @@
 - For S4's README: cases 13–14 in the table, the results above, and the remaining review
   skip as open work.
 - Next: S4 (ask D8 first).
+
+## 2026-10-29 — S4: docs, version, close-out
+
+- D8 answered: 0.9.0.
+- `README.md`: the design step in the intro; Architecture added to the sections skills read;
+  a new "Design comes before code" idea (the four lines, setup, reuse first, the always-stop
+  rule, report lines, unfilled fallback, the `scripts/check` design-gate examples); the
+  three-part review and the multi-session Design section under Sessions; fourteen eval cases
+  with rows for 13 and 14 and the review graders on 02; two open-work items (the remaining
+  review skip, 1 of 6 runs; the empty-repo docs-check failure found in S1).
+- Version 0.8.0 → 0.9.0 in both manifests.
+- Checks (`s4-checks.log`): both `validate --strict` pass; full install has the four
+  Architecture lines and `scripts/check --all` PASS docs; lite install has them too and no
+  checks configured (expected); an empty repo with no `README.md` still fails the docs check
+  (re-checked; recorded as open work).
+- Criteria A1–A10: all met. A1, A8, A10 checked on scratch installs this session; A2–A7 by
+  reading the skills; A9 from the S3 re-run (13: 2/3, 14: 3/3, 02: 3/3).
+- Left for the user: delete this folder (its own commit), and the README open-work items.
+- Close-out: every session is done.
