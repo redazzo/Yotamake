@@ -4,7 +4,9 @@
 
 Every change to code, tests or docs runs as a session, however small: use the
 `yotamake:simple-session` skill. If the change will not fit one branch and one context, use
-`yotamake:multi-session` instead. Questions and explanations need no session.
+`yotamake:multi-session` instead. This holds when the user names the branch or spells out
+the exact edit too: the skill covers working on a named branch, and its checks, doc update and
+stop before commit still apply. Questions and explanations need no session.
 
 ## Project overview
 
