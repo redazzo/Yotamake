@@ -14,6 +14,11 @@ Use it for a new feature, or a change in behaviour where "done" is not yet clear
 a rename or a refactor does not need one. If the request is that small, say so and use
 `simple-session` instead.
 
+This skill needs no project command or rule, so it reads no `CLAUDE.md` section by name. It
+reads **Project overview** and **Architecture** for context only; if they are unfilled, the
+code answers instead. Whether the repository has a docs system is read from `docs/README.md`,
+not from `CLAUDE.md`. The session it hands over to reads its own sections.
+
 ## 1. Read first
 
 Read CLAUDE.md, the code the request touches, and the reference doc that owns the subject
