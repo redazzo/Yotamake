@@ -123,6 +123,9 @@ branch, say so and show the line, rather than fixing it in this branch.
 
 Skip this step when the branch changes only docs (Markdown files and `docs/`). Every
 other change gets the full review, however small: a one-line diff still runs both skills.
+Call each one with the Skill tool. Reading the diff yourself does not replace them, even
+when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
+checks below are only for a skill the Skill tool says is not available.
 
 Otherwise review the branch's diff against the main branch in three parts:
 
@@ -154,8 +157,8 @@ Do not commit yet. Tell the user:
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
 - the check results (one line each);
-- the review: what it found and fixed, what you left and why, or that it was skipped
-  because the branch changes only docs;
+- the review: which skills you ran, what they found and fixed, what you left and why, or
+  that it was skipped because the branch changes only docs;
 - any side-fixes and any suggestions you left out;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).

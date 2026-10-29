@@ -26,6 +26,9 @@ run it by hand from a clone of this repo:
 ./plugin/install.sh /path/to/your/repo
 ```
 
+If the repo has no `README.md`, a full install writes a stub, because `CLAUDE.md` links to
+it and the docs check would fail without it.
+
 The repo's `.claude/settings.json` then names this marketplace and enables the plugin, so
 teammates who open the repo in Claude Code are prompted to install it.
 
@@ -250,9 +253,10 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
   passed 2/3, 3/3 and 3/3 runs (2026-10-29, Claude Code 2.1.312, one model). In the one
   failure Claude read the diff by hand instead of running `/simplify` and `/code-review`. That
   is 1 of 6 code-change runs, down from about 5 of 6 before version 0.9.0 said the review
-  runs for every code change. Re-check on the next full suite run.
-- **A fresh install in an empty repo fails the docs check.** The template `CLAUDE.md` links
-  `./README.md`, so a repo with no `README.md` gets a broken-link failure until it adds one.
+  runs for every code change. Version 0.9.1 says that reading the diff by hand does not
+  replace the two skills, and the report names the skills that ran. On re-run, 13-reuse and
+  02-small-change each passed 3 of 3, with both skills called in all 6 runs (2026-10-29).
+  Likely fixed; re-check on the next full suite run.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).
