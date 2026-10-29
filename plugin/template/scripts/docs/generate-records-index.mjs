@@ -82,7 +82,7 @@ function collect() {
       continue;
     }
 
-    const source = readFileSync(file, 'utf8');
+    const source = readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
     const fm = frontMatter(source);
 
     entries.push({

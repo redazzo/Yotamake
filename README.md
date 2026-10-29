@@ -108,7 +108,11 @@ deploy or migration command.
 **One gate, run by everyone.** `scripts/check` is the only list of checks. Claude runs it
 before proposing a commit. The pre-commit hook runs its fast checks on staged changes; slow
 ones (usually tests) sit behind `full` in the script and wait for Claude's run and CI. CI runs
-all of it. A person's commit passes the same gate as Claude's.
+all of it. A person's commit passes the same gate as Claude's, with one catch:
+`core.hooksPath` is a local git setting and is not cloned. A teammate gets the pre-commit
+hook only after running `/yotamake:setup` or `install.sh` (or
+`git config core.hooksPath .githooks`) in their clone. Enabling the plugin alone does not set
+it. CI covers everyone.
 
 **Stop points are enforced, not just asked for.** The skills stop before commit, version
 bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `push`,
@@ -123,6 +127,12 @@ has to cut a branch first, even when a skill did not fire. Files outside a repos
 affected, nor are git-ignored ones (such as a multi-session `.scratchpad/` folder). A repository that works on main on purpose opts out with an empty file at
 `.claude/yotamake/allow-edits-on-main`. The protected-paths list stops Claude creating it
 with Edit or Write; a person makes it.
+
+**What the hooks do not cover.** The main-branch and protected-paths hooks watch Edit and
+Write only. A shell command gets past them: `sed -i`, `echo > .env`, or `touch` on the
+opt-out file. Claude Code's own permission prompt for Bash is the guard there. The `ask`
+rules are separate, and `git -C . commit` still asked in a test (one run, Claude Code
+2.1.312).
 
 ## Sessions
 

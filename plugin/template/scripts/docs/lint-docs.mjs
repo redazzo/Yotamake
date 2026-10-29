@@ -232,7 +232,7 @@ function lint() {
 
   for (const absolute of files) {
     const file = path.relative(REPO_ROOT, absolute);
-    const source = readFileSync(absolute, 'utf8');
+    const source = readFileSync(absolute, 'utf8').replace(/\r\n/g, '\n');
 
     const { frontMatter } = splitFrontMatter(source);
     if (frontMatter !== null) {

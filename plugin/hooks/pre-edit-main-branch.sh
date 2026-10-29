@@ -26,14 +26,20 @@ root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || exit 0
 [[ -f "$root/.claude/yotamake/allow-edits-on-main" ]] && exit 0
 git -C "$root" rev-parse --verify -q HEAD >/dev/null || exit 0
 git -C "$root" check-ignore -q -- "$fp" && exit 0
-branch=$(git -C "$root" symbolic-ref --short -q HEAD) || exit 0
-
 main=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' "$root/CLAUDE.md" 2>/dev/null | head -n1)
-if [[ -n "$main" ]]; then
-    [[ "$branch" == "$main" ]] || exit 0
-else
-    [[ "$branch" == main || "$branch" == master ]] || exit 0
-fi
+mains=${main:-main master}
 
-echo "BLOCKED: $root is on its main branch '$branch'. Cut a branch first (e.g. git switch -c fix/<topic>), then edit. If this repository works on main on purpose, the user can create .claude/yotamake/allow-edits-on-main." >&2
+# On a branch: block when it is a main branch. Detached: block when HEAD is a main branch's tip.
+on=""
+if branch=$(git -C "$root" symbolic-ref --short -q HEAD); then
+    for m in $mains; do [[ "$branch" == "$m" ]] && on=$m; done
+else
+    head=$(git -C "$root" rev-parse HEAD)
+    for m in $mains; do
+        [[ "$(git -C "$root" rev-parse -q --verify "refs/heads/$m")" == "$head" ]] && on="$m (detached HEAD at its tip)"
+    done
+fi
+[[ -n "$on" ]] || exit 0
+
+echo "BLOCKED: $root is on its main branch '$on'. Cut a branch first (e.g. git switch -c fix/<topic>), then edit. If this repository works on main on purpose, the user can create .claude/yotamake/allow-edits-on-main." >&2
 exit 2

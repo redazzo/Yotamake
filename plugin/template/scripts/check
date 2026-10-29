@@ -49,8 +49,10 @@ case "$mode" in
 esac
 
 failed=0
+ran=0
 run() {
     local name=$1; shift
+    ran=$((ran + 1))
     local out
     if out=$("$@" 2>&1); then
         echo "PASS  $name"
@@ -83,4 +85,5 @@ run docs node scripts/docs/lint-docs.mjs
 # touches '^db/migrations/'         && run db-lint     pnpm run lint:db
 # full && touches '^proxy/'         && run proxy-tests bash -c 'cd proxy && npm test'
 
+[[ $ran -gt 0 ]] || echo "note: no checks configured; add them to scripts/check." >&2
 exit $failed

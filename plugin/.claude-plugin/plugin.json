@@ -1,12 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "yotamake",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "A development harness: small sessions on branches, one check command, stop-and-ask before commit and deploy, and a docs system that stays true.",
   "author": {
     "name": "redazzo"
   },
   "repository": "https://github.com/redazzo/Yotamake",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "keywords": ["workflow", "sessions", "docs", "adr", "hooks"]
 }
