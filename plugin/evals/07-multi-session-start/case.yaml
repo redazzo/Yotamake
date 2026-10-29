@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 07-multi-session-start
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  The run starts a multi-session effort: a working folder under .scratchpad/ with README.md and plan.md, the analysis in findings.md, no source or test edits, and a final message that gives the resume line.

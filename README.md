@@ -120,7 +120,7 @@ source (tested 2026-10-28 with Claude Code 2.1.312, in the same file and across 
 **No edits on the main branch.** A hook refuses Edit and Write while the file's repository is
 on its main branch (the `Main branch` line in `CLAUDE.md`, else `main` or `master`). Claude
 has to cut a branch first, even when a skill did not fire. Files outside a repository are not
-affected. A repository that works on main on purpose opts out with an empty file at
+affected, nor are git-ignored ones (such as a multi-session `.scratchpad/` folder). A repository that works on main on purpose opts out with an empty file at
 `.claude/yotamake/allow-edits-on-main`. The protected-paths list stops Claude creating it
 with Edit or Write; a person makes it.
 
@@ -155,8 +155,8 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds six cases. Each runs against a small Node project built fresh by
-`evals/_fixture/setup.sh` with the harness installed:
+`plugin/evals/` holds eleven cases. Each runs against a small Node project built fresh by
+`evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
 |---|---|
@@ -166,9 +166,14 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 04-docs-only | fixes a guide, runs the docs check, plans no version bump |
 | 05-work-record | writes a valid record and regenerates the index |
 | 06-question | answers a question without starting a session (should not fire) |
+| 07-multi-session-start | writes a `.scratchpad/` plan for a multi-session effort, edits no code, gives the resume line |
+| 08-multi-session-resume | resumes at the first session not done and asks its open decision before editing |
+| 09-release-check-no-section | refuses to deploy when CLAUDE.md has no Deploying section, and guesses no command |
+| 10-new-migration | names the migration with the next sequence number and warns about the remote command |
+| 11-setup-fill-in | fills in `scripts/check` and CLAUDE.md after an install, runs the check, asks before committing |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
-account, about $3.50 for the full suite with the baseline arm):
+account, about $7 for the full suite with the baseline arm):
 
 ```bash
 cd plugin
@@ -177,7 +182,9 @@ claude plugin eval . --scaffold --allow-tools Bash Write Edit --ablation with-wi
 
 The headline number is Δ: the score with the plugin minus the score without it. The eval
 sandbox does not let Claude write inside `.git`, so cases that need work done start on a
-pre-made branch (as an assigned branch would in a cloud session).
+pre-made branch (as an assigned branch would in a cloud session). It also keeps `.claude/`
+read-only, so `install.sh` cannot run inside a case; case 11's scaffold runs it instead.
+Cases 09–11 start with a slash command, since those skills are not model-invoked.
 
 ## Requirements
 

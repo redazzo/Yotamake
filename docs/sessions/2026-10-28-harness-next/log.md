@@ -209,3 +209,56 @@
 - Version 0.5.0 → 0.6.0. Commit `ff09ade`, pushed.
 - Not measured: no eval run. S8 runs the suite against these skills.
 - Next: S8 (evals). Ask D8 first.
+
+## 2026-10-29 — S8: evals
+
+- D8 answered: about $8, as recommended. Spent about $7.97: 02-small-change ×3 ($0.43),
+  pilots ($0.57), full suite with the baseline arm ($6.97, a little over its $6.50 cap
+  because runs already in flight finish).
+- **F18 (trigger gap).** The `simple-session` description now says the skill works on "a new
+  branch cut from the main branch, or the one the user or environment names", and applies
+  "also when the user already names the branch". Result: fired 3/3 alone, then 2/3 in the
+  full suite, so 5/6 against 2/3 before. Too few runs to call it fixed. Still open.
+- **Bug found while writing case 07: the main-branch hook blocked `.scratchpad/`.** The local
+  multi-session setup makes its git-ignored folder while on main, and the S1 hook refused the
+  write. The hook now allows git-ignored files (`git check-ignore`, which skips tracked
+  files, so a tracked file matching an ignore pattern is still blocked). Fake tool calls:
+  `.scratchpad/` on main allowed, `src/` on main blocked, `.env` on main blocked (both
+  hooks), `src/` on a branch allowed. README updated.
+- **New cases (F19):** 07-multi-session-start, 08-multi-session-resume,
+  09-release-check-no-section, 10-new-migration, 11-setup-fill-in. Every scaffold builds
+  locally.
+- **Surprise: the eval sandbox keeps `.claude/` read-only,** so `install.sh` cannot run inside
+  a case. The first pilot of a bare-repo setup case scored 0: the agent stopped and explained
+  why, correctly. Reshaped to 11-setup-fill-in: the scaffold runs the installer and the case
+  grades step 2 (filling in the facts). Setup's step 1 (the install itself) has no eval.
+- Calibration: 11's `no-commit` needed `min: 0`. 08's `read-plan` (tool_used Read) failed in
+  one run whose outcome graders all passed, so it was grading method, not outcome; removed.
+  Traces were not kept, so that cause is a likely guess (it read the plan another way).
+- Full suite, with the plugin vs without (3 runs each):
+
+  | Case | With | Without | Δ |
+  |---|---|---|---|
+  | 01-branches-first | 1.00 | 0.00 | +1.00 |
+  | 02-small-change | 0.95 | 0.86 | +0.10 |
+  | 03-too-big | 1.00 | 0.11 | +0.89 |
+  | 04-docs-only | 1.00 | 0.80 | +0.20 |
+  | 05-work-record | 1.00 | 0.93 | +0.07 |
+  | 06-question | 1.00 | 1.00 | 0.00 |
+  | 07-multi-session-start | 1.00 | 0.33 | +0.67 |
+  | 08-multi-session-resume | 0.92 | 0.75 | +0.17 |
+  | 09-release-check-no-section | 1.00 | 0.67 | +0.33 |
+  | 10-new-migration | 1.00 | 1.00 | 0.00 |
+  | 11-setup-fill-in | 1.00 | — | — |
+
+  Mean Δ +0.34. 11's baseline has no score: the cost cap skipped its paid graders. 10 shows no
+  gain: without the plugin the model also followed the Migrations section, so that case
+  measures little. The one 02 miss in the with arm was `proposes-commit-message`. One model
+  only (the runner's default).
+- Checks (`s8-checks.log`): `bash -n`, `node --check`, both `validate --strict`, install
+  test, lite install test, eval fixture — all pass.
+- Review step: the only code change is three lines in the hook; reviewed by hand (above), no
+  findings. `/code-review` not run.
+- Version 0.6.0 → 0.7.0.
+- Not done: no PR-path case (noted in S6). F18 stays open.
+- Next: S9. Ask D9 first.

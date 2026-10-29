@@ -115,7 +115,7 @@ Ask D7 first.
 
 ✂ **Clear context.**
 
-## S8 — Evals (F18, F19) — `todo`
+## S8 — Evals (F18, F19) — `done`
 
 Ask D8 first.
 

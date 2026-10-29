@@ -1,6 +1,6 @@
 ---
 name: simple-session
-description: Run one self-contained change as a single session — branch from the main branch, do the work, update the doc that owns it, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use for ANY request that changes code, tests or docs in a repository set up with the harness (it has scripts/check), even a one-line change, a rename or a typo fix — not only when the user says "session" or "branch". Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
+description: Run one self-contained change as a single session — work on a branch (a new one cut from the main branch, or the one the user or environment names), do the work, update the doc that owns it, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use for ANY request that changes code, tests or docs in a repository set up with the harness (it has scripts/check), even a one-line change, a rename or a typo fix — not only when the user says "session" or "branch", and also when the user already names the branch to work on. Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
 ---
 
 # Simple session

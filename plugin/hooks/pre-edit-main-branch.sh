@@ -4,8 +4,9 @@
 #
 # The main branch is read from the repository's CLAUDE.md line
 # "- **Main branch:** `<name>`"; without one, both main and master count.
-# Files outside a git repository (scratchpad, /tmp) are always allowed, and so is
-# a repository with no commits yet. A repository that works on main on purpose
+# Files outside a git repository (scratchpad, /tmp) are always allowed, and so are
+# git-ignored files (a multi-session .scratchpad/ folder, made on main) and a
+# repository with no commits yet. A repository that works on main on purpose
 # opts out with an empty file at .claude/yotamake/allow-edits-on-main.
 # Exit 2 blocks the call and sends stderr back to Claude.
 
@@ -24,6 +25,7 @@ while [[ ! -d "$dir" && "$dir" != / && "$dir" != . ]]; do dir=$(dirname "$dir");
 root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || exit 0
 [[ -f "$root/.claude/yotamake/allow-edits-on-main" ]] && exit 0
 git -C "$root" rev-parse --verify -q HEAD >/dev/null || exit 0
+git -C "$root" check-ignore -q -- "$fp" && exit 0
 branch=$(git -C "$root" symbolic-ref --short -q HEAD) || exit 0
 
 main=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' "$root/CLAUDE.md" 2>/dev/null | head -n1)

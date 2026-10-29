@@ -1,0 +1,20 @@
+## bash -n / node --check
+bash -n: ok
+node --check: ok
+## validate
+√ Validation passed
+exit 0
+√ Validation passed
+## install test
+PASS  docs
+exit 0
+## lite install test
+exit 0
+## eval fixture
+PASS  docs
+PASS  tests
+PASS  docs
+PASS  tests
+exit 0
+## hook: main-branch, git-ignored path
+fake tool calls: .scratchpad/ on main exit 0, src/ on main exit 2, .env on main exit 2, src/ on branch exit 0 (see log)
