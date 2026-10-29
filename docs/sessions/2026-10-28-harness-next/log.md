@@ -206,6 +206,6 @@
 - Review step: `/code-review` at low effort, no findings.
 - Checks (`s7-checks.log`): `bash -n`, `node --check`, both `validate --strict` (icon warning
   only), install test, lite install test, eval fixture — all pass.
-- Version 0.5.0 → 0.6.0.
+- Version 0.5.0 → 0.6.0. Commit `ff09ade`, pushed.
 - Not measured: no eval run. S8 runs the suite against these skills.
 - Next: S8 (evals). Ask D8 first.
