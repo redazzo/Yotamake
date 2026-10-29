@@ -63,23 +63,30 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
    spec, agree it first: ask the questions that change scope or a criterion, one at a time,
    write the acceptance criteria (A1, A2, …, rules in the `spec` skill, step 3), and get the
    user's approval before writing `plan.md`. Questions about how to build it wait in
-   `decisions.md` for the session that needs them (step 4).
-3. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
+   `decisions.md` for the session that needs them (step 5).
+3. If the effort changes code, fill in the Design section of `plan.md` before cutting
+   sessions. Read the **Architecture** section of CLAUDE.md (and accepted ADRs) and the code,
+   then write: the modules touched, the existing code to reuse or extend, any new
+   interfaces, and the boundaries at risk. Any plan that would break a boundary or go
+   against an ADR is raised as a question now, as in `simple-session`, step 3. Agree the
+   Design section with the user before S1. Each session's design step then checks its work
+   against it.
+4. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
    (or, on an assigned branch, one set of commits) that fits in one context**, so a `/clear`
    never lands mid-change. Order them so each makes
    the next one easier (bugs first, then deletions, then refactors, docs last so they describe
    the final state). With a spec, each session names the criteria it delivers, and every
    criterion is in some session.
-4. Put every question for the user in `decisions.md`, tagged with the session that needs the
+5. Put every question for the user in `decisions.md`, tagged with the session that needs the
    answer. Give a recommendation with each. Ask at the start of that session, not all up front:
    by then the earlier sessions may have changed the question.
-5. End S0 by telling the user the resume line and that it is a good point to `/clear`.
+6. End S0 by telling the user the resume line and that it is a good point to `/clear`.
 
 ## Rules for every session
 
 - Branch from an up-to-date main branch, as in `simple-session`, or stay on the assigned
   branch in a committed setup. Never work on the main branch.
-- Before proposing a commit, run `scripts/check` (see `simple-session`, step 4). Save its
+- Before proposing a commit, run `scripts/check` (see `simple-session`, step 5). Save its
   output to `s<N>-checks.log` in the folder and report only the summary lines.
 - Commit, version bump, push and merge only after the user says yes. In a committed setup,
   commit the folder's updates with the session's work.

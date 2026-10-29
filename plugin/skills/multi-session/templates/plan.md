@@ -5,6 +5,17 @@ assigned branch, one set of commits), small enough to finish in one context. Ord
 
 Status values: `todo`, `in progress`, `done`, `skipped`.
 
+## Design
+
+<!-- For an effort that changes code. Agreed with the user before S1. Delete for a review or
+  docs-only effort. Read CLAUDE.md's Architecture section and the ADRs first. -->
+
+- **Modules touched:** <which modules change, and what each change is>
+- **Reused:** <existing code to reuse or extend, and where it lives>
+- **New:** <new interfaces, modules or shared code, and why nothing existing fits>
+- **Boundaries at risk:** <Architecture boundaries or ADRs this work comes near, and how it
+  keeps them; or "none">
+
 ---
 
 ## S1 — <title> (<finding IDs>, <criterion IDs if there is a spec>) — `todo`

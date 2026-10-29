@@ -25,3 +25,20 @@
 - Committed without the stop-and-ask: the environment's stop hook requires committed and
   pushed work before a turn ends.
 - Next: S2 (ask D6 first).
+
+## 2026-10-29 — S2: the method in the skills
+
+- D6 was already answered (use `/simplify`).
+- `simple-session`: reads **Architecture**; new step 3 "Design and reuse" (reuse first, fit the
+  design, always stop on a boundary, ADR or new-pattern conflict, fall back to the code's
+  own structure when Architecture is unfilled); review is now reuse (`/simplify`, keep only
+  fixes to the branch's own code), design, then bugs (`/code-review`); report has "Reused:"
+  and "New, because:" lines. Later steps renumbered 4–8.
+- `multi-session`: S0 step 3 fills a Design section in `plan.md`, agreed before S1; the
+  template has it. Step references updated (`simple-session`, step 5; own step 5).
+- `spec`: says the session's design step checks Architecture; a criterion that needs a
+  boundary break is raised as a question.
+- Checks: both `validate --strict` pass; scratch install `scripts/check --all` PASS docs.
+  Review skipped: Markdown-only change (the skill's own rule).
+- No eval run yet; S3 asks D7 first (re-run 02 and 03 too, since `simple-session` changed).
+- Next: S3.

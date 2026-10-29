@@ -36,7 +36,7 @@ Branch: the assigned branch. Ask D5 first.
 
 ✂ **Clear context.**
 
-## S2 — The method in the skills (F2, F4, F5, F7, F9; A3–A7) — `todo`
+## S2 — The method in the skills (F2, F4, F5, F7, F9; A3–A7) — `done`
 
 Ask D6 first.
 
