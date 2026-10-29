@@ -10,8 +10,8 @@ stop before commit still apply. Questions and explanations need no session.
 
 ## Project overview
 
-Greeter: a tiny Node library with one function, `greet(name)` in `src/greet.js`. Tests are in
-`test/`, run with Node's built-in test runner.
+Greeter: a tiny Node library. `greet(name)` is in `src/greet.js`; shared text helpers are in
+`src/text.js`. Tests are in `test/`, run with Node's built-in test runner.
 
 **Docs:** [docs/README.md](./docs/README.md) (index and the "Owns" table) ·
 [docs/backlog.md](./docs/backlog.md) (open work)
@@ -42,3 +42,18 @@ Raise anything with behavioural reach first.
 
 **One owner per subject.** A change in behaviour updates the doc that owns it (the "Owns"
 table in `docs/README.md`) in the same branch.
+
+## Architecture
+
+The design every change follows. Before writing code, look in **Shared code** for something
+to reuse or extend. A change that would cross a **Boundary**, go against an accepted ADR, or
+bring in a way of doing things that **Patterns** does not list stops before any edit and is
+raised with the user, whoever asked for it.
+
+- **Modules:** `src/greet.js` the greeting; `src/text.js` shared text helpers.
+- **Boundaries:** `src/` is pure: it never reads `process.env`, files, the network or the
+  console. Input and output belong to the caller, which passes values in as arguments.
+- **Shared code:** `src/text.js`.
+- **Patterns:** named exports only; each function takes its inputs as arguments and returns a
+  string; each `src/` file has a test file of the same name in `test/`.
+- **Decisions:** accepted ADRs in `docs/decisions/` are part of the design.

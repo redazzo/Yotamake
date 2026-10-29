@@ -48,6 +48,16 @@ from guesses:
 - **`CLAUDE.md`** — Project overview, Commands, Branching and releases. Fill in Migrations and
   Deploying only from what the repository shows; if it shows nothing, ask whether to delete
   those sections.
+- **`CLAUDE.md`, Architecture** — read the layout, the imports between top-level folders and
+  any existing design docs or ADRs. Propose each line: **Modules** (the main parts and what
+  each owns), **Boundaries** (which parts never import which, as the code shows them today),
+  **Shared code** (where the reused helpers live) and **Patterns** (how the code already
+  handles errors, config, logging and data access). Show the proposal and ask the user to
+  confirm it: these lines become rules the sessions stop on, so a wrong boundary blocks real
+  work. A boundary the code already breaks goes in the report, not in the line.
+- **`scripts/check`, design gates** — if the repository already has a boundary or
+  duplicate-code tool configured, add it as a `run` line. Otherwise leave the placeholders and
+  mention them in the report.
 - **`.github/workflows/check.yml`** — the toolchain setup steps, or ask whether to delete it.
 - **`.claude/yotamake/post-edit-checks.conf`** — one fast per-file linter line per language.
 

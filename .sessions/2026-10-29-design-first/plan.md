@@ -23,7 +23,7 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 
 ---
 
-## S1 — Architecture as a fact (F1, F3, F6, F8; A1, A2, A8) — `todo`
+## S1 — Architecture as a fact (F1, F3, F6, F8; A1, A2, A8) — `done`
 
 Branch: the assigned branch. Ask D5 first.
 

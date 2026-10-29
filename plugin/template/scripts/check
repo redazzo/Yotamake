@@ -72,6 +72,13 @@ full() { [[ "$mode" != --staged ]]; }
 # run type-check  pnpm run type-check
 # run lint        pnpm run lint
 
+# Design gates: they turn the Boundaries and Shared code lines in CLAUDE.md
+# (Architecture) from requests into checks. Pick a tool for the stack, and put it
+# behind `full` if it takes more than a few seconds. FILL IN, e.g.:
+# run boundaries  npx depcruise src --config .dependency-cruiser.cjs
+# run boundaries  lint-imports
+# run duplication npx jscpd src --threshold 1
+
 # yotamake:docs begin
 run docs node scripts/docs/lint-docs.mjs
 # yotamake:docs end

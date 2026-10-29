@@ -3,7 +3,7 @@
 <!--
   Yotamake harness template. Replace every "FILL IN" comment, then delete this comment.
   The yotamake plugin's skills read the sections below BY NAME:
-    Checks, Branching and releases, Migrations, Deploying, Conventions.
+    Checks, Branching and releases, Migrations, Deploying, Conventions, Architecture.
   Keep those headings. Delete Migrations or Deploying if the project has none;
   the skills then stop and ask instead of guessing.
 -->
@@ -116,9 +116,27 @@ ephemeral environment. See the `yotamake:multi-session` skill.
 `rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks before each one. Do not
 work around this with other commands that have the same effect.
 
-<!-- FILL IN: project conventions — boundaries that must not be crossed, naming, error handling. -->
+<!-- FILL IN: project conventions — naming, style, anything Architecture does not cover. -->
 
 ## Architecture
 
-<!-- FILL IN: the parts an agent must know to work safely. Link to the detailed docs rather
-than repeating them here. -->
+The design every change follows. Before writing code, look in **Shared code** for something
+to reuse or extend. A change that would cross a **Boundary**, go against an accepted ADR, or
+bring in a way of doing things that **Patterns** does not list stops before any edit and is
+raised with the user, whoever asked for it.
+
+<!-- FILL IN each line. Keep the four labels: the skills read them. Link to detailed docs
+  rather than repeating them here. -->
+
+- **Modules:** <!-- FILL IN: the main parts and what each owns, e.g. "`api/` HTTP handlers;
+  `core/` business rules; `db/` data access". -->
+- **Boundaries:** <!-- FILL IN: rules a change must not break, e.g. "`core/` never imports
+  `api/` or `db/`"; "only `db/` talks to the database". -->
+- **Shared code:** <!-- FILL IN: where reusable code lives, e.g. "`lib/` helpers;
+  `ui/components/` shared UI". -->
+- **Patterns:** <!-- FILL IN: the one way the project does recurring things, e.g. errors,
+  config, logging, validation, data access. -->
+<!-- yotamake:docs begin -->
+- **Decisions:** accepted ADRs in [docs/decisions/](./docs/decisions/README.md) are part of
+  the design. A change that needs a different one gets a new ADR first.
+<!-- yotamake:docs end -->

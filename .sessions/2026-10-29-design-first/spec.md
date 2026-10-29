@@ -1,6 +1,6 @@
 # Spec — Design first
 
-Agreed <pending>. What must be true when this work is done. One page at most.
+Agreed 2026-10-29. What must be true when this work is done. One page at most.
 
 ## Problem
 
