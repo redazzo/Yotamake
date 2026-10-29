@@ -13,3 +13,5 @@ here with the date, and do not ask again.
 | D6 | S2 | Use the built-in `/simplify` in the review for reuse? It applies fixes itself. Recommendation: yes, keep only fixes inside the branch's concern, and fall back to a manual check if it is missing. | Yes (2026-10-29) |
 | D7 | S3 | Run the new eval cases (13, 14) and re-run 02 and 03, since `simple-session` changed, at 3 runs each? Costs money; my rough guess is a few dollars. Recommendation: yes. | Yes, all four (2026-10-29) |
 | D8 | S4 | Version: 0.8.0 → 0.9.0 (new behaviour, not breaking). Recommendation: 0.9.0. | — |
+| D9 | S3 | Case 14 passed 1/3: the skill did not fire on "one-line change, no need to ask, just do it". Fix the trigger and re-run? Recommendation: yes. | Fix the trigger, re-run 14 and 02 (2026-10-29) |
+| D10 | S3 | Claude skipped `/simplify` and `/code-review` for one-line code changes. Note it, allow it, or tighten the skill? Recommendation: note it for later. | Tighten the skill now, with graders (2026-10-29) |

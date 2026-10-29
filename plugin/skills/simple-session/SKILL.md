@@ -1,6 +1,6 @@
 ---
 name: simple-session
-description: Use before editing code, tests or docs in a repository set up with the harness (it has scripts/check) — for ANY change, even a one-line fix, a rename or a typo, and also when the user already names the branch, says exactly what to change, or the environment assigns a branch. Runs the change as one session: work on that branch (or cut one from the main branch), update the doc that owns the change, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
+description: Use before editing code, tests or docs in a repository set up with the harness (it has scripts/check) — for ANY change, even a one-line fix, a rename or a typo, and also when the user already names the branch, says exactly what to change, says it is quick or not to ask, or the environment assigns a branch. Runs the change as one session: work on that branch (or cut one from the main branch), update the doc that owns the change, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
 ---
 
 # Simple session
@@ -121,7 +121,8 @@ branch, say so and show the line, rather than fixing it in this branch.
 
 ## 6. Review
 
-Skip this step when the branch changes only docs (Markdown files and `docs/`).
+Skip this step when the branch changes only docs (Markdown files and `docs/`). Every
+other change gets the full review, however small: a one-line diff still runs both skills.
 
 Otherwise review the branch's diff against the main branch in three parts:
 
@@ -153,7 +154,8 @@ Do not commit yet. Tell the user:
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
 - the check results (one line each);
-- the review: what it found and fixed, what you left and why, or that it was skipped;
+- the review: what it found and fixed, what you left and why, or that it was skipped
+  because the branch changes only docs;
 - any side-fixes and any suggestions you left out;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).
