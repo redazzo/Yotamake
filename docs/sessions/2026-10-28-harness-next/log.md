@@ -262,3 +262,30 @@
 - Version 0.6.0 → 0.7.0. Commit `afbac91`, pushed.
 - Not done: no PR-path case (noted in S6). F18 stays open.
 - Next: S9. Ask D9 first.
+
+## 2026-10-29 — S9: stale-docs design, and close-out
+
+- D9 answered: design only, as recommended.
+- Design written to `docs/stale-docs-check.md` (lasts after this folder goes). Measured with a
+  prototype on video-vault (needed `git fetch --unshallow` first: the container's clone had
+  one commit, which flagged every doc). Cited files only, merges skipped, and commits that
+  also changed a reference doc skipped: 2/14 docs flagged today, 9/14 as of 2026-10-01, 4/14
+  as of 2026-09-01. Of 5 flags judged by a quick read, 1 was borderline real (`pwa.md`) and
+  4 were passing mentions. Recommendation in the doc: an advisory report, not a gate, with
+  a `covers:` front-matter field. Build only on its trigger.
+- Close-out: `ci.yml` moved to `docs/ci.yml`. README gained an "Open work" section with the
+  items below that belong to the plugin. No plugin change, so no version bump.
+- Checks (`s9-checks.log`): both `validate --strict`, install test, `scripts/check --all` in
+  the scratch repo — all pass. Review step skipped: docs only.
+- Commit: see below.
+
+### Left for the user
+
+1. Add `docs/ci.yml` as `.github/workflows/ci.yml` by hand (the GitHub App lacks the
+   `workflows` permission), add the line to CLAUDE.md "Before committing", watch the first
+   run.
+2. Video-vault: `chore/yotamake-harness` (commits `7b25d6b`, `7168290`) is pushed, not
+   merged into `main`.
+3. Open in the plugin (also in README "Open work"): F18 trigger gap (5/6 runs), F4 icon, no
+   eval for the PR path or for `setup`'s install step, stale-docs check not built.
+4. Delete this folder, in a commit of its own, once you agree.

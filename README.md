@@ -186,6 +186,20 @@ pre-made branch (as an assigned branch would in a cloud session). It also keeps 
 read-only, so `install.sh` cannot run inside a case; case 11's scaffold runs it instead.
 Cases 09–11 start with a slash command, since those skills are not model-invoked.
 
+## Open work
+
+- **CI is written but not active.** `docs/ci.yml` runs the "Before committing" checks from
+  `CLAUDE.md`. The GitHub App cannot push under `.github/workflows/`, so it needs adding there
+  by hand. Then add a line about it to `CLAUDE.md`, "Before committing" (it pins the Claude
+  Code CLI version; bump that on purpose).
+- **`simple-session` can miss when the user names a branch.** After a fix it fired in 5 of 6
+  eval runs (`02-small-change`). Too few runs to call it fixed.
+- **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
+- **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
+  install step (the eval sandbox keeps `.claude/` read-only).
+- **Stale-docs check: designed, not built.** See `docs/stale-docs-check.md`, which says when
+  to build it.
+
 ## Requirements
 
 `bash`, `git` and Node 18+ (the hooks and installer use it to read JSON; the docs scripts

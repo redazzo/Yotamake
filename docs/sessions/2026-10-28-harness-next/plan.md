@@ -128,7 +128,7 @@ Ask D8 first.
 
 ✂ **Clear context.**
 
-## S9 — Stale-docs check: design, then close-out (F20) — `todo`
+## S9 — Stale-docs check: design, then close-out (F20) — `done`
 
 Ask D9 first.
 
