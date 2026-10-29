@@ -220,8 +220,9 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
   skill description and says the same in the template `CLAUDE.md`. It then fired in 10 of 10
   runs (2026-10-29, Claude Code 2.1.312, one model). Likely fixed; re-check on the next full
   suite run.
-- **`spec` is untested.** Case 12 is written but not yet run. Nothing yet tests the
-  question-at-a-time path (an eval case is one prompt) or the hand-over to a session.
+- **`spec` is only partly tested.** Case 12 passed 3 of 3 runs (2026-10-29, Claude Code
+  2.1.312, one model). Nothing yet tests the question-at-a-time path (an eval case is one
+  prompt) or the hand-over to a session.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).
