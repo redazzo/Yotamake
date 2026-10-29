@@ -202,8 +202,11 @@ Cases 09–11 start with a slash command, since those skills are not model-invok
   `CLAUDE.md`. The GitHub App cannot push under `.github/workflows/`, so it needs adding there
   by hand. Then add a line about it to `CLAUDE.md`, "Before committing" (it pins the Claude
   Code CLI version; bump that on purpose).
-- **`simple-session` can miss when the user names a branch.** After a fix it fired in 5 of 6
-  eval runs (`02-small-change`). Too few runs to call it fixed.
+- **`simple-session` can miss when the user names a branch.** After a first fix it fired in
+  5 of 6 eval runs (`02-small-change`). Version 0.7.3 moves the trigger to the front of the
+  skill description and says the same in the template `CLAUDE.md`. It then fired in 10 of 10
+  runs (2026-10-29, Claude Code 2.1.312, one model). Likely fixed; re-check on the next full
+  suite run.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).
