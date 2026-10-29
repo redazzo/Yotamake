@@ -259,6 +259,6 @@
   test, lite install test, eval fixture — all pass.
 - Review step: the only code change is three lines in the hook; reviewed by hand (above), no
   findings. `/code-review` not run.
-- Version 0.6.0 → 0.7.0.
+- Version 0.6.0 → 0.7.0. Commit `afbac91`, pushed.
 - Not done: no PR-path case (noted in S6). F18 stays open.
 - Next: S9. Ask D9 first.
