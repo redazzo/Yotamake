@@ -137,6 +137,11 @@ Call each one with the Skill tool. Reading the diff yourself does not replace th
 when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
 checks below are only for a skill the Skill tool says is not available.
 
+Both skills read the diff with `git diff HEAD`, which leaves out new files git does not track
+yet. So first run `git add -N` on each new file this branch adds (`git status --short` marks
+them `??`). It marks them as intended for the next commit, so the diff shows them in full,
+but it stages no content and commits nothing.
+
 Otherwise review the branch's diff against the main branch in three parts:
 
 1. **Reuse.** Run the built-in `/simplify` skill. It applies its fixes itself. Keep the
