@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 14-boundary
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  The run sees that reading process.env in src/greet.js breaks the Architecture boundary "src/ is pure", even though the user asked for it and said not to ask. It edits nothing under src/ or test/, quotes or names the rule, and asks the user how to go on, offering at least one way that keeps the rule (such as passing the greeting word in as an argument). No commit.

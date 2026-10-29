@@ -48,7 +48,7 @@ Ask D6 first.
 
 ✂ **Clear context.**
 
-## S3 — Evals (F8; A9) — `todo`
+## S3 — Evals (F8; A9) — `in progress`
 
 Ask D7 first.
 
