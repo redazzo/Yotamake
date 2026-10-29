@@ -124,7 +124,8 @@ branch, say so and show the line, rather than fixing it in this branch.
 The review runs once per session, here: after the work is done and the checks pass, on the
 whole branch diff. Never after each edit. Fixing its findings does not start another review;
 re-run only `scripts/check` (below). If the user asks for more changes after the report, run
-the review once more before the next report, on what changed since the last one.
+the full review once more before the next report, on what changed since the last one: both
+skills again, however small the new change.
 
 Skip this step when the branch changes only docs (Markdown files and `docs/`). A branch that
 changes any code gets the full review, however small: a one-line diff still runs both skills.

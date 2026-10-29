@@ -1,0 +1,44 @@
+diff --git a/docs/reference/greeting.md b/docs/reference/greeting.md
+index 5acfcec..c5344ea 100644
+--- a/docs/reference/greeting.md
++++ b/docs/reference/greeting.md
+@@ -1,10 +1,12 @@
+ ---
+ kind: reference
+ status: current
+-updated: 2026-01-01
++updated: 2026-10-29
+ owns: [greeting-format]
+ ---
+ 
+ # Greeting
+ 
+-`greet(name)` in `src/greet.js` returns `Hello, <name>.` — the name, ending with a full stop.
++`greet(name)` in `src/greet.js` returns `Hello, <name>.` — the name, ending with a full stop. The name is capitalised with
++`titleCase` from `src/text.js`: each word starts upper-case and the rest is lower-case, so
++`ada LOVELACE` gives `Hello, Ada Lovelace.`.
+diff --git a/src/greet.js b/src/greet.js
+index 8463031..494c81c 100644
+--- a/src/greet.js
++++ b/src/greet.js
+@@ -1,4 +1,6 @@
+-// Returns the greeting shown to a user.
++import { titleCase } from './text.js';
++
++// Returns the greeting shown to a user, with the name capitalised.
+ export function greet(name) {
+-  return `Hello, ${name}.`;
++  return `Hello, ${titleCase(name)}.`;
+ }
+diff --git a/test/greet.test.js b/test/greet.test.js
+index 63cddca..e12d571 100644
+--- a/test/greet.test.js
++++ b/test/greet.test.js
+@@ -5,3 +5,7 @@ import { greet } from '../src/greet.js';
+ test('greets by name', () => {
+   assert.equal(greet('Ada'), 'Hello, Ada.');
+ });
++
++test('capitalises the name', () => {
++  assert.equal(greet('ada LOVELACE'), 'Hello, Ada Lovelace.');
++});

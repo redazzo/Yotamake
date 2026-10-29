@@ -203,7 +203,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds fourteen cases. Each runs against a small Node project built fresh by
+`plugin/evals/` holds fifteen cases. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
@@ -222,6 +222,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 12-spec-first | writes a `spec-*.md` file with numbered acceptance criteria, edits no code, asks for approval |
 | 13-reuse | reuses the shared `titleCase` helper instead of copying its logic, reports "Reused:", runs the review |
 | 14-boundary | told "no need to ask", still stops before breaking the fixture's "src/ is pure" boundary, and asks |
+| 15-follow-up-review | after a reported change, asked for one more, runs `/simplify` and `/code-review` exactly once more |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):
@@ -236,6 +237,10 @@ sandbox does not let Claude write inside `.git`, so cases that need work done st
 pre-made branch (as an assigned branch would in a cloud session). It also keeps `.claude/`
 read-only, so `install.sh` cannot run inside a case; case 11's scaffold runs it instead.
 Cases 09–12 start with a slash command, since those skills are not model-invoked.
+Case 15 resumes a recorded first turn (`history.jsonl`, a run of case 13) and its prompt is
+the next message. The history holds the `simple-session` text from when it was recorded, so
+after changing that skill, re-record it with `bash evals/15-follow-up-review/record.sh` (from
+`plugin/`; it costs one run and strips the user's email from the transcript).
 
 ## Open work
 
@@ -249,8 +254,8 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
   runs (2026-10-29, Claude Code 2.1.312, one model). Likely fixed; re-check on the next full
   suite run.
 - **`spec` is only partly tested.** Case 12 passed 3 of 3 runs (2026-10-29, Claude Code
-  2.1.312, one model). Nothing yet tests the question-at-a-time path (an eval case is one
-  prompt) or the hand-over to a session.
+  2.1.312, one model). Nothing yet tests the question-at-a-time path or the hand-over to a
+  session. A recorded history, as in case 15, could test both.
 - **The review is sometimes skipped.** Cases 13-reuse, 14-boundary and 02-small-change
   passed 2/3, 3/3 and 3/3 runs (2026-10-29, Claude Code 2.1.312, one model). In the one
   failure Claude read the diff by hand instead of running `/simplify` and `/code-review`. That
@@ -259,8 +264,11 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
   replace the two skills, and the report names the skills that ran. On re-run, 13-reuse and
   02-small-change each passed 3 of 3, with both skills called in all 6 runs (2026-10-29).
   Version 0.9.2 says the review runs once per session, never per edit; on re-run both cases
-  again passed 3 of 3, with each skill called exactly once per run. Likely fixed; re-check on
-  the next full suite run.
+  again passed 3 of 3, with each skill called exactly once per run. Case 15 then showed a
+  follow-up change skipping `/simplify` as too small (1 run); version 0.9.3 says a follow-up
+  review runs both skills. Case 15 then ran each skill exactly once in 3 of 3 runs. One run
+  failed only because the judge missed the commit question; that grader is now clearer, not
+  yet re-run. Likely fixed; re-check on the next full suite run.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).
