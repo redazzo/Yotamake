@@ -26,7 +26,8 @@ while read -r glob cmd; do
     [[ "$fp" == $glob ]] || continue
 
     quoted=$(printf '%q' "$fp")
-    out=$(cd "$root" && bash -c "${cmd//\{file\}/$quoted}" 2>&1)
+    # Inner quotes keep bash 5.2 from reading & in the path as "the matched text".
+    out=$(cd "$root" && bash -c "${cmd//\{file\}/"$quoted"}" 2>&1)
     status=$?
     if [[ $status -ne 0 ]]; then
         printf 'Post-edit check failed for %s:\n%s\n' "$fp" "$out" >&2

@@ -16,15 +16,35 @@
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)" || exit 2
 
-MAIN_BRANCH=${CHECK_BASE:-main}
 mode=${1:-changed}
+
+# The main branch: CHECK_BASE, else the "Main branch" line in CLAUDE.md (the same
+# line the plugin's main-branch hook reads), else main or master.
+main_branches() {
+    if [[ -n "${CHECK_BASE:-}" ]]; then echo "$CHECK_BASE"; return; fi
+    local m
+    m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
+    if [[ -n "$m" ]]; then echo "$m"; else printf '%s\n' main master; fi
+}
 
 case "$mode" in
     --all) changed="" ;;
     --staged) changed=$(git diff --cached --name-only) ;;
     changed)
-        base=$(git merge-base HEAD "$MAIN_BRANCH" 2>/dev/null || echo HEAD)
-        changed=$( { git diff --name-only "$base" 2>/dev/null; git ls-files --others --exclude-standard; } | sort -u) ;;
+        base=""
+        for b in $(main_branches); do
+            for ref in "$b" "origin/$b"; do
+                base=$(git merge-base HEAD "$ref" 2>/dev/null) && break 2
+            done
+        done
+        if [[ -z "$base" ]]; then
+            # Without a base the changed files are unknown, so check everything.
+            echo "note: no merge base with the main branch ($(main_branches | paste -sd/ -)); running every check. Set CHECK_BASE to override." >&2
+            mode=--all
+            changed=""
+        else
+            changed=$( { git diff --name-only "$base" 2>/dev/null; git ls-files --others --exclude-standard; } | sort -u)
+        fi ;;
     *) echo "usage: scripts/check [--staged|--all]" >&2; exit 2 ;;
 esac
 
