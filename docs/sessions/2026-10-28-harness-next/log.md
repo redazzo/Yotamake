@@ -119,3 +119,30 @@
 - No version bump (user: tooling only). Commit `7b25d6b`, pushed; not merged.
 - User to do: `git config core.hooksPath .githooks` in their own clone.
 - Next: S5. Ask D6 first.
+
+## 2026-10-29 — S5: video-vault, part 2 (remove the old copies)
+
+- D6 answered: delete all five, as recommended. Same branch as S4 (`chore/yotamake-harness`;
+  `main` had not moved).
+- Moved the facts from `create-migration` and `deploy-check` into video-vault's CLAUDE.md, in
+  the template's bullet shape: Migrations (directory, pattern, local/remote apply) and
+  Deploying (targets, releases from, command, dry run, not shipped, verify, Gotchas list). The
+  old skill's flag list lacked `--content-worker`; took the flags from `scripts/deploy/deploy.js`.
+  Added `Bash(node scripts/deploy/deploy.js:*)` and `Bash(pnpm run deploy:*)` to `permissions.ask`.
+- Deleted `.claude/skills/` (incl. the local `simple-session` evals, which the plugin's
+  `02`–`04` cases cover) and `.claude/hooks/`, and the `hooks` block in `.claude/settings.json`.
+  Checked the plugin's `pre-edit-protect.sh` blocks `.env.local` and
+  `packages/client/.env.development.local` (fake tool calls, exit 2).
+- Side fixes: CLAUDE.md §6 and a `.gitignore` comment pointed at `.claude/skills/multi-session`.
+- Checked every section and line the plugin skills and hooks read (Checks, Migrations,
+  Branching and releases with Main branch/Integration/Version bump, Deploying → Gotchas,
+  Conventions' side-fix policy, the Owns table): all present.
+- Video-vault commit `7168290`, pushed; not merged. The first commit attempt was stopped by the pre-commit hook (tests fail at import without the `VITE_*` values in a fresh shell); it passed with them set.
+- Record: `docs/records/2026/2026-10-28-yotamake-harness.md` (covers S4 and S5), index
+  regenerated. `write-doc` was followed by reading the plugin file: the plugin is not loaded
+  in this cloud session.
+- Checks (`s5-checks.log`): all PASS except `db-grants` (no database in the container; this
+  branch touches no migrations). Dummy `VITE_*` values passed as environment variables, not an
+  `.env` file: Vite's `loadEnv` reads `process.env`.
+- Surprise worth knowing for S8: the plugin skills are not available as `yotamake:*` in these
+  cloud sessions, so any eval or pilot has to load the plugin explicitly.

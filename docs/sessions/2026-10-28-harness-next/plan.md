@@ -76,7 +76,7 @@ User involvement: approve commit and push; settings changes are theirs to accept
 
 ✂ **Clear context.**
 
-## S5 — Video-vault, part 2: remove the old copies (F10, F11) — `todo`
+## S5 — Video-vault, part 2: remove the old copies (F10, F11) — `done`
 
 Ask D6 first.
 

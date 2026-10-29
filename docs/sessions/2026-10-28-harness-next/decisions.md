@@ -11,7 +11,7 @@ here with the date, and do not ask again.
 | D3 | S4 | Video-vault's CLAUDE.md headings differ from what the skills read. Recommendation: rename its headings (Checks added; Branching and releases; Migrations; Deploying; Conventions), keep the content, and fix the links that point at the old anchors. The alternative is teaching every skill aliases. | 2026-10-28: as recommended. |
 | D4 | S4 | Branch name in video-vault, and push access for this session. Recommendation: `chore/yotamake-harness`, with push access granted. | 2026-10-28: as recommended. |
 | D5 | S4 | Should video-vault's pre-commit run the full gate? Recommendation: yes; its whole pre-flight is about 12 s. | 2026-10-28: as recommended. |
-| D6 | S5 | Video-vault's local skill copies. Recommendation: delete all five; the plugin provides three, and the facts in `create-migration` and `deploy-check` move into CLAUDE.md. | — |
+| D6 | S5 | Video-vault's local skill copies. Recommendation: delete all five; the plugin provides three, and the facts in `create-migration` and `deploy-check` move into CLAUDE.md. | 2026-10-29: as recommended. |
 | D7 | S7 | Lite mode shape. Recommendation: an `install.sh --lite` flag that installs `CLAUDE.md`, `scripts/check`, the hook config and settings, but no docs skeleton. | — |
 | D8 | S8 | Eval budget. Recommendation: approve about $8 (new cases piloted once, then the full suite with the baseline arm). | — |
 | D9 | S9 | Stale-docs check: build it, or design only? Recommendation: design only in S9; build later if the design holds up. | — |
