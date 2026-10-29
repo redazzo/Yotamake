@@ -258,7 +258,9 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
   runs for any branch that changes code. Version 0.9.1 says that reading the diff by hand does not
   replace the two skills, and the report names the skills that ran. On re-run, 13-reuse and
   02-small-change each passed 3 of 3, with both skills called in all 6 runs (2026-10-29).
-  Likely fixed; re-check on the next full suite run.
+  Version 0.9.2 says the review runs once per session, never per edit; on re-run both cases
+  again passed 3 of 3, with each skill called exactly once per run. Likely fixed; re-check on
+  the next full suite run.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).
