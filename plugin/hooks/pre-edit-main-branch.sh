@@ -9,14 +9,11 @@
 # opts out with an empty file at .claude/yotamake/allow-edits-on-main.
 # Exit 2 blocks the call and sends stderr back to Claude.
 
-fp=$(python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin).get('tool_input', {})
-except Exception:
-    d = {}
-print(d.get('file_path') or d.get('notebook_path') or '')
-" 2>/dev/null)
+fp=$(node -e '
+let d = {};
+try { d = JSON.parse(require("fs").readFileSync(0, "utf8")).tool_input || {}; } catch {}
+process.stdout.write(String(d.file_path || d.notebook_path || ""));
+' 2>/dev/null)
 [[ -n "$fp" ]] || exit 0
 
 # The file may not exist yet: start from its nearest existing directory.

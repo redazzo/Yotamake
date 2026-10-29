@@ -7,14 +7,11 @@
 conf="${CLAUDE_PROJECT_DIR:-.}/.claude/yotamake/post-edit-checks.conf"
 [[ -f "$conf" ]] || exit 0
 
-fp=$(python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin).get('tool_input', {})
-except Exception:
-    d = {}
-print(d.get('file_path') or d.get('notebook_path') or '')
-" 2>/dev/null)
+fp=$(node -e '
+let d = {};
+try { d = JSON.parse(require("fs").readFileSync(0, "utf8")).tool_input || {}; } catch {}
+process.stdout.write(String(d.file_path || d.notebook_path || ""));
+' 2>/dev/null)
 [[ -n "$fp" && -f "$fp" ]] || exit 0
 
 case "$fp" in

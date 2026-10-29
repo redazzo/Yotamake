@@ -18,11 +18,13 @@ Every change to code, tests or docs runs as a session, however small: use the
 
 <!-- FILL IN: one paragraph. What the project is, the stack, the repo layout. -->
 
+<!-- yotamake:docs begin -->
 **Docs:** [docs/README.md](./docs/README.md) (index — start here; explains the four kinds of
 doc and which doc owns what) · [README.md](./README.md) (setup) ·
 [docs/decisions/](./docs/decisions/README.md) (ADRs — never edited, only superseded) ·
 [docs/records/](./docs/records/README.md) (history) · [docs/backlog.md](./docs/backlog.md)
 (open work)
+<!-- yotamake:docs end -->
 
 ## Commands
 
@@ -94,9 +96,11 @@ in the change summary or commit message. Anything non-trivial or with side effec
 (behaviour, API, schema or migration changes, refactors, anything that could break callers)
 must be raised and confirmed first.
 
+<!-- yotamake:docs begin -->
 **One owner per subject.** Every subject has one doc that owns it (the "Owns" table in
 `docs/README.md`). A change in behaviour updates that doc in the same branch. Other docs link
 to it rather than restate it.
+<!-- yotamake:docs end -->
 
 **One-off operations are scripts, not endpoints.** A backfill, data migration or reindex with
 no recurring caller is a script run locally, not a permanent endpoint. The test is "who calls
@@ -114,5 +118,5 @@ work around this with other commands that have the same effect.
 
 ## Architecture
 
-<!-- FILL IN: the parts an agent must know to work safely. Link to docs/reference/ for detail
-rather than repeating it here. -->
+<!-- FILL IN: the parts an agent must know to work safely. Link to the detailed docs rather
+than repeating them here. -->

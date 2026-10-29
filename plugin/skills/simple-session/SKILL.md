@@ -67,6 +67,8 @@ branch. The "Owns" table in `docs/README.md` names it. Also fix CLAUDE.md if it 
 thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing goes
 in `docs/backlog.md` with a trigger to act. An architecturally significant decision needs an
 ADR in `docs/decisions/`; ask before writing one. The `write-doc` skill covers the formats.
+If the repository has no `docs/README.md` (a lite install), there is no docs system: fix
+CLAUDE.md or `README.md` where they describe the change, and put follow-ups in the report.
 
 ## 4. Run the checks
 

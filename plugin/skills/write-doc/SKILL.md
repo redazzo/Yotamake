@@ -8,6 +8,9 @@ description: Add or change project documentation under docs/ using the four kind
 `docs/README.md` is the rulebook and the index. Read its tables before adding anything. This
 skill is the short form, plus the templates.
 
+If the repository has no `docs/README.md`, it has no docs system (a lite install, or one
+never set up). Say so and ask where the doc should go; do not create the skeleton yourself.
+
 ## 1. Pick the kind
 
 | Writing about | Kind | Where | How it changes later |

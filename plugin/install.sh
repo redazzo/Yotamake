@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Set up a repository for the Yotamake harness, or refresh one already set up.
 #
-#   install.sh <target-repo> [--force]
+#   install.sh <target-repo> [--force] [--lite]
 #
 # The method (skills, hooks, output style) comes from the yotamake plugin. This
 # script installs the files each repository keeps for itself, from template/:
@@ -17,17 +17,29 @@
 # its path in .claude/yotamake/skip (one per line, # for comments). The installer
 # then never writes that path, e.g. when the repository has its own docs linter.
 #
+# --lite leaves out the docs system (docs/ and scripts/docs/): it adds those paths
+# to .claude/yotamake/skip, so later runs leave them out too, and drops the docs
+# lines from a newly copied CLAUDE.md and scripts/check.
+#
 # Also adds .scratchpad/ to .gitignore and points git at .githooks/, unless
 # another hook tool (pre-commit, lefthook, a hook in .git/hooks) is in use.
 
 set -euo pipefail
 
-usage() { echo "usage: $0 <target-repo> [--force]" >&2; exit 1; }
+usage() { echo "usage: $0 <target-repo> [--force] [--lite]" >&2; exit 1; }
 
 [[ $# -ge 1 ]] || usage
 target=$1
-force=${2:-}
-[[ -z "$force" || "$force" == "--force" ]] || usage
+shift
+force=""
+lite=""
+for arg in "$@"; do
+    case "$arg" in
+        --force) force=--force ;;
+        --lite) lite=--lite ;;
+        *) usage ;;
+    esac
+done
 [[ -d "$target" ]] || { echo "not a directory: $target" >&2; exit 1; }
 
 src="$(cd "$(dirname "$0")" && pwd)/template"
@@ -37,9 +49,10 @@ today=$(date +%Y-%m-%d)
 managed=(scripts/docs/lint-docs.mjs scripts/docs/generate-records-index.mjs .githooks/pre-commit)
 is_managed() { local f; for f in "${managed[@]}"; do [[ "$1" == "$f" ]] && return 0; done; return 1; }
 
+skip_file="$target/.claude/yotamake/skip"
+
 # Paths the repository opted out of. Trim spaces and comments; ignore blank lines.
 optout=()
-skip_file="$target/.claude/yotamake/skip"
 if [[ -f "$skip_file" ]]; then
     while IFS= read -r line || [[ -n "$line" ]]; do
         line=${line%%#*}
@@ -49,6 +62,25 @@ if [[ -f "$skip_file" ]]; then
     done < "$skip_file"
 fi
 is_optout() { local f; for f in "${optout[@]-}"; do [[ -n "$f" && "$1" == "$f" ]] && return 0; done; return 1; }
+
+# --lite: record the docs system's paths in the skip file, once.
+if [[ -n "$lite" ]]; then
+    mkdir -p "$(dirname "$skip_file")"
+    [[ -s "$skip_file" && -n "$(tail -c1 "$skip_file")" ]] && echo >> "$skip_file"
+    added=0
+    while IFS= read -r -d '' file; do
+        rel=${file#"$src"/}
+        [[ "$rel" == docs/* || "$rel" == scripts/docs/* ]] || continue
+        is_optout "$rel" && continue
+        if [[ $added -eq 0 ]]; then
+            printf '# --lite: no docs system. Delete these lines and re-run the installer to add it.\n' >> "$skip_file"
+        fi
+        echo "$rel" >> "$skip_file"
+        optout+=("$rel")
+        added=$((added + 1))
+    done < <(find "$src" -type f -print0 | sort -z)
+    [[ $added -gt 0 ]] && echo "--lite: added $added docs path(s) to .claude/yotamake/skip"
+fi
 
 copied=()
 refreshed=()
@@ -73,31 +105,49 @@ while IFS= read -r -d '' file; do
     fi
     mkdir -p "$(dirname "$dest")"
     cp -p "$file" "$dest"
+    # Lines between "yotamake:docs begin" and "end" markers belong to the docs
+    # system: --lite drops them, otherwise only the marker lines go.
+    if grep -qE 'yotamake:docs (begin|end)' "$dest"; then
+        if [[ -n "$lite" ]]; then
+            sed '/yotamake:docs begin/,/yotamake:docs end/d' "$dest" | cat -s > "$dest.bak"
+            cat "$dest.bak" > "$dest"
+        else
+            sed -E -i.bak '/yotamake:docs (begin|end)/d' "$dest"
+        fi
+        rm -f "$dest.bak"
+    fi
 done < <(find "$src" -type f -print0 | sort -z)
 
-# Merge settings.json: add the harness's entries, keep everything else.
+# Merge settings.json: add the harness's entries, keep everything else. An allow
+# rule that names a script the repository opted out of, and does not have, is left out.
 mkdir -p "$target/.claude"
-python3 - "$src/.claude/settings.json" "$target/.claude/settings.json" <<'EOF'
-import json, os, sys
-src_path, dest_path = sys.argv[1], sys.argv[2]
-ours = json.load(open(src_path))
-theirs = json.load(open(dest_path)) if os.path.exists(dest_path) else {}
-before = json.dumps(theirs, sort_keys=True)
-for key in ("extraKnownMarketplaces", "enabledPlugins"):
-    theirs.setdefault(key, {})
-    for k, v in ours[key].items():
-        theirs[key].setdefault(k, v)
-perms = theirs.setdefault("permissions", {})
-for kind in ("allow", "ask"):
-    have = perms.setdefault(kind, [])
-    for rule in ours["permissions"][kind]:
-        if rule not in have and rule not in perms.get("deny", []):
-            have.append(rule)
-if json.dumps(theirs, sort_keys=True) != before:
-    with open(dest_path, "w") as f:
-        json.dump(theirs, f, indent=2)
-        f.write("\n")
-    print("merged harness entries into .claude/settings.json")
+node - "$src/.claude/settings.json" "$target/.claude/settings.json" "$target" "${optout[@]-}" <<'EOF'
+const fs = require("fs");
+const path = require("path");
+const [srcPath, destPath, target, ...optout] = process.argv.slice(2);
+const ours = JSON.parse(fs.readFileSync(srcPath, "utf8"));
+const theirs = fs.existsSync(destPath) ? JSON.parse(fs.readFileSync(destPath, "utf8")) : {};
+const before = JSON.stringify(theirs);
+const missing = optout.filter((f) => f && !fs.existsSync(path.join(target, f)));
+for (const key of ["extraKnownMarketplaces", "enabledPlugins"]) {
+    theirs[key] = theirs[key] || {};
+    for (const [k, v] of Object.entries(ours[key])) {
+        if (!(k in theirs[key])) theirs[key][k] = v;
+    }
+}
+const perms = (theirs.permissions = theirs.permissions || {});
+for (const kind of ["allow", "ask"]) {
+    const have = (perms[kind] = perms[kind] || []);
+    for (const rule of ours.permissions[kind]) {
+        if (have.includes(rule) || (perms.deny || []).includes(rule)) continue;
+        if (kind === "allow" && missing.some((f) => rule.includes(f))) continue;
+        have.push(rule);
+    }
+}
+if (JSON.stringify(theirs) !== before) {
+    fs.writeFileSync(destPath, JSON.stringify(theirs, null, 2) + "\n");
+    console.log("merged harness entries into .claude/settings.json");
+}
 EOF
 
 chmod +x "$target/scripts/check" "$target/.githooks/pre-commit" 2>/dev/null || true
@@ -177,11 +227,16 @@ if [[ ! -e "$target/README.md" ]] && grep -qF '(./README.md)' "$target/CLAUDE.md
     echo "note: no README.md; CLAUDE.md links to it, so the docs check fails until you add one"
 fi
 
-cat <<EOF
-
-Next steps:
-  1. Fill in every FILL IN comment in CLAUDE.md and scripts/check.
-  2. Add your toolchain setup to .github/workflows/check.yml (or delete it).
-  3. Uncomment the lines in .claude/yotamake/post-edit-checks.conf that fit the project.
-  4. Run: scripts/check --all
-EOF
+# Next steps, leaving out files the repository opted out of.
+steps=()
+fill=""
+for f in CLAUDE.md scripts/check; do is_optout "$f" || fill+="${fill:+ and }$f"; done
+[[ -n "$fill" ]] && steps+=("Fill in every FILL IN comment in $fill.")
+is_optout .github/workflows/check.yml ||
+    steps+=("Add your toolchain setup to .github/workflows/check.yml (or delete it).")
+is_optout .claude/yotamake/post-edit-checks.conf ||
+    steps+=("Uncomment the lines in .claude/yotamake/post-edit-checks.conf that fit the project.")
+steps+=("Run: scripts/check --all")
+echo
+echo "Next steps:"
+for i in "${!steps[@]}"; do echo "  $((i + 1)). ${steps[$i]}"; done

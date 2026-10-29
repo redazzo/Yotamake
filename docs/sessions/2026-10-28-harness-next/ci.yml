@@ -38,3 +38,17 @@ jobs:
           echo "# Scratch" > "$scratch/README.md"
           ./plugin/install.sh "$scratch"
           cd "$scratch" && scripts/check --all
+
+      - name: Install in lite mode and run its checks
+        run: |
+          scratch=$(mktemp -d)
+          git -C "$scratch" init -q -b main
+          ./plugin/install.sh "$scratch" --lite
+          test ! -e "$scratch/docs"
+          cd "$scratch" && scripts/check --all
+
+      - name: Build the eval fixture and run its checks
+        run: |
+          fixture=$(mktemp -d)
+          cd "$fixture" && bash "$GITHUB_WORKSPACE/plugin/evals/_fixture/setup.sh"
+          scripts/check --all

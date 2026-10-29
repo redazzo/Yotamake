@@ -95,6 +95,8 @@ then the folder is deleted:
 - follow-ups and out-of-scope findings → `docs/backlog.md`, each with a trigger to act;
 - an architecturally significant decision → an ADR in `docs/decisions/` (check its bar first).
 
-The `write-doc` skill has the format for each. Then mark every session done, write a
+The `write-doc` skill has the format for each. A repository with no `docs/README.md` (a lite
+install) has none of these: move what lasts into CLAUDE.md or `README.md`, and list
+follow-ups for the user in the close-out entry. Then mark every session done, write a
 close-out entry in `log.md` listing what is left for the user, and ask before deleting the
 folder. A committed folder is deleted in a commit of its own.

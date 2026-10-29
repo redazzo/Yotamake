@@ -35,7 +35,15 @@ lines that call `.githooks/pre-commit` from the other tool.
 
 If the repo already has its own version of a template file, such as a docs linter, list the
 harness path in `.claude/yotamake/skip` (one per line). The installer never writes a listed
-path.
+path, and adds no `allow` rule for a listed script the repo does not have.
+
+**Lite mode.** For a small repo that does not want the docs system (ADRs, records, backlog),
+run `install.sh <repo> --lite`, or ask `/yotamake:setup` for lite mode. It installs
+`CLAUDE.md`, `scripts/check`, the pre-commit hook, the hook config and settings, but nothing
+under `docs/` or `scripts/docs/`. It writes those paths into `.claude/yotamake/skip`, so later
+runs leave them out too, and drops the docs lines from the new `CLAUDE.md` and
+`scripts/check`. To add the docs system later, delete those lines from the skip file, re-run
+the installer, and add the docs check to `scripts/check` by hand.
 
 **Updating.** `claude plugin update yotamake@yotamake` updates the method for every repo at
 once. Re-run `/yotamake:setup` (or `install.sh`) in a repo to refresh its harness-owned
@@ -173,5 +181,5 @@ pre-made branch (as an assigned branch would in a cloud session).
 
 ## Requirements
 
-`bash`, `git`, `python3` (the hooks and installer use it to read JSON) and Node 18+ (docs
-scripts). The docs scripts have no npm dependencies.
+`bash`, `git` and Node 18+ (the hooks and installer use it to read JSON; the docs scripts
+need it too). Nothing has npm dependencies.

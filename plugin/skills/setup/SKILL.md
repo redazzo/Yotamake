@@ -23,6 +23,12 @@ or records-index script), list the harness path in `.claude/yotamake/skip`, one 
 before running. The installer never writes a listed path, on this run or later ones. Then
 point `scripts/check` at the repository's own script.
 
+For a small repository that does not want the docs system (ADRs, records, backlog), offer
+lite mode: add `--lite` to the command. It leaves out `docs/` and `scripts/docs/`, and
+records them in `.claude/yotamake/skip` so later runs leave them out too. Ask which the user
+wants when the repository has no `docs/` folder yet and is small; otherwise install the full
+set.
+
 If the working tree has uncommitted changes, ask before running it. If the repository has
 commits and is on its main branch, cut `chore/yotamake-harness` first: the plugin's hook
 blocks edits on the main branch, so filling in the facts below would fail there.

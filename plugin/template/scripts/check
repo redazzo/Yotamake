@@ -50,7 +50,9 @@ full() { [[ "$mode" != --staged ]]; }
 # run type-check  pnpm run type-check
 # run lint        pnpm run lint
 
+# yotamake:docs begin
 run docs node scripts/docs/lint-docs.mjs
+# yotamake:docs end
 
 # --- Full: not in the pre-commit hook -----------------------------------------
 # Slow checks. They still run before Claude proposes a commit, and in CI. FILL IN, e.g.:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the eval fixture in the current directory: a tiny Node project with the
 # Yotamake harness installed and its facts filled in, committed on main.
-# Each case's scaffold.sh calls this. Needs bash, git, node and python3.
+# Each case's scaffold.sh calls this. Needs bash, git and node.
 #
 #   setup.sh [branch]   with a branch name, also creates and checks it out, so the
 #                       case starts on an assigned working branch.
@@ -14,26 +14,27 @@ bash "$plugin_root/install.sh" "$PWD" >/dev/null
 
 # The runner loads the plugin itself; drop the marketplace entries so the
 # fixture never tries to fetch it.
-python3 - <<'PY'
-import json
-p = ".claude/settings.json"
-d = json.load(open(p))
-d.pop("extraKnownMarketplaces", None)
-d.pop("enabledPlugins", None)
-json.dump(d, open(p, "w"), indent=2)
-PY
+node - <<'JS'
+const fs = require("fs");
+const p = ".claude/settings.json";
+const d = JSON.parse(fs.readFileSync(p, "utf8"));
+delete d.extraKnownMarketplaces;
+delete d.enabledPlugins;
+fs.writeFileSync(p, JSON.stringify(d, null, 2));
+JS
 
 cp -R "$here/files/." .
-sed -i 's|^# run tests       pnpm run test --run|run tests npm test|' scripts/check
+sed -i 's|^# full && run tests  pnpm run test --run|run tests npm test|' scripts/check
 grep -q '^run tests npm test' scripts/check
-python3 - <<'PY'
-p = "docs/README.md"
-s = open(p).read()
-s = s.replace("| _None yet._ | |", "| [greeting.md](./reference/greeting.md) | The greeting format and the `greet` function |", 1)
+node - <<'JS'
+const fs = require("fs");
+const p = "docs/README.md";
+let s = fs.readFileSync(p, "utf8");
+s = s.replace("| _None yet._ | |", "| [greeting.md](./reference/greeting.md) | The greeting format and the `greet` function |");
 s = s.replace("Task recipes. Read the one that matches what you are doing.\n\n_None yet._",
-              "Task recipes. Read the one that matches what you are doing.\n\n- [running-tests.md](./guides/running-tests.md) — run the test suite", 1)
-open(p, "w").write(s)
-PY
+              "Task recipes. Read the one that matches what you are doing.\n\n- [running-tests.md](./guides/running-tests.md) — run the test suite");
+fs.writeFileSync(p, s);
+JS
 
 git add -A
 git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Initial fixture"

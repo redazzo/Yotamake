@@ -101,7 +101,7 @@ Ask D10 first.
 
 ✂ **Clear context.**
 
-## S7 — Small fixes and lite mode (F4, F6, F17) — `todo`
+## S7 — Small fixes and lite mode (F4, F6, F17) — `done`
 
 Ask D7 first.
 

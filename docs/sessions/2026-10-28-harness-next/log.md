@@ -171,3 +171,41 @@
 - Not measured: no eval run for these skill changes. S8 covers multi-session cases; the PR
   path has no case yet (candidate for S8).
 - Next: S7. Ask D7 first.
+
+## 2026-10-29 — S7: small fixes and lite mode
+
+- D7 answered: `--lite` flag, as recommended. Icon (F4): skipped for now.
+- **`python3` → `node` (F6).** The three hooks read the tool call with `node -e`; the
+  installer's settings merge and the eval fixture's two edits are now Node. No `python3` is
+  left in `plugin/`. README's Requirements updated. 16 fake tool calls through the three hooks
+  (protect, main branch, post-edit; bad JSON, empty, `null`, `tool_input: null`, spaces in the
+  path) all as expected.
+- **F21.** The merge skips an `allow` rule that names an opted-out path the repo does not have.
+  If the repo has its own file at that path, the rule is still added.
+- **F22.** "Next steps" leaves out files the skip file lists (CLAUDE.md, `scripts/check`,
+  `check.yml`, `post-edit-checks.conf`) and numbers what is left.
+- **Lite mode (F17).** `install.sh <repo> [--force] [--lite]`, flags in any order. `--lite`
+  appends every template path under `docs/` and `scripts/docs/` to `.claude/yotamake/skip`
+  (with a comment, only paths not already listed), so plain re-runs keep it lite. New
+  `yotamake:docs begin/end` markers in the template CLAUDE.md (Docs line, "One owner per
+  subject") and `scripts/check` (the docs check): `--lite` drops the block, a full install
+  drops only the marker lines. A lite `scripts/check --all` has no checks until filled in, and
+  prints nothing. `setup`, `simple-session`, `multi-session` and `write-doc` now say what to do
+  when there is no `docs/README.md`.
+- **Surprise: the eval fixture has been broken since S3.** Its `sed` looked for the old
+  `# run tests` line, which S3 changed to `# full && run tests`, so `setup.sh` exited 1 before
+  filling in `docs/README.md`. No eval has run since S1, so no recorded score is affected.
+  Fixed; the fixture builds and passes `docs` and `tests`. Added it, and a lite install, to the
+  parked `ci.yml` so this is caught next time.
+- Side fix: the Architecture placeholder in the template CLAUDE.md no longer names
+  `docs/reference/`.
+- Install tests (scratchpad): plain, re-run, lite, lite re-run with and without the flag, skip
+  file without a trailing newline plus `--lite`, `./`-prefixed entry with a comment, skipped
+  script present vs absent, skipped CLAUDE.md/check/conf, flag order, bad flag, existing
+  settings kept (`deny` still wins), no README, real commit through the hook. All as expected.
+- Review step: `/code-review` at low effort, no findings.
+- Checks (`s7-checks.log`): `bash -n`, `node --check`, both `validate --strict` (icon warning
+  only), install test, lite install test, eval fixture — all pass.
+- Version 0.5.0 → 0.6.0.
+- Not measured: no eval run. S8 runs the suite against these skills.
+- Next: S8 (evals). Ask D8 first.
