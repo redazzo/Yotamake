@@ -62,7 +62,7 @@ Ask D2 first.
 
 ✂ **Clear context.**
 
-## S4 — Video-vault, part 1: install and facts (F8, F9, F12, F13) — `todo`
+## S4 — Video-vault, part 1: install and facts (F8, F9, F12, F13) — `done`
 
 Ask D3, D4, D5 first. Needs push access to video-vault (F13).
 
@@ -107,6 +107,8 @@ Ask D7 first.
 
 1. Replace `python3` with `node` in the hooks, installer and fixture (F6). Re-run the hook
    tests and the install tests.
+1a. Installer: no `allow` rules for opted-out scripts (F21); no "Next steps" line for a
+   skipped file (F22).
 2. Lite mode per D7.
 3. Icon: ask the user for a PNG, or skip.
 4. Bump version, propose commit.

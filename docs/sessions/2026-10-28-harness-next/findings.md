@@ -114,3 +114,14 @@ before the trigger, size-check and fixture fixes. All runs used one model.
 `owns:` front-matter (`plugin/template/docs/backlog.md:5`) holds subject names, not code
 paths, so nothing can tell when the code a doc describes has changed since its `updated:`
 date.
+
+## Found in S4
+
+**F21 — The installer allows scripts it did not install (low).** With both `scripts/docs/*.mjs`
+in `.claude/yotamake/skip`, `install.sh` still merges `Bash(node scripts/docs/lint-docs.mjs:*)`
+and `Bash(node scripts/docs/generate-records-index.mjs:*)` into `permissions.allow`
+(the merge loop in `plugin/install.sh` ignores the skip list). Harmless, but a re-run adds them
+back if removed. Fix in S7: skip an allow rule whose script path is opted out.
+
+**F22 — "Next steps" names a skipped file (low).** The installer's closing text always says to
+edit `.github/workflows/check.yml`, even when the skip file lists it. Fix in S7.

@@ -92,3 +92,30 @@
 - Version 0.3.0 → 0.4.0. Commit: `0018b5a`, pushed.
 - For S4: video-vault's skip file needs both `scripts/docs/*.mjs` paths; its `scripts/check`
   then calls `pnpm run lint:docs`. Per D5 its checks all go in the fast block.
+
+## 2026-10-28 — S4: video-vault, part 1 (install and facts)
+
+- D3, D4, D5 answered: all as recommended. F9 re-checked first: headings still as found.
+- Branch `chore/yotamake-harness` in video-vault from `main` at `7e7c1e3`. Push access was
+  already attached; the push worked.
+- `.claude/yotamake/skip`: both `scripts/docs/*.mjs`, `.github/workflows/check.yml` (no CI;
+  also the GitHub App cannot push workflows, see S2) and the three `.gitkeep`s (folders full).
+- `scripts/check`: type-check, lint, unused, tests, `lint:docs` in the fast block (D5).
+  Deviation from D5: `lint:db` sits under `touches '^services/supabase/'`, since it exits 2
+  without a database and would fail every commit when the local stack is down. Proxy
+  type-check and tests under `touches '^proxy/'`. `post-edit-checks.conf`: per-package eslint
+  for `.ts` and `.tsx`, matching the old local hook.
+- CLAUDE.md: Checks section added; Migrations, Branching and releases (with `Main branch`,
+  `Integration`, `Version bump` lines), Deploying, `6. Conventions`. Kept the numbers, so the
+  many `CLAUDE.md §2`/`§6` mentions still hold. No links used the old anchors; two prose
+  mentions in a 2026-08 record left alone (history).
+- Timing in this container: `--all` 60 s cold, `--staged` 36–40 s warm (CLAUDE.md says ~12 s
+  on the user's machine). Tests fail at import without `.env.development.local`; with dummy
+  `VITE_*` values all 101 files pass (log: `s4-checks.log`). The commit ran the real hook with
+  those dummy values: all PASS.
+- `npm install` in `proxy/` rewrote `proxy/package-lock.json`; reverted, not committed.
+- New: F21 (installer allows skipped scripts), F22 ("Next steps" names a skipped file); added
+  to S7.
+- No version bump (user: tooling only). Commit `7b25d6b`, pushed; not merged.
+- User to do: `git config core.hooksPath .githooks` in their own clone.
+- Next: S5. Ask D6 first.
