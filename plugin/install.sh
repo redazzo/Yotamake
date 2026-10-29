@@ -223,14 +223,20 @@ if [[ ${#opted_out[@]} -gt 0 ]]; then
     echo "did not install ${#opted_out[@]} file(s) listed in .claude/yotamake/skip:"
     printf '  %s\n' "${opted_out[@]}"
 fi
+# CLAUDE.md links ./README.md, so a repo without one would fail the docs check.
+readme_stub=""
 if [[ ! -e "$target/README.md" ]] && grep -qF '(./README.md)' "$target/CLAUDE.md" 2>/dev/null; then
-    echo "note: no README.md; CLAUDE.md links to it, so the docs check fails until you add one"
+    printf '# %s\n\n<!-- FILL IN: what the project is, and how to set it up and run it. -->\n' \
+        "$(basename "$(cd "$target" && pwd)")" > "$target/README.md"
+    readme_stub=1
+    echo "wrote a stub README.md (CLAUDE.md links to it)"
 fi
 
 # Next steps, leaving out files the repository opted out of.
 steps=()
 fill=""
 for f in CLAUDE.md scripts/check; do is_optout "$f" || fill+="${fill:+ and }$f"; done
+[[ -n "$readme_stub" ]] && fill+="${fill:+ and }README.md"
 [[ -n "$fill" ]] && steps+=("Fill in every FILL IN comment in $fill.")
 is_optout .github/workflows/check.yml ||
     steps+=("Add your toolchain setup to .github/workflows/check.yml (or delete it).")

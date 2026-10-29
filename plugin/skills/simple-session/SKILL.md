@@ -1,6 +1,6 @@
 ---
 name: simple-session
-description: Use before editing code, tests or docs in a repository set up with the harness (it has scripts/check) — for ANY change, even a one-line fix, a rename or a typo, and also when the user already names the branch, says exactly what to change, or the environment assigns a branch. Runs the change as one session: work on that branch (or cut one from the main branch), update the doc that owns the change, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
+description: Use before editing code, tests or docs in a repository set up with the harness (it has scripts/check) — for ANY change, even a one-line fix, a rename or a typo, and also when the user already names the branch, says exactly what to change, says it is quick or not to ask, or the environment assigns a branch. Runs the change as one session: work on that branch (or cut one from the main branch), update the doc that owns the change, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
 ---
 
 # Simple session
@@ -14,6 +14,8 @@ Project specifics live in `CLAUDE.md`, not here. This skill reads these sections
 - **Checks** — how the project's one check command works (normally `scripts/check`).
 - **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
   merge or a pull request), and whether code changes get a version bump.
+- **Architecture** — the design a change follows: its `Modules`, `Boundaries`,
+  `Shared code` and `Patterns` lines, and the accepted ADRs (step 3).
 
 If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
 report and use the defaults given below.
@@ -60,7 +62,39 @@ you cannot create a branch, stop and say why, without editing anything.
 If the working tree is dirty, stop and ask what to do with the changes. Do not stash or
 discard them yourself.
 
-## 3. Do the work
+## 3. Design and reuse — before any edit
+
+Skip this step when the change touches only docs. Otherwise read the **Architecture** section
+of CLAUDE.md and decide how the change fits before you write it.
+
+1. **Reuse first.** Before you write a new function, type, component or module, search for
+   code that already does the job: first in the places **Shared code** names, then in the
+   module the change touches. Reuse it, or extend it when a small change makes it fit. Write
+   new code only when nothing fits, and know why. New code that more than one place will use
+   goes where **Shared code** says.
+2. **Fit the design.** Put the change in the module that owns it (**Modules**). Do recurring
+   things the way **Patterns** and the nearby code already do them.
+3. **Stop on a design conflict.** Stop before any edit and ask the user when the change
+   would:
+   - break a rule in **Boundaries**;
+   - go against an accepted ADR (`docs/decisions/`);
+   - bring in a way of doing a recurring thing (errors, config, logging, validation, data
+     access) that **Patterns** does not list and the code does not already use;
+   - add a dependency that overlaps or replaces one the project already uses, or that
+     **Boundaries** or **Patterns** rule out. Any other new dependency goes ahead, and the
+     report names it.
+
+   Say what conflicts and quote the rule. Give options with a recommendation, for example: a
+   way that keeps the rule; changing the rule first (edit Architecture, or write a new ADR,
+   which makes the work too big for one session, step 1); or dropping that part. Do this
+   every time, even when the user asked for exactly that change or said not to ask. The rule
+   is the project's, and changing it is a separate decision. Wait for the answer.
+
+If the Architecture section is missing or still holds `FILL IN` placeholders, follow the
+structure and patterns already in the code. Say once in the report that it is unfilled, and
+that `/yotamake:setup` can fill it in.
+
+## 4. Do the work
 
 Follow CLAUDE.md. Keep to the one concern the branch is named for. The trivial side-fix
 policy (CLAUDE.md, Conventions) applies: fix a typo or stale comment you pass, and note it in
@@ -75,7 +109,7 @@ ADR in `docs/decisions/`; ask before writing one. The `write-doc` skill covers t
 If the repository has no `docs/README.md` (a lite install), there is no docs system: fix
 CLAUDE.md or `README.md` where they describe the change, and put follow-ups in the report.
 
-## 4. Run the checks
+## 5. Run the checks
 
 Run `scripts/check`. It picks the checks that match what changed, and prints one `PASS` or
 `FAIL` line per check. Run it even though a pre-commit hook exists: the hook runs only the
@@ -87,27 +121,52 @@ Do not add, skip or weaken a check to get a pass. Report only the summary lines.
 If a check fails, fix it when the failure is yours. If it was already failing on the main
 branch, say so and show the line, rather than fixing it in this branch.
 
-## 5. Review
+## 6. Review
 
-Skip this step when the branch changes only docs (Markdown files and `docs/`).
+The review runs once per session, here: after the work is done and the checks pass, on the
+whole branch diff. Never after each edit. Fixing its findings does not start another review;
+re-run only `scripts/check` (below). If the user asks for more changes after the report, run
+the full review once more before the next report, on what changed since the last one: both
+skills again, however small the new change.
 
-Otherwise run the built-in `/code-review` skill at low effort on the branch's diff against
-the main branch. Fix each finding that is a real defect in this branch's change, then run
-`scripts/check` again. A finding you judge wrong, or one outside this branch's concern, goes
-in the report with one line on why you left it.
+Skip this step when the branch changes only docs (Markdown files and `docs/`). A branch that
+changes any code gets the full review, however small: a one-line diff still runs both skills.
+Call each one with the Skill tool. Reading the diff yourself does not replace them, even
+when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
+checks below are only for a skill the Skill tool says is not available.
 
-If `/code-review` is not available, say so in the report and carry on.
+Otherwise review the branch's diff against the main branch in three parts:
 
-## 6. Stop and report
+1. **Reuse.** Run the built-in `/simplify` skill. It applies its fixes itself. Keep the
+   fixes to code this branch added or changed. Undo the others by hand (not with
+   `git checkout`, which would also drop your own uncommitted work) and list them in the
+   report as suggestions. If `/simplify` is not available, check by hand: for each new
+   function or block, search for code that already does the same, and reuse it.
+2. **Design.** Read the diff against **Architecture** (step 3): a broken boundary, a clash
+   with an accepted ADR, a pattern the project does not use, or logic copied from elsewhere.
+   Fix what lies inside this change. A conflict you only see now gets the same stop as in
+   step 3: ask before going on.
+3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a
+   real defect in this branch's change.
+
+If any part changed code, run `scripts/check` again. A finding you judge wrong, or one
+outside this branch's concern, goes in the report with one line on why you left it. If
+`/code-review` is not available, say so in the report and carry on.
+
+## 7. Stop and report
 
 Do not commit yet. Tell the user:
 
 - what changed, by file, in a few lines;
+- for a code change, two lines: "Reused:" the existing code it reuses or extends (or
+  "nothing"), and "New, because:" each new function, type, module or dependency and why
+  nothing existing fit (or "nothing new"); and that the Architecture section is unfilled, if it is;
 - which docs you updated, or why none needed it;
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
 - the check results (one line each);
-- the review: what it found and fixed, what you left and why, or that it was skipped;
+- the review: which skills you ran, what they found and fixed, what you left and why, or
+  that it was skipped because the branch changes only docs;
 - any side-fixes and any suggestions you left out;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).
@@ -115,7 +174,7 @@ Do not commit yet. Tell the user:
 Then ask whether to commit and merge, or, if the project works through pull requests (below),
 whether to commit, push and open a pull request.
 
-## 7. On yes: commit, bump, integrate
+## 8. On yes: commit, bump, integrate
 
 Only after the user says yes. Claude Code will also ask before `git commit`, `git merge` and
 `git push` when the project's settings put them under `ask`; that is expected. Stage the files

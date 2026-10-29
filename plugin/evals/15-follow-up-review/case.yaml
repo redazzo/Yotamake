@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: 15-follow-up-review
+context:
+  scaffold_script: scaffold.sh
+  history_file: history.jsonl
+expected_outcome: |
+  The conversation resumes after case 13's change was made, reviewed and reported. For the follow-up change, the run updates src/greet.js and its test, runs scripts/check, and runs the review once more: /simplify once and /code-review once, not per edit and not again after fixing findings. No commit; the run ends by asking before committing.
