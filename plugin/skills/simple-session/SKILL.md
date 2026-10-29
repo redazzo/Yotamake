@@ -79,8 +79,10 @@ of CLAUDE.md and decide how the change fits before you write it.
    - break a rule in **Boundaries**;
    - go against an accepted ADR (`docs/decisions/`);
    - bring in a way of doing a recurring thing (errors, config, logging, validation, data
-     access, a new dependency) that **Patterns** does not list and the code does not
-     already use.
+     access) that **Patterns** does not list and the code does not already use;
+   - add a dependency that overlaps or replaces one the project already uses, or that
+     **Boundaries** or **Patterns** rule out. Any other new dependency goes ahead, and the
+     report names it.
 
    Say what conflicts and quote the rule. Give options with a recommendation, for example: a
    way that keeps the rule; changing the rule first (edit Architecture, or write a new ADR,
@@ -157,8 +159,8 @@ Do not commit yet. Tell the user:
 
 - what changed, by file, in a few lines;
 - for a code change, two lines: "Reused:" the existing code it reuses or extends (or
-  "nothing"), and "New, because:" each new function, type or module and why nothing
-  existing fit (or "nothing new"); and that the Architecture section is unfilled, if it is;
+  "nothing"), and "New, because:" each new function, type, module or dependency and why
+  nothing existing fit (or "nothing new"); and that the Architecture section is unfilled, if it is;
 - which docs you updated, or why none needed it;
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;

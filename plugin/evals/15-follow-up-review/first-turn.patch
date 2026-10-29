@@ -1,5 +1,5 @@
 diff --git a/docs/reference/greeting.md b/docs/reference/greeting.md
-index 5acfcec..c5344ea 100644
+index 5acfcec..bc3ee6c 100644
 --- a/docs/reference/greeting.md
 +++ b/docs/reference/greeting.md
 @@ -1,10 +1,12 @@
@@ -13,19 +13,17 @@ index 5acfcec..c5344ea 100644
  
  # Greeting
  
--`greet(name)` in `src/greet.js` returns `Hello, <name>.` — the name, ending with a full stop.
-+`greet(name)` in `src/greet.js` returns `Hello, <name>.` — the name, ending with a full stop. The name is capitalised with
-+`titleCase` from `src/text.js`: each word starts upper-case and the rest is lower-case, so
-+`ada LOVELACE` gives `Hello, Ada Lovelace.`.
+ `greet(name)` in `src/greet.js` returns `Hello, <name>.` — the name, ending with a full stop.
++The name is capitalised word by word with `titleCase` from `src/text.js`, so
++`greet("ada LOVELACE")` returns `Hello, Ada Lovelace.`.
 diff --git a/src/greet.js b/src/greet.js
-index 8463031..494c81c 100644
+index 8463031..cf7c87a 100644
 --- a/src/greet.js
 +++ b/src/greet.js
 @@ -1,4 +1,6 @@
--// Returns the greeting shown to a user.
 +import { titleCase } from './text.js';
 +
-+// Returns the greeting shown to a user, with the name capitalised.
+ // Returns the greeting shown to a user.
  export function greet(name) {
 -  return `Hello, ${name}.`;
 +  return `Hello, ${titleCase(name)}.`;

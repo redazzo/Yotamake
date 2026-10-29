@@ -117,8 +117,9 @@ project does errors, config, logging and other recurring things). In a full inst
 points at the accepted ADRs. `/yotamake:setup` proposes these lines from the repo. Before
 writing code, `simple-session` looks for existing code to reuse, starting in Shared code, and
 puts the change in the module that owns it. If a change would break a boundary, go against
-an ADR, or bring in a pattern the project does not use, it stops before any edit and asks,
-with options. It does this even when the user asked for exactly that change or said not to
+an ADR, bring in a pattern the project does not use, or add a dependency that overlaps one it
+already has, it stops before any edit and asks, with options. Other new dependencies go ahead
+and are named in the report. It does this even when the user asked for exactly that change or said not to
 ask: changing the rule is a separate decision. The report says what was reused and why any
 new code was needed. If the section is unfilled, the skill follows the code's own structure
 and says so. `scripts/check` has commented examples for a boundary check and a
@@ -237,9 +238,10 @@ pre-made branch (as an assigned branch would in a cloud session). It also keeps 
 read-only, so `install.sh` cannot run inside a case; case 11's scaffold runs it instead.
 Cases 09–12 start with a slash command, since those skills are not model-invoked.
 Case 15 resumes a recorded first turn (`history.jsonl`, a run of case 13) and its prompt is
-the next message. The history holds the `simple-session` text from when it was recorded, so
-after changing that skill, re-record it with `bash evals/15-follow-up-review/record.sh` (from
-`plugin/`; it costs one run and strips the user's email from the transcript).
+the next message. The history holds the `simple-session` text, the system prompt and the
+Claude Code version from when it was recorded. So after changing that skill or upgrading
+Claude Code, re-record it with `bash evals/15-follow-up-review/record.sh` (from `plugin/`; it
+costs one run and strips the user's email from the transcript).
 
 ## Open work
 
@@ -261,9 +263,8 @@ after changing that skill, re-record it with `bash evals/15-follow-up-review/rec
   skills, that the review runs once per session (never per edit), and that a follow-up
   change gets one more full review. Latest runs (2026-10-29, Claude Code 2.1.312, one model):
   13-reuse and 02-small-change passed 3 of 3 each, with each skill called exactly once per
-  run; case 15 called each skill exactly once in 3 of 3 runs. One case-15 run failed
-  `asks-before-commit`, likely a judge error; that grader is now clearer but not yet re-run.
-  Likely fixed; re-check on the next full suite run.
+  run. Case 15 (0.9.4, with its clarified graders) passed 3 of 3, each skill called exactly
+  once per run. Likely fixed; re-check on the next full suite run.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).

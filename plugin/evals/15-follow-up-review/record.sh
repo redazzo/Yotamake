@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Re-records history.jsonl and first-turn.patch from one run of case 13-reuse.
-# The history holds the simple-session text from when it was recorded, and a
-# resumed run does not reload the skill, so re-record after changing the skill.
+# The history holds the simple-session text, system prompt and Claude Code version
+# from when it was recorded, and a resumed run does not reload the skill, so
+# re-record after changing the skill or upgrading Claude Code.
 # Costs one eval run. Run from plugin/: bash evals/15-follow-up-review/record.sh
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
