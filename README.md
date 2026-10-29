@@ -107,9 +107,8 @@ scripts/docs/                   docs linter and records index generator
 
 **Skills hold the method. `CLAUDE.md` holds the facts.** Skills read named sections
 (Checks, Branching and releases, Migrations, Deploying, Conventions, Architecture). If one is
-missing or
-unfilled, the skill says so and uses a stated default, or stops and asks. It never guesses a
-deploy or migration command.
+missing or unfilled, the skill says so and uses a stated default, or stops and asks. It never
+guesses a deploy or migration command.
 
 **Design comes before code.** The `Architecture` section of `CLAUDE.md` has four lines the
 skills read: **Modules** (the main parts and what each owns), **Boundaries** (rules a change
@@ -256,19 +255,15 @@ after changing that skill, re-record it with `bash evals/15-follow-up-review/rec
 - **`spec` is only partly tested.** Case 12 passed 3 of 3 runs (2026-10-29, Claude Code
   2.1.312, one model). Nothing yet tests the question-at-a-time path or the hand-over to a
   session. A recorded history, as in case 15, could test both.
-- **The review is sometimes skipped.** Cases 13-reuse, 14-boundary and 02-small-change
-  passed 2/3, 3/3 and 3/3 runs (2026-10-29, Claude Code 2.1.312, one model). In the one
-  failure Claude read the diff by hand instead of running `/simplify` and `/code-review`. That
-  is 1 of 6 code-change runs, down from about 5 of 6 before version 0.9.0 said the review
-  runs for any branch that changes code. Version 0.9.1 says that reading the diff by hand does not
-  replace the two skills, and the report names the skills that ran. On re-run, 13-reuse and
-  02-small-change each passed 3 of 3, with both skills called in all 6 runs (2026-10-29).
-  Version 0.9.2 says the review runs once per session, never per edit; on re-run both cases
-  again passed 3 of 3, with each skill called exactly once per run. Case 15 then showed a
-  follow-up change skipping `/simplify` as too small (1 run); version 0.9.3 says a follow-up
-  review runs both skills. Case 15 then ran each skill exactly once in 3 of 3 runs. One run
-  failed only because the judge missed the commit question; that grader is now clearer, not
-  yet re-run. Likely fixed; re-check on the next full suite run.
+- **The review was often skipped.** Before 0.9.0, Claude skipped `/simplify` and
+  `/code-review` in about 5 of 6 code-change eval runs; after it, in 1 of 6, by reading the
+  diff by hand. Versions 0.9.1 to 0.9.3 say that reading the diff does not replace the two
+  skills, that the review runs once per session (never per edit), and that a follow-up
+  change gets one more full review. Latest runs (2026-10-29, Claude Code 2.1.312, one model):
+  13-reuse and 02-small-change passed 3 of 3 each, with each skill called exactly once per
+  run; case 15 called each skill exactly once in 3 of 3 runs. One case-15 run failed
+  `asks-before-commit`, likely a judge error; that grader is now clearer but not yet re-run.
+  Likely fixed; re-check on the next full suite run.
 - **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
 - **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
   install step (the eval sandbox keeps `.claude/` read-only).
