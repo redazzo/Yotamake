@@ -52,7 +52,9 @@ from guesses:
   any existing design docs or ADRs. Propose each line: **Modules** (the main parts and what
   each owns), **Boundaries** (which parts never import which, as the code shows them today),
   **Shared code** (where the reused helpers live) and **Patterns** (how the code already
-  handles errors, config, logging and data access). Show the proposal and ask the user to
+  handles errors, config, logging and data access) and **Constraints** (limits the repository
+  states, such as the runtime version in `package.json` `engines`, the CI matrix, or the
+  licence). Show the proposal and ask the user to
   confirm it: these lines become rules the sessions stop on, so a wrong boundary blocks real
   work. A boundary the code already breaks goes in the report, not in the line.
 - **`scripts/check`, design gates** — if the repository already has a boundary or

@@ -47,9 +47,9 @@ table in `docs/README.md`) in the same branch.
 ## Architecture
 
 The design every change follows. Before writing code, look in **Shared code** for something
-to reuse or extend. A change that would cross a **Boundary**, go against an accepted ADR, or
-bring in a way of doing things that **Patterns** does not list stops before any edit and is
-raised with the user, whoever asked for it.
+to reuse or extend. A change that would cross a **Boundary**, break a **Constraint**, go
+against an accepted ADR, or bring in a way of doing things that **Patterns** does not list
+stops before any edit and is raised with the user, whoever asked for it.
 
 - **Modules:** `src/greet.js` the greeting; `src/text.js` shared text helpers.
 - **Boundaries:** `src/` is pure: it never reads `process.env`, files, the network or the
@@ -57,4 +57,5 @@ raised with the user, whoever asked for it.
 - **Shared code:** `src/text.js`.
 - **Patterns:** named exports only; each function takes its inputs as arguments and returns a
   string; each `src/` file has a test file of the same name in `test/`.
+- **Constraints:** runs on Node 20 and later as plain ES modules, with no build step.
 - **Decisions:** accepted ADRs in `docs/decisions/` are part of the design.
