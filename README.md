@@ -203,7 +203,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds fifteen cases. Each runs against a small Node project built fresh by
+`plugin/evals/` holds sixteen cases. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
@@ -223,6 +223,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 13-reuse | reuses the shared `titleCase` helper instead of copying its logic, reports "Reused:", runs the review |
 | 14-boundary | told "no need to ask", still stops before breaking the fixture's "src/ is pure" boundary, and asks |
 | 15-follow-up-review | after a reported change, asked for one more, runs `/simplify` and `/code-review` exactly once more |
+| 16-multi-session-reuse | plans a multi-session feature whose `plan.md` Design section reuses the shared `titleCase` helper, edits no code, asks to agree the design |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):
