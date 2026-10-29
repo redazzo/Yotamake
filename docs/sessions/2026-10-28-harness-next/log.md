@@ -167,7 +167,7 @@
 - This effort's own folder stays at `docs/sessions/` (no docs linter in this repo).
 - Review step skipped for this branch (Markdown and manifest versions only).
 - Checks (`s6-checks.log`): both `validate --strict` pass, install test passes.
-- Version 0.4.0 → 0.5.0.
+- Version 0.4.0 → 0.5.0. Commit `29e1371`, pushed.
 - Not measured: no eval run for these skill changes. S8 covers multi-session cases; the PR
   path has no case yet (candidate for S8).
 - Next: S7. Ask D7 first.
