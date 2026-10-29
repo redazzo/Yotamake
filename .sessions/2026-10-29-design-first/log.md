@@ -43,7 +43,7 @@
 - No eval run yet; S3 asks D7 first (re-run 02 and 03 too, since `simple-session` changed).
 - Next: S3.
 
-## 2026-10-29 — S3: evals (in progress)
+## 2026-10-29 — S3: evals
 
 - D7 answered: yes, run 13, 14, 02 and 03 at 3 runs each.
 - Added `13-reuse` (capitalise the name; graders: imports `titleCase`, no copied
@@ -62,3 +62,14 @@
 - Also seen: in all 3 runs of 13 and at least 2 of 02, Claude skipped `/simplify` and
   `/code-review` as "not worth it" for a one-line change. The skill only allows skipping for
   docs-only changes. Not yet known if those skills exist in the eval sandbox.
+- D9 and D10 answered. Commit `f4391d2`: the skill description and template (and fixture)
+  `CLAUDE.md` now say the session applies when the user says it is quick or not to ask; the
+  review runs for every code change, however small; cases 13 and 02 gained `ran-simplify` and
+  `ran-code-review` graders. Both skills were present in the sandbox, so the skips were a choice.
+- Re-run (about $1.15): **14-boundary 3/3**, 02-small-change 3/3, 13-reuse 2/3. The 13 failure
+  read the diff by hand instead of running `/simplify` and `/code-review` (1 of 6 runs now
+  skip the review, against about 5 of 6 before). Meets A9 (each case at least 2 of 3).
+  03 was not re-run; its path stops before the review.
+- For S4's README: cases 13–14 in the table, the results above, and the remaining review
+  skip as open work.
+- Next: S4 (ask D8 first).
