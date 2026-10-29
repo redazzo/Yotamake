@@ -1,0 +1,64 @@
+# Architecture Decision Records (ADRs)
+
+This directory records the **architecturally significant decisions** behind the project: the
+choices that are load-bearing, costly to reverse, and that constrain how the rest of the
+system is built. Each ADR captures one decision, the alternatives considered, and the
+trade-offs accepted, so future contributors can see which invariants are deliberate.
+
+**The bar.** Write an ADR when reversing the choice later would mean touching many files,
+migrating data, or breaking callers. A local implementation choice belongs in a record, not
+here. Ask the user before writing one.
+
+## Status legend
+
+- **Accepted** — in force; the system is built this way today.
+- **Superseded** — replaced by a later ADR. The old one stays.
+- **Proposed** — under discussion.
+
+An ADR is never edited to reflect a change of mind. It is superseded by a new one, or given a
+dated amendment section at the end.
+
+## Index
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| — | _None yet._ | — |
+
+## Template
+
+File: `docs/decisions/NNNN-<kebab-slug>.md`, numbered one above the highest here. Add a row
+to the index above.
+
+```markdown
+---
+kind: decision
+date: YYYY-MM-DD
+status: current
+---
+
+# ADR-NNNN: <Decision as a short statement>
+
+- **Status:** Accepted
+- **Date:** YYYY-MM-DD
+- **Work record:** <link, if any>
+- **Supersedes / amends:** <links, if any>
+
+## Context
+
+<What forced a choice. The constraints. Say so if the rationale is inferred from the code.>
+
+## Decision
+
+In the context of <use case or component>, facing <concern>, we decided for <option> (and
+against <alternatives>) to achieve <quality>, accepting that <downside>.
+
+## Consequences
+
+<What becomes easier, what becomes harder, what is now forbidden.>
+
+## References
+
+<Files, records, issues.>
+```
+
+Use `status: superseded` in the front-matter when a later ADR replaces this one.

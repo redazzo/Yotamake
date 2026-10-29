@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 09-release-check-no-section
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  CLAUDE.md has no Deploying section, so release-check stops, says so, and runs no deploy command (none guessed).

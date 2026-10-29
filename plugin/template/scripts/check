@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# The one check entry point. Claude's skills, the pre-commit hook and CI all run
+# this, so a change passes the same gate whoever makes it.
+#
+#   scripts/check          full checks for what changed since the main branch, plus
+#                          uncommitted work (Claude runs this before proposing a commit)
+#   scripts/check --staged fast checks for what is staged (the pre-commit hook uses this)
+#   scripts/check --all    every check, whatever changed (CI uses this)
+#
+# Prints one PASS/FAIL line per check, and the tail of a failing check's output.
+# Exit 0 when everything passes.
+#
+# Edit the FILL IN blocks below. This file belongs to the project: the harness
+# installer never overwrites it.
+
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+mode=${1:-changed}
+
+# The main branch: CHECK_BASE, else the "Main branch" line in CLAUDE.md (the same
+# line the plugin's main-branch hook reads), else main or master.
+main_branches() {
+    if [[ -n "${CHECK_BASE:-}" ]]; then echo "$CHECK_BASE"; return; fi
+    local m
+    m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
+    if [[ -n "$m" ]]; then echo "$m"; else printf '%s\n' main master; fi
+}
+
+case "$mode" in
+    --all) changed="" ;;
+    --staged) changed=$(git diff --cached --name-only) ;;
+    changed)
+        base=""
+        for b in $(main_branches); do
+            for ref in "$b" "origin/$b"; do
+                base=$(git merge-base HEAD "$ref" 2>/dev/null) && break 2
+            done
+        done
+        if [[ -z "$base" ]]; then
+            # Without a base the changed files are unknown, so check everything.
+            echo "note: no merge base with the main branch ($(main_branches | paste -sd/ -)); running every check. Set CHECK_BASE to override." >&2
+            mode=--all
+            changed=""
+        else
+            changed=$( { git diff --name-only "$base" 2>/dev/null; git ls-files --others --exclude-standard; } | sort -u)
+        fi ;;
+    *) echo "usage: scripts/check [--staged|--all]" >&2; exit 2 ;;
+esac
+
+failed=0
+ran=0
+run() {
+    local name=$1; shift
+    ran=$((ran + 1))
+    local out
+    if out=$("$@" 2>&1); then
+        echo "PASS  $name"
+    else
+        echo "FAIL  $name"
+        tail -n 40 <<<"$out" | sed 's/^/      /'
+        failed=1
+    fi
+}
+# touches <regex>: true when a changed path matches, or always under --all.
+touches() { [[ "$mode" == --all ]] || grep -qE "$1" <<<"$changed"; }
+# full: true except in the pre-commit hook. Put slow checks behind it.
+full() { [[ "$mode" != --staged ]]; }
+
+# --- Fast: every run, including the pre-commit hook ---------------------------
+# Keep these to a few seconds. FILL IN, e.g.:
+# run type-check  pnpm run type-check
+# run lint        pnpm run lint
+
+# yotamake:docs begin
+run docs node scripts/docs/lint-docs.mjs
+# yotamake:docs end
+
+# --- Full: not in the pre-commit hook -----------------------------------------
+# Slow checks. They still run before Claude proposes a commit, and in CI. FILL IN, e.g.:
+# full && run tests  pnpm run test --run
+
+# --- When the diff touches ----------------------------------------------------
+# FILL IN, e.g.:
+# touches '^db/migrations/'         && run db-lint     pnpm run lint:db
+# full && touches '^proxy/'         && run proxy-tests bash -c 'cd proxy && npm test'
+
+[[ $ran -gt 0 ]] || echo "note: no checks configured; add them to scripts/check." >&2
+exit $failed

@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 10-new-migration
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  A new file db/migrations/<today>000002_add_nicknames_table.sql (one migration already exists today), with the header comment; the run names the local apply command first and warns in bold that the remote one reaches production; no migration is applied.

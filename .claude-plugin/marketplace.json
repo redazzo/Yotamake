@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "yotamake",
+  "description": "The Yotamake development harness for Claude Code.",
+  "owner": {
+    "name": "redazzo"
+  },
+  "plugins": [
+    {
+      "name": "yotamake",
+      "source": "./plugin",
+      "description": "A development harness: small sessions on branches, one check command, stop-and-ask before commit and deploy, and a docs system that stays true.",
+      "version": "0.7.2"
+    }
+  ]
+}
