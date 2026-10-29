@@ -180,11 +180,13 @@ work is done; behaviour that lasts goes into the reference doc that owns it, so 
 second, drifting copy. Fixes, renames and refactors skip it. The skill is manual so that it
 does not compete with `simple-session` for the trigger.
 
-Before it stops and reports, `simple-session` reviews every code change, however small, in
-three parts: reuse (the built-in `/simplify`, keeping only fixes to the branch's own code),
-design (the diff against Architecture), and bugs (the built-in `/code-review` at low effort).
-Docs-only branches skip the review. A `multi-session` plan for code has a Design section
-(modules touched, code reused, new interfaces, boundaries at risk), agreed before S1. When the `Integration` line in
+Once per session, after the checks pass and before it reports, `simple-session` reviews the
+whole branch diff in three parts: reuse (the built-in `/simplify`, keeping only fixes to the
+branch's own code), design (the diff against Architecture), and bugs (the built-in
+`/code-review` at low effort). It runs for any branch that changes code, however small, but
+never after each edit, and fixing its findings does not start a second review. Docs-only
+branches skip it. A `multi-session` plan for code has a Design section (modules touched, code
+reused, new interfaces, boundaries at risk), agreed before S1. When the `Integration` line in
 `CLAUDE.md` says the project works through pull requests, the last step pushes the branch and
 opens a pull request instead of merging locally.
 
@@ -253,7 +255,7 @@ Cases 09–12 start with a slash command, since those skills are not model-invok
   passed 2/3, 3/3 and 3/3 runs (2026-10-29, Claude Code 2.1.312, one model). In the one
   failure Claude read the diff by hand instead of running `/simplify` and `/code-review`. That
   is 1 of 6 code-change runs, down from about 5 of 6 before version 0.9.0 said the review
-  runs for every code change. Version 0.9.1 says that reading the diff by hand does not
+  runs for any branch that changes code. Version 0.9.1 says that reading the diff by hand does not
   replace the two skills, and the report names the skills that ran. On re-run, 13-reuse and
   02-small-change each passed 3 of 3, with both skills called in all 6 runs (2026-10-29).
   Likely fixed; re-check on the next full suite run.

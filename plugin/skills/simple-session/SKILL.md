@@ -121,8 +121,13 @@ branch, say so and show the line, rather than fixing it in this branch.
 
 ## 6. Review
 
-Skip this step when the branch changes only docs (Markdown files and `docs/`). Every
-other change gets the full review, however small: a one-line diff still runs both skills.
+The review runs once per session, here: after the work is done and the checks pass, on the
+whole branch diff. Never after each edit. Fixing its findings does not start another review;
+re-run only `scripts/check` (below). If the user asks for more changes after the report, run
+the review once more before the next report, on what changed since the last one.
+
+Skip this step when the branch changes only docs (Markdown files and `docs/`). A branch that
+changes any code gets the full review, however small: a one-line diff still runs both skills.
 Call each one with the Skill tool. Reading the diff yourself does not replace them, even
 when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
 checks below are only for a skill the Skill tool says is not available.
