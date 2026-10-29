@@ -10,7 +10,7 @@
       "name": "yotamake",
       "source": "./plugin",
       "description": "A development harness: small sessions on branches, one check command, stop-and-ask before commit and deploy, and a docs system that stays true.",
-      "version": "0.7.3"
+      "version": "0.8.0"
     }
   ]
 }
