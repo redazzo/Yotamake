@@ -1,0 +1,152 @@
+== scripts/check --all (cold turbo cache) ==
+PASS  type-check
+PASS  lint
+PASS  unused
+FAIL  tests
+           37|  * sense alongside reintroducing direct data access, which the ADRs fo…
+           38|  */
+           39| const baseUrl = new URL(SUPABASE_URL.endsWith('/') ? SUPABASE_URL : `$…
+             |                                      ^
+           40| 
+           41| export const supabase = {
+       ❯ packages/client/src/integrations/youtube/youtube-api.ts:1:1
+      
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/20]⎯
+      
+      
+      ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+      
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > does not read the video data context until the menu is opened
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > mounts the real menu once opened
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > opens the same items from the kebab dropdown as from the right-click wrapper
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > does not mount the delete confirmation until delete is chosen
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > EditorialArticleCard — memoization > skips a re-render when its props are unchanged, and re-renders when isSelected flips
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > mounts a viewport-sized window of cards, not one per video
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > renders every card when there is no scrollable ancestor
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > promotes no hero by default, and still windows
+      TypeError: Cannot read properties of undefined (reading 'endsWith')
+       ❯ packages/client/src/integrations/supabase/client.ts:39:38
+           37|  * sense alongside reintroducing direct data access, which the ADRs fo…
+           38|  */
+           39| const baseUrl = new URL(SUPABASE_URL.endsWith('/') ? SUPABASE_URL : `$…
+             |                                      ^
+           40| 
+           41| export const supabase = {
+       ❯ packages/client/src/lib/api-client.ts:1:1
+      
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/20]⎯
+      
+      
+       Test Files  14 failed | 87 passed (101)
+            Tests  8 failed | 1321 passed | 11 skipped (1340)
+         Start at  00:01:28
+         Duration  30.19s (transform 2.53s, setup 14.81s, collect 6.34s, tests 6.10s, environment 37.75s, prepare 7.72s)
+      
+       ELIFECYCLE  Test failed. See above for more details.
+PASS  docs
+FAIL  db-grants
+      
+      > app@1.0.0 lint:db /home/user/app
+      > bash scripts/lint-db-grants.sh
+      
+      lint:db: no database reachable (set DATABASE_URL, or start the local Supabase stack)
+       ELIFECYCLE  Command failed with exit code 2.
+PASS  proxy-types
+PASS  proxy-tests
+exit=1 wall=60s
+== scripts/check --staged (warm cache) ==
+PASS  type-check
+PASS  lint
+PASS  unused
+FAIL  tests
+           37|  * sense alongside reintroducing direct data access, which the ADRs fo…
+           38|  */
+           39| const baseUrl = new URL(SUPABASE_URL.endsWith('/') ? SUPABASE_URL : `$…
+             |                                      ^
+           40| 
+           41| export const supabase = {
+       ❯ packages/client/src/integrations/youtube/youtube-api.ts:1:1
+      
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/20]⎯
+      
+      
+      ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+      
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > does not read the video data context until the menu is opened
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > mounts the real menu once opened
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > opens the same items from the kebab dropdown as from the right-click wrapper
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > does not mount the delete confirmation until delete is chosen
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > EditorialArticleCard — memoization > skips a re-render when its props are unchanged, and re-renders when isSelected flips
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > mounts a viewport-sized window of cards, not one per video
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > renders every card when there is no scrollable ancestor
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > promotes no hero by default, and still windows
+      TypeError: Cannot read properties of undefined (reading 'endsWith')
+       ❯ packages/client/src/integrations/supabase/client.ts:39:38
+           37|  * sense alongside reintroducing direct data access, which the ADRs fo…
+           38|  */
+           39| const baseUrl = new URL(SUPABASE_URL.endsWith('/') ? SUPABASE_URL : `$…
+             |                                      ^
+           40| 
+           41| export const supabase = {
+       ❯ packages/client/src/lib/api-client.ts:1:1
+      
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/20]⎯
+      
+      
+       Test Files  14 failed | 87 passed (101)
+            Tests  8 failed | 1321 passed | 11 skipped (1340)
+         Start at  00:02:08
+         Duration  30.28s (transform 2.69s, setup 15.15s, collect 6.15s, tests 6.25s, environment 37.41s, prepare 7.82s)
+      
+       ELIFECYCLE  Test failed. See above for more details.
+PASS  docs
+exit=1 wall=36s
+== after CLAUDE.md edits: scripts/check ==
+PASS  type-check
+PASS  lint
+PASS  unused
+FAIL  tests
+           37|  * sense alongside reintroducing direct data access, which the ADRs fo…
+           38|  */
+           39| const baseUrl = new URL(SUPABASE_URL.endsWith('/') ? SUPABASE_URL : `$…
+             |                                      ^
+           40| 
+           41| export const supabase = {
+       ❯ packages/client/src/integrations/youtube/youtube-api.ts:1:1
+      
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/20]⎯
+      
+      
+      ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+      
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > does not read the video data context until the menu is opened
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > mounts the real menu once opened
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > opens the same items from the kebab dropdown as from the right-click wrapper
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > VideoContextMenu — lazy content > does not mount the delete confirmation until delete is chosen
+       FAIL  tools/testing/tests/unit/cardCost.test.tsx > EditorialArticleCard — memoization > skips a re-render when its props are unchanged, and re-renders when isSelected flips
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > mounts a viewport-sized window of cards, not one per video
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > renders every card when there is no scrollable ancestor
+       FAIL  tools/testing/tests/unit/gridWindowing.test.tsx > EditorialGridLayout — windowing > promotes no hero by default, and still windows
+      TypeError: Cannot read properties of undefined (reading 'endsWith')
+       ❯ packages/client/src/integrations/supabase/client.ts:39:38
+           37|  * sense alongside reintroducing direct data access, which the ADRs fo…
+           38|  */
+           39| const baseUrl = new URL(SUPABASE_URL.endsWith('/') ? SUPABASE_URL : `$…
+             |                                      ^
+           40| 
+           41| export const supabase = {
+       ❯ packages/client/src/lib/api-client.ts:1:1
+      
+      ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/20]⎯
+      
+      
+       Test Files  14 failed | 87 passed (101)
+            Tests  8 failed | 1321 passed | 11 skipped (1340)
+         Start at  00:03:40
+         Duration  31.29s (transform 2.85s, setup 15.34s, collect 6.42s, tests 6.39s, environment 38.79s, prepare 8.09s)
+      
+       ELIFECYCLE  Test failed. See above for more details.
+PASS  docs
+PASS  proxy-types
+PASS  proxy-tests
+exit=1 wall=40s
