@@ -90,7 +90,7 @@ Ask D6 first.
 
 ✂ **Clear context.**
 
-## S6 — Skills: pull-request mode, cloud-friendly multi-session, review step (F14, F15, F16) — `todo`
+## S6 — Skills: pull-request mode, cloud-friendly multi-session, review step (F14, F15, F16) — `done`
 
 Ask D10 first.
 

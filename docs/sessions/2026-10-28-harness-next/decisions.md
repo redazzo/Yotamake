@@ -15,4 +15,4 @@ here with the date, and do not ask again.
 | D7 | S7 | Lite mode shape. Recommendation: an `install.sh --lite` flag that installs `CLAUDE.md`, `scripts/check`, the hook config and settings, but no docs skeleton. | — |
 | D8 | S8 | Eval budget. Recommendation: approve about $8 (new cases piloted once, then the full suite with the baseline arm). | — |
 | D9 | S9 | Stale-docs check: build it, or design only? Recommendation: design only in S9; build later if the design holds up. | — |
-| D10 | S6 | When does the review step run? Recommendation: code changes only, using the built-in `/code-review` at low effort; docs-only branches skip it. | — |
+| D10 | S6 | When does the review step run? Recommendation: code changes only, using the built-in `/code-review` at low effort; docs-only branches skip it. | 2026-10-29: as recommended. |

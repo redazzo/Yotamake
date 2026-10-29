@@ -1,6 +1,6 @@
 ---
 name: simple-session
-description: Run one self-contained change as a single session — branch from the main branch, do the work, update the doc that owns it, run scripts/check, then stop and ask before commit, version bump and merge. Use for ANY request that changes code, tests or docs in a repository set up with the harness (it has scripts/check), even a one-line change, a rename or a typo fix — not only when the user says "session" or "branch". Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
+description: Run one self-contained change as a single session — branch from the main branch, do the work, update the doc that owns it, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use for ANY request that changes code, tests or docs in a repository set up with the harness (it has scripts/check), even a one-line change, a rename or a typo fix — not only when the user says "session" or "branch". Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
 ---
 
 # Simple session
@@ -12,8 +12,8 @@ has to survive a `/clear`.
 Project specifics live in `CLAUDE.md`, not here. This skill reads these sections:
 
 - **Checks** — how the project's one check command works (normally `scripts/check`).
-- **Branching and releases** — the main branch, branch prefixes, how to integrate, and
-  whether code changes get a version bump.
+- **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
+  merge or a pull request), and whether code changes get a version bump.
 
 If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
 report and use the defaults given below.
@@ -80,24 +80,37 @@ Do not add, skip or weaken a check to get a pass. Report only the summary lines.
 If a check fails, fix it when the failure is yours. If it was already failing on the main
 branch, say so and show the line, rather than fixing it in this branch.
 
-## 5. Stop and report
+## 5. Review
+
+Skip this step when the branch changes only docs (Markdown files and `docs/`).
+
+Otherwise run the built-in `/code-review` skill at low effort on the branch's diff against
+the main branch. Fix each finding that is a real defect in this branch's change, then run
+`scripts/check` again. A finding you judge wrong, or one outside this branch's concern, goes
+in the report with one line on why you left it.
+
+If `/code-review` is not available, say so in the report and carry on.
+
+## 6. Stop and report
 
 Do not commit yet. Tell the user:
 
 - what changed, by file, in a few lines;
 - which docs you updated, or why none needed it;
 - the check results (one line each);
+- the review: what it found and fixed, what you left and why, or that it was skipped;
 - any side-fixes and any suggestions you left out;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).
 
-Then ask whether to commit and merge.
+Then ask whether to commit and merge, or, if the project works through pull requests (below),
+whether to commit, push and open a pull request.
 
-## 6. On yes: commit, bump, integrate
+## 7. On yes: commit, bump, integrate
 
-Only after the user says yes. Claude Code will also ask before `git commit` and `git merge`
-when the project's settings put them under `ask`; that is expected. Stage the files you
-changed by name, not `git add -A`. If the pre-commit hook fails, fix the cause; never pass
+Only after the user says yes. Claude Code will also ask before `git commit`, `git merge` and
+`git push` when the project's settings put them under `ask`; that is expected. Stage the files
+you changed by name, not `git add -A`. If the pre-commit hook fails, fix the cause; never pass
 `--no-verify` unless the user asks.
 
 ```bash
@@ -108,16 +121,30 @@ git commit -m "<message>"
 If CLAUDE.md defines a version bump, code changes get one as its own commit on the branch,
 using the command and file it names. Docs-only branches do not.
 
-Then integrate the way CLAUDE.md says. The default is a local merge commit:
+Then integrate the way the `Integration` line in CLAUDE.md says.
+
+**Local merge** (the default, when the line is missing or unfilled):
 
 ```bash
 git checkout <main-branch>
 git merge --no-ff <branch> -m "Merge <branch> into <main-branch>"
 ```
 
-If CLAUDE.md says the project works through pull requests, push the branch instead and offer
-to open one.
+Do not push or delete the branch unless the user asks.
 
-Do not push, delete the branch or deploy unless the user asks. Deploying is always their
-call. Finish with one line: the merge commit hash (or the pushed branch) and the new version,
-if any.
+**Pull request** (when the line says the project works through pull requests, or the
+environment says to push to an assigned branch):
+
+1. Push the branch: `git push -u origin <branch>`.
+2. If a pull request for this branch is already open, stop there: the push updated it.
+3. Otherwise open one against the main branch. Use the GitHub tools the environment provides,
+   or `gh pr create --base <main-branch>`. If the repository has a pull request template,
+   follow its headings. Title: the commit summary. Body: what changed and why, the docs
+   updated, the check and review results, and any attribution lines the environment asks for.
+4. If you cannot open one (no tool, no access), say so and give the branch name instead.
+
+Do not merge the pull request yourself; that is the reviewer's or the user's call. If the
+environment says not to open pull requests unless asked, push only and offer to open one.
+
+Never deploy; that is always the user's call. Finish with one line: the merge commit hash, or
+the pull request link (or the pushed branch), and the new version, if any.

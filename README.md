@@ -125,6 +125,15 @@ interface, more than one service, needs an ADR). If the change is too big, it of
 git-ignored `.scratchpad/<date>-<slug>/`. You `/clear` between sessions and resume with:
 "Read .scratchpad/<folder>/README.md and start the next session."
 
+In an ephemeral environment (a cloud container), or when the environment assigns one branch,
+the folder is committed at `.sessions/<date>-<slug>/` instead, and each session is a set of
+commits on that branch, pushed at the end of the session.
+
+Before it stops and reports, `simple-session` runs the built-in `/code-review` at low effort
+when the branch changes code (docs-only branches skip it). When the `Integration` line in
+`CLAUDE.md` says the project works through pull requests, the last step pushes the branch and
+opens a pull request instead of merging locally.
+
 ## Docs
 
 Four kinds, each maintained differently: reference (corrected in place), guides (corrected

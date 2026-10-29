@@ -102,8 +102,9 @@ to it rather than restate it.
 no recurring caller is a script run locally, not a permanent endpoint. The test is "who calls
 this next month?" An endpoint for a single use is permanent attack surface.
 
-**Work that spans several contexts** runs as numbered sessions with a git-ignored working
-folder under `.scratchpad/`, so it survives `/clear`. See the `yotamake:multi-session` skill.
+**Work that spans several contexts** runs as numbered sessions with a working folder that
+survives `/clear`: git-ignored under `.scratchpad/`, or committed under `.sessions/` in an
+ephemeral environment. See the `yotamake:multi-session` skill.
 
 **Stop points are enforced.** `.claude/settings.json` puts `git commit`, `merge`, `push`,
 `rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks before each one. Do not

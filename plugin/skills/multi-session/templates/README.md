@@ -2,10 +2,11 @@
 
 Started <yyyy-mm-dd>. <One or two sentences: what this effort is, and its scope, e.g. a commit range.>
 
-This folder is local only (`.scratchpad/` is git-ignored). It carries the work across context
-clears. Workflow: `.claude/skills/multi-session/SKILL.md`.
+**Setup:** <!-- one of: "Local: this folder is git-ignored; one branch per session." or
+"Committed: this folder is committed; all sessions are commits on branch `<branch>`." -->
+It carries the work across context clears. Workflow: the `multi-session` skill.
 
-The user resumes with: **"Read .scratchpad/<folder>/README.md and start the next session."**
+The user resumes with: **"Read <folder path>/README.md and start the next session."**
 
 ## Files
 

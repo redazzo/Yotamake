@@ -146,3 +146,28 @@
   `.env` file: Vite's `loadEnv` reads `process.env`.
 - Surprise worth knowing for S8: the plugin skills are not available as `yotamake:*` in these
   cloud sessions, so any eval or pilot has to load the plugin explicitly.
+
+## 2026-10-29 — S6: skills (pull-request mode, committed folder, review step)
+
+- D10 answered: as recommended (code changes only, `/code-review` at low effort).
+- `simple-session`: new step 5 **Review** (skipped for docs-only branches; fix real defects,
+  re-run checks, list the rest; say so if `/code-review` is missing). Old 5–6 are now 6–7.
+  Step 7 now has two paths from the `Integration` line: local merge (default) or pull request
+  (push, stop if a PR is already open, else open one with the environment's GitHub tools or
+  `gh pr create`, follow a PR template, never merge it). The report lists review results.
+- `multi-session`: new section on the two setups. Local (default): git-ignored
+  `.scratchpad/`, one branch per session. Committed: `.sessions/<date>-<slug>/` (outside
+  `docs/`, so the docs linter's orphan rule does not fire), sessions as commits on an assigned
+  branch, pushed after each session. Resume looks in both places and pulls first. Templates
+  updated (`README.md` setup line, `plan.md` branch line).
+- Side fix: the README template pointed at `.claude/skills/multi-session/SKILL.md`, a path
+  from before the plugin; it now names the skill.
+- README and template CLAUDE.md (Conventions) describe both. No section renamed, so the eval
+  fixture is unchanged.
+- This effort's own folder stays at `docs/sessions/` (no docs linter in this repo).
+- Review step skipped for this branch (Markdown and manifest versions only).
+- Checks (`s6-checks.log`): both `validate --strict` pass, install test passes.
+- Version 0.4.0 → 0.5.0.
+- Not measured: no eval run for these skill changes. S8 covers multi-session cases; the PR
+  path has no case yet (candidate for S8).
+- Next: S7. Ask D7 first.
