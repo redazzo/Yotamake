@@ -14,16 +14,40 @@ Project specifics live in `CLAUDE.md`, not here. This skill reads these sections
 - **Checks** — how the project's one check command works (normally `scripts/check`).
 - **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
   merge or a pull request), and whether code changes get a version bump.
-- **Architecture** — the design a change follows: its `Modules`, `Boundaries`,
+- **Architecture** — the design a change follows: its `Style`, `Modules`, `Boundaries`,
   `Shared code`, `Patterns` and `Constraints` lines, and the accepted ADRs (step 3).
 
 If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
 report and use the defaults given below.
 
+## 0. Harness upgrades — first
+
+Do this once per conversation, before step 1. Read the plugin's version from
+`<this skill's directory>/../../.claude-plugin/plugin.json` and the repository's from
+`.claude/yotamake/version`. If the file is missing, the repository was set up before 0.11.0.
+If it is older than the plugin, read `<this skill's directory>/../../reference/upgrades.md`
+and run the **Check** of each entry newer than the repository's version. If every check
+passes, carry on without comment.
+
+Otherwise list the entries whose check fails, one line each, and ask the user to pick one:
+
+- **Apply now** (recommended): on its own branch, `chore/yotamake-upgrade` (cut as in
+  step 2), run the plugin's `install.sh` against the repository root, which refreshes the
+  harness files and the version file. Then do each pending entry's **Apply**, oldest first,
+  run `scripts/check`, and report and ask as in step 7. After it is merged, go back to the
+  user's request at step 1. On an assigned branch, do this as its own commit there instead.
+- **Not now:** carry on with the request. The next conversation asks again.
+- **Skip these:** once step 2 has cut the request's branch, write the plugin's version to
+  `.claude/yotamake/version` there, name it in the report, and carry on. No session asks
+  about these entries again.
+
+If the user said not to ask, do not stop for this: carry on and list the pending entries in
+the report.
+
 ## 1. Check the size — before branching
 
-Do this before any branch, edit or install. The change is **too big for one session** if any
-of these hold:
+Do this before any branch, edit or install for the request. The change is **too big for one
+session** if any of these hold:
 
 - it adds or changes a database schema or migration *and* other code;
 - it adds more than one new interface (an HTTP API, a CLI, a UI screen, a background job);
@@ -72,14 +96,18 @@ of CLAUDE.md and decide how the change fits before you write it.
    module the change touches. Reuse it, or extend it when a small change makes it fit. Write
    new code only when nothing fits, and know why. New code that more than one place will use
    goes where **Shared code** says.
-2. **Fit the design.** Put the change in the module that owns it (**Modules**). Do recurring
-   things the way **Patterns** and the nearby code already do them.
+2. **Fit the design.** Put the change in the module that owns it (**Modules**). Shape a new
+   part the way **Style** says, e.g. a new adapter rather than database code in a hexagonal
+   core. Do recurring things the way **Patterns** and the nearby code already do them.
 3. **Stop on a design conflict.** Stop before any edit and ask the user when the change
    would:
    - break a rule in **Boundaries**;
    - break a limit in **Constraints** (a runtime or platform version, a size or speed
      budget, a licence, a security or data rule);
    - go against an accepted ADR (`docs/decisions/`);
+   - bring in a kind of part or a way for parts to talk that **Style** does not include,
+     e.g. a message queue in a system of direct calls, or a new deployable service in a
+     monolith;
    - bring in a way of doing a recurring thing (errors, config, logging, validation, data
      access) that **Patterns** does not list and the code does not already use;
    - add a dependency that overlaps or replaces one the project already uses, or that
@@ -150,7 +178,8 @@ Otherwise review the branch's diff against the main branch in three parts:
    report as suggestions. If `/simplify` is not available, check by hand: for each new
    function or block, search for code that already does the same, and reuse it.
 2. **Design.** Read the diff against **Architecture** (step 3): a broken boundary or constraint,
-   a clash with an accepted ADR, a pattern the project does not use, or logic copied from elsewhere.
+   a clash with an accepted ADR, a part that does not fit the Style, a pattern the project
+   does not use, or logic copied from elsewhere.
    Fix what lies inside this change. A conflict you only see now gets the same stop as in
    step 3: ask before going on.
 3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a

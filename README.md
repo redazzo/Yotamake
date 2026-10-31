@@ -53,13 +53,20 @@ the installer, and add the docs check to `scripts/check` by hand.
 once. Re-run `/yotamake:setup` (or `install.sh`) in a repo to refresh its harness-owned
 scripts; it never overwrites the files that belong to the project.
 
+When a new version needs something added to those files, such as a new line in `CLAUDE.md`,
+`plugin/reference/upgrades.md` says what and how to check for it. The installer records the
+version it ran in `.claude/yotamake/version`. When `simple-session` or `multi-session` starts in
+a repo older than the plugin, it lists the upgrades still missing and asks: apply now (on a
+`chore/yotamake-upgrade` branch of its own), not now, or skip these. `/yotamake:setup` applies
+them on a refresh.
+
 ## How it is split
 
 | Lives in | What | Who changes it |
 |---|---|---|
 | The plugin (`plugin/`) | Skills, hooks, output style, the installer and template | This repo; reaches every project on update |
 | Each repository | `CLAUDE.md` facts, `scripts/check`, `docs/`, hook config, CI workflow | The project |
-| Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit` | Refreshed by the installer |
+| Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit`, `.claude/yotamake/version` | Refreshed by the installer |
 
 ### The plugin
 
@@ -82,6 +89,8 @@ plugin/
     post-edit-check.sh             runs a fast per-file check after each edit
     protected-paths.default.conf   used when a repo has no list of its own
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
+  reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
+  reference/upgrades.md            per version: what to add to a repo's own files, and how
   install.sh                       installs template/ into a repo
   template/                        the per-repo files
   evals/                           the eval suite (see below)
@@ -99,6 +108,7 @@ scripts/check                   the one gate: skills, the pre-commit hook and CI
   protected-paths.conf          files Claude may not edit
   post-edit-checks.conf         glob → per-file check command
   skip                          optional: template paths the installer must never write
+  version                       the plugin version the harness files were installed from
 docs/                           README (rulebook and index), backlog, decisions, records, …
 scripts/docs/                   docs linter and records index generator
 ```
@@ -110,21 +120,25 @@ scripts/docs/                   docs linter and records index generator
 missing or unfilled, the skill says so and uses a stated default, or stops and asks. It never
 guesses a deploy or migration command.
 
-**Design comes before code.** The `Architecture` section of `CLAUDE.md` has five lines the
-skills read: **Modules** (the main parts and what each owns), **Boundaries** (rules a change
-must not break), **Shared code** (where reusable code lives) and **Patterns** (the one way the
-project does errors, config, logging and other recurring things) and **Constraints** (limits
-from outside the code, such as runtime versions, size budgets, licences or data rules). In a full install it also
-points at the accepted ADRs. `/yotamake:setup` proposes these lines from the repo. Before
-writing code, `simple-session` looks for existing code to reuse, starting in Shared code, and
-puts the change in the module that owns it. If a change would break a boundary or a constraint, go
-against an ADR, bring in a pattern the project does not use, or add a dependency that overlaps one it
-already has, it stops before any edit and asks, with options. Other new dependencies go ahead
-and are named in the report. It does this even when the user asked for exactly that change or said not to
-ask: changing the rule is a separate decision. The report says what was reused and why any
-new code was needed. If the section is unfilled, the skill follows the code's own structure
-and says so. `scripts/check` has commented examples for a boundary check and a
-duplicate-code check (dependency-cruiser, import-linter, jscpd); the project picks the tool.
+**Design comes before code.** The `Architecture` section of `CLAUDE.md` has six lines the
+skills read: **Style** (the architecture style or styles, such as layered, hexagonal or
+event-driven, and where each applies), **Modules** (the main parts and what each owns),
+**Boundaries** (rules a change must not break), **Shared code** (where reusable code lives),
+**Patterns** (the one way the project does errors, config, logging and other recurring things)
+and **Constraints** (limits from outside the code, such as runtime versions, size budgets,
+licences or data rules). In a full install it also points at the accepted ADRs.
+`/yotamake:setup` proposes these lines from the repo, naming the style from a catalogue in
+`plugin/reference/architecture-styles.md` that also lists the boundaries and gates each style
+implies. Before writing code, `simple-session` looks for existing code to reuse, starting in
+Shared code, and puts the change in the module that owns it. If a change would break a boundary
+or a constraint, step outside the style, go against an ADR, bring in a pattern the project does
+not use, or add a dependency that overlaps one it already has, it stops before any edit and
+asks, with options. Other new dependencies go ahead and are named in the report. It does this
+even when the user asked for exactly that change or said not to ask: changing the rule is a
+separate decision. The report says what was reused and why any new code was needed. If the
+section is unfilled, the skill follows the code's own structure and says so. `scripts/check`
+has commented examples for a boundary check and a duplicate-code check (dependency-cruiser,
+import-linter, jscpd); the project picks the tool.
 
 **One gate, run by everyone.** `scripts/check` is the only list of checks. Claude runs it
 before proposing a commit. The pre-commit hook runs its fast checks on staged changes; slow
@@ -204,7 +218,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds sixteen cases. Each runs against a small Node project built fresh by
+`plugin/evals/` holds seventeen cases. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
@@ -225,6 +239,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 14-boundary | told "no need to ask", still stops before breaking the fixture's "src/ is pure" boundary, and asks |
 | 15-follow-up-review | after a reported change, asked for one more, runs `/simplify` and `/code-review` exactly once more |
 | 16-multi-session-reuse | plans a multi-session feature whose `plan.md` Design section reuses the shared `titleCase` helper, edits no code, asks to agree the design |
+| 17-upgrade-offer | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):

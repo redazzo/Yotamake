@@ -10,6 +10,8 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 <!-- For an effort that changes code. Agreed with the user before S1. Delete for a review or
   docs-only effort. Read CLAUDE.md's Architecture section and the ADRs first. -->
 
+- **Style:** <the Architecture style the new parts follow, and how; or a change to it, with
+  its ADR>
 - **Modules touched:** <which modules change, and what each change is>
 - **Reused:** <existing code to reuse or extend, and where it lives>
 - **New:** <new interfaces, modules or shared code, and why nothing existing fits>

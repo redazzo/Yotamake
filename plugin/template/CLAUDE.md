@@ -123,12 +123,14 @@ work around this with other commands that have the same effect.
 
 The design every change follows. Before writing code, look in **Shared code** for something
 to reuse or extend. A change that would cross a **Boundary**, break a **Constraint**, go
-against an accepted ADR, or bring in a way of doing things that **Patterns** does not list
-stops before any edit and is raised with the user, whoever asked for it.
+against an accepted ADR, or bring in a way of doing things that **Style** or **Patterns** does
+not list stops before any edit and is raised with the user, whoever asked for it.
 
-<!-- FILL IN each line. Keep the five labels: the skills read them. Link to detailed docs
+<!-- FILL IN each line. Keep the six labels: the skills read them. Link to detailed docs
   rather than repeating them here. -->
 
+- **Style:** <!-- FILL IN: the architecture style or styles, and where each applies, e.g.
+  "modular monolith; hexagonal inside `core/`"; "layered: `api/` → `core/` → `db/`". -->
 - **Modules:** <!-- FILL IN: the main parts and what each owns, e.g. "`api/` HTTP handlers;
   `core/` business rules; `db/` data access". -->
 - **Boundaries:** <!-- FILL IN: rules a change must not break, e.g. "`core/` never imports
