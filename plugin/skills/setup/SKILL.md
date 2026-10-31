@@ -33,10 +33,19 @@ If the working tree has uncommitted changes, ask before running it. If the repos
 commits and is on its main branch, cut `chore/yotamake-harness` first: the plugin's hook
 blocks edits on the main branch, so filling in the facts below would fail there.
 
+Before running it on a repository already set up, note the version in
+`.claude/yotamake/version` (or that the file is missing): the installer overwrites it, and
+step 2 needs the old one.
+
 Report what it printed: files copied, harness files refreshed, project files kept. Do not
 re-run with `--force` unless the user asks; it overwrites project-owned files.
 
 ## 2. Fill in the facts
+
+On a refresh of an existing install, read `<this skill's directory>/../../reference/upgrades.md`
+first. Run the **Check** of each entry newer than the version `.claude/yotamake/version` held
+before the installer ran (no file: before 0.11.0). Do the **Apply** of each one that fails,
+oldest first, and list them in the report.
 
 On a fresh install, offer to fill in the `FILL IN` placeholders. Work from the repository, not
 from guesses:
@@ -49,17 +58,22 @@ from guesses:
   Deploying only from what the repository shows; if it shows nothing, ask whether to delete
   those sections.
 - **`CLAUDE.md`, Architecture** — read the layout, the imports between top-level folders and
-  any existing design docs or ADRs. Propose each line: **Modules** (the main parts and what
-  each owns), **Boundaries** (which parts never import which, as the code shows them today),
-  **Shared code** (where the reused helpers live) and **Patterns** (how the code already
-  handles errors, config, logging and data access) and **Constraints** (limits the repository
+  any existing design docs or ADRs. Propose each line: **Style** (the style or styles the code
+  follows and where, named from the "Signs in code" entries in
+  `<this skill's directory>/../../reference/architecture-styles.md`), **Modules** (the main
+  parts and what each owns), **Boundaries** (which parts never import which, as the code shows
+  them today), **Shared code** (where the reused helpers live), **Patterns** (how the code
+  already handles errors, config, logging and data access) and **Constraints** (limits the repository
   states, such as the runtime version in `package.json` `engines`, the CI matrix, or the
-  licence). Show the proposal and ask the user to
-  confirm it: these lines become rules the sessions stop on, so a wrong boundary blocks real
-  work. A boundary the code already breaks goes in the report, not in the line.
+  licence). Use the style's entry in the catalogue to check the Boundaries and Patterns lines
+  for rules the style implies that the code keeps but the lines leave out. Show the proposal
+  and ask the user to confirm it: these lines become rules the sessions stop on, so a wrong
+  boundary blocks real work. A boundary the code already breaks goes in the report, not in the
+  line.
 - **`scripts/check`, design gates** — if the repository already has a boundary or
   duplicate-code tool configured, add it as a `run` line. Otherwise leave the placeholders and
-  mention them in the report.
+  mention them in the report, with the rules the style's "Gate" entry says a tool would
+  check.
 - **`.github/workflows/check.yml`** — the toolchain setup steps, or ask whether to delete it.
 - **`.claude/yotamake/post-edit-checks.conf`** — one fast per-file linter line per language.
 

@@ -8,7 +8,7 @@
 #
 #   Project-owned  CLAUDE.md, scripts/check, docs/, .claude/yotamake/*.conf, CI workflow.
 #                  Copied only when missing (--force overwrites). Yours to edit.
-#   Harness-owned  scripts/docs/*.mjs, .githooks/pre-commit.
+#   Harness-owned  scripts/docs/*.mjs, .githooks/pre-commit, .claude/yotamake/version.
 #                  Always refreshed, so re-running this script updates them.
 #   Merged         .claude/settings.json: the harness's marketplace, plugin and
 #                  permission entries are added to whatever is already there.
@@ -151,6 +151,18 @@ if (JSON.stringify(theirs) !== before) {
 EOF
 
 chmod +x "$target/scripts/check" "$target/.githooks/pre-commit" 2>/dev/null || true
+
+# Record the plugin version these files came from. The sessions compare it with the
+# plugin's own and offer the upgrades in reference/upgrades.md.
+version_file=.claude/yotamake/version
+if ! is_optout "$version_file"; then
+    version=$(node -p 'require(process.argv[1]).version' "$src/../.claude-plugin/plugin.json")
+    if [[ "$(cat "$target/$version_file" 2>/dev/null)" != "$version" ]]; then
+        mkdir -p "$(dirname "$target/$version_file")"
+        echo "$version" > "$target/$version_file"
+        echo "recorded harness version $version in $version_file"
+    fi
+fi
 
 # Date the backlog's front-matter, if we just wrote it.
 if [[ " ${copied[*]-} " == *" docs/backlog.md "* ]]; then

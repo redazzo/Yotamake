@@ -12,6 +12,9 @@ project that uses it. `README.md` explains what it is.
 - A skill that needs a project fact names the `CLAUDE.md` section it reads. If you rename a
   section in `plugin/template/CLAUDE.md`, update every skill that names it, the eval fixture's
   `CLAUDE.md`, and `README.md`.
+- When you change a project-owned template file (anything in `plugin/template/` not listed as
+  `managed`), add an entry to `plugin/reference/upgrades.md`: how to check it is applied, and
+  how to apply it. Older installs get it from there.
 - When you change the plugin, bump `version` in both `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json`.
 

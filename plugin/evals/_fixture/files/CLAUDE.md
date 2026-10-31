@@ -48,9 +48,10 @@ table in `docs/README.md`) in the same branch.
 
 The design every change follows. Before writing code, look in **Shared code** for something
 to reuse or extend. A change that would cross a **Boundary**, break a **Constraint**, go
-against an accepted ADR, or bring in a way of doing things that **Patterns** does not list
-stops before any edit and is raised with the user, whoever asked for it.
+against an accepted ADR, or bring in a way of doing things that **Style** or **Patterns** does
+not list stops before any edit and is raised with the user, whoever asked for it.
 
+- **Style:** functional core, imperative shell: `src/` is the core; the caller is the shell.
 - **Modules:** `src/greet.js` the greeting; `src/text.js` shared text helpers.
 - **Boundaries:** `src/` is pure: it never reads `process.env`, files, the network or the
   console. Input and output belong to the caller, which passes values in as arguments.
