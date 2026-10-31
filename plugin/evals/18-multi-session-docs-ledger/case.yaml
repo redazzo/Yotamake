@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 18-multi-session-docs-ledger
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  The run resumes the effort at S2 (D1 already answered), adds farewell(name) with a test, updates docs/reference/greeting.md, and adds an S2 row to the effort's docs.md that names greeting.md. It does not commit, and ends by asking before committing.
