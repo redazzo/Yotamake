@@ -42,7 +42,9 @@ The user resumes with: **"Read <folder>/README.md and start the next session."**
 
 1. In a committed setup, first make sure you are on the effort's branch with its latest
    commits (`git pull`), since the folder lives there.
-2. Read that `README.md`, then `plan.md`, then the last entry in `log.md`.
+2. Read that `README.md`, then `plan.md`, then the last entry in `log.md`, then `docs.md`.
+   An effort started before the ledger existed has no `docs.md`: copy the template now, and
+   fill it from `log.md` and the diffs of the sessions already done, before going on.
 3. Read only the parts of `findings.md` the current session names.
 4. Start the first session in `plan.md` whose status is not `done`. Ask its questions from
    `decisions.md` before doing anything else, unless they already have answers.
@@ -61,7 +63,8 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
    `spec.md` only when the effort builds a new feature or changes behaviour users see; a
    review, a migration or a refactor leaves it out. If the user already wrote one with
    `/yotamake:spec` (a `spec-*.md` file in `.scratchpad/` or `.sessions/`), move it into the
-   folder as `spec.md` instead, and move its open questions into `decisions.md`.
+   folder as `spec.md` instead, and move its open questions into `decisions.md`. Always copy
+   `docs.md`, the docs ledger (see the rules below); it starts with no rows.
 2. Do the analysis once, in the first session (S0). Record what you found in `findings.md`
    with file:line references. Each finding gets an ID (F1, F2, …) and a severity. With a
    spec, first ask the questions that change scope or a criterion, one at a time, and wait for
@@ -102,27 +105,38 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
 - A session that changes behaviour updates the reference doc that owns it (the "Owns" table in
   `docs/README.md`) in the same branch. The close-out sweep below catches what slips through; it
   is not the place to write them.
+- Keep the docs ledger, `docs.md`, as you go, not from memory at the end. Before the report
+  (`simple-session`, step 7), add a row for every behaviour, rule, interface, config or command
+  this session changed: the doc that owns it, and `done`, `open` or `none`. Also add every
+  name this session renamed or removed, any follow-up for the backlog, any decision that may
+  need an ADR, and a line for the record. A doc update you put off is an `open` row, never
+  just a line in `log.md`. The report's docs line names the rows this session added.
 - At the end of a session: set its status in `plan.md`, append an entry to `log.md` (what was
-  done, commit hashes, what is left, anything surprising), then tell the user it is a good
-  point to `/clear`. In a committed setup, commit and push those updates first.
+  done, commit hashes, what is left, anything surprising), check `docs.md` is up to date, then
+  tell the user it is a good point to `/clear`. In a committed setup, commit and push those
+  updates first.
 
 ## Closing out
 
 The folder is disposable. Its last session moves anything worth keeping somewhere that lasts,
-then the folder is deleted:
+then the folder is deleted. Work from `docs.md`, row by row, not from memory or the log alone:
 
 - how the system works now → the reference docs that own each changed subject (the "Owns"
-  table in `docs/README.md`) and CLAUDE.md. Grep `docs/reference/` for every table, column,
-  file and function the effort renamed or removed, and fix each hit. Bump `updated:` on each
-  doc you change. If there is a `spec.md`, check each criterion is met, and put the behaviour
-  it describes in those docs, not in a copy of the spec;
-- what was built and why → a record in `docs/records/` (then run
-  `node scripts/docs/generate-records-index.mjs`);
-- follow-ups and out-of-scope findings → `docs/backlog.md`, each with a trigger to act;
-- an architecturally significant decision → an ADR in `docs/decisions/` (check its bar first).
+  table in `docs/README.md`) and CLAUDE.md. Do every `open` row in `docs.md` and re-read each
+  `done` row's doc against the final code, since a later session may have changed it again.
+  Grep `docs/` and CLAUDE.md for every old name under "Renames and removals", and fix each
+  hit. Bump `updated:` on each doc you change. If there is a `spec.md`, check each criterion
+  is met, and put the behaviour it describes in those docs, not in a copy of the spec;
+- what was built and why → a record in `docs/records/`, from the ledger's Record lines and
+  `log.md` (then run `node scripts/docs/generate-records-index.mjs`);
+- follow-ups and out-of-scope findings → `docs/backlog.md`, each with a trigger to act
+  (the ledger's Backlog lines, and any finding no session fixed);
+- an architecturally significant decision → an ADR in `docs/decisions/` (the ledger's ADR
+  candidates; check the bar first).
 
 The `write-doc` skill has the format for each. A repository with no `docs/README.md` (a lite
 install) has none of these: move what lasts into CLAUDE.md or `README.md`, and list
-follow-ups for the user in the close-out entry. Then mark every session done, write a
-close-out entry in `log.md` listing what is left for the user, and ask before deleting the
-folder. A committed folder is deleted in a commit of its own.
+follow-ups for the user in the close-out entry. Mark each ledger row `done` or `none` as you
+go. When no row is `open`, mark every session done, write a close-out entry in `log.md`
+listing what is left for the user, and ask before deleting the folder. A committed folder is
+deleted in a commit of its own.
