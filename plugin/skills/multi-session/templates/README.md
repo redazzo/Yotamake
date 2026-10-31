@@ -15,3 +15,5 @@ The user resumes with: **"Read <folder path>/README.md and start the next sessio
 - `findings.md` — what the analysis found, with file:line references. Why each task exists.
 - `decisions.md` — questions for the user and their answers. Check before asking again.
 - `log.md` — one entry per session: what was done, commits, what is left, surprises.
+- `docs.md` — the docs ledger: every change a durable doc must reflect, and whether it is
+  done. Close-out works from it.

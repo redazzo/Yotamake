@@ -28,7 +28,8 @@ Ask <decision IDs> first.
 
 1. Verify <finding> still holds (read <files>).
 2. <task>
-3. `scripts/check` and the review, then propose commit, version bump (if the project uses
+3. Update the docs that own what changed, and add this session's rows to `docs.md`.
+4. `scripts/check` and the review, then propose commit, version bump (if the project uses
    one) and merge or pull request.
 
 User involvement: <approvals, manual tests>.

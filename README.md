@@ -174,8 +174,10 @@ rules are separate, and `git -C . commit` still asked in a test (one run, Claude
 A session is one branch and one merge that fits in one context. `simple-session` first checks
 the size against concrete tests (a schema change plus other code, more than one new
 interface, more than one service, needs an ADR). If the change is too big, it offers
-`multi-session`, which keeps `plan.md`, `findings.md`, `decisions.md` and `log.md` in a
-git-ignored `.scratchpad/<date>-<slug>/`. You `/clear` between sessions and resume with:
+`multi-session`, which keeps `plan.md`, `findings.md`, `decisions.md`, `log.md` and a docs
+ledger, `docs.md`, in a git-ignored `.scratchpad/<date>-<slug>/`. Each session logs the doc
+changes it made or put off in the ledger, and the last session works through it, so no doc
+update is lost by the end. You `/clear` between sessions and resume with:
 "Read .scratchpad/<folder>/README.md and start the next session."
 
 In an ephemeral environment (a cloud container), or when the environment assigns one branch,
