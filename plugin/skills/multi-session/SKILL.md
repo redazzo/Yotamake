@@ -64,9 +64,10 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
    folder as `spec.md` instead, and move its open questions into `decisions.md`.
 2. Do the analysis once, in the first session (S0). Record what you found in `findings.md`
    with file:line references. Each finding gets an ID (F1, F2, …) and a severity. With a
-   spec, agree it first: ask the questions that change scope or a criterion, one at a time,
-   write the acceptance criteria (A1, A2, …, rules in the `spec` skill, step 3), and get the
-   user's approval before writing `plan.md`. Questions about how to build it wait in
+   spec, first ask the questions that change scope or a criterion, one at a time, and wait for
+   each answer. Then write the acceptance criteria (A1, A2, …, rules in the `spec` skill,
+   step 3) and go on to `plan.md` in the same turn; the user approves the spec and the plan
+   together at the end of S0 (step 6). Questions about how to build it wait in
    `decisions.md` for the session that needs them (step 5).
 3. If the effort changes code, fill in the Design section of `plan.md` before cutting sessions.
    Read the **Architecture** section of CLAUDE.md (and accepted ADRs) and the code, then write:
@@ -74,7 +75,7 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
    any new interfaces, and the boundaries and constraints at risk. Any plan that would break a
    boundary or a constraint, step outside the Style, or go against an ADR, is raised as a
    question now, as in `simple-session`, step 3. Agree the Design section with the user before
-   S1. Each session's design step then checks its work against it.
+   S1 (step 6). Each session's design step then checks its work against it.
 4. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
    (or, on an assigned branch, one set of commits) that fits in one context**, so a `/clear`
    never lands mid-change. Order them so each makes
@@ -84,7 +85,10 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
 5. Put every question for the user in `decisions.md`, tagged with the session that needs the
    answer. Give a recommendation with each. Ask at the start of that session, not all up front:
    by then the earlier sessions may have changed the question.
-6. End S0 by telling the user the resume line and that it is a good point to `/clear`.
+6. End S0 with one message: a summary of the spec (if any) and the plan with its Design
+   section, a request to approve them before S1, the resume line, and that it is a good point
+   to `/clear` once they are approved. Write `spec.md` and `plan.md` before this message, so
+   the user approves files, not a draft in the chat.
 
 ## Rules for every session
 
