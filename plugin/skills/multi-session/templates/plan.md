@@ -13,8 +13,8 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 - **Modules touched:** <which modules change, and what each change is>
 - **Reused:** <existing code to reuse or extend, and where it lives>
 - **New:** <new interfaces, modules or shared code, and why nothing existing fits>
-- **Boundaries at risk:** <Architecture boundaries, constraints or ADRs this work comes near,
-  and how it keeps them; or "none">
+- **Boundaries and constraints at risk:** <Architecture boundaries, constraints or ADRs this
+  work comes near, and how it keeps them; or "none">
 
 ---
 
