@@ -1,0 +1,2 @@
+# The GitHub App cannot push under .github/workflows/; docs/ci.yml is the workflow to add by hand.
+.github/workflows/check.yml
