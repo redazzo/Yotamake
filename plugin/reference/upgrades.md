@@ -20,6 +20,16 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.11.3 — Paths from the project root in protected-paths.conf
+
+- **Check:** the comment at the top of `.claude/yotamake/protected-paths.conf` says a glob
+  with a `/` is also matched against the path from the project root, or the repository has
+  no such file.
+- **Apply:** replace the first comment paragraph with the one in the plugin's
+  `template/.claude/yotamake/protected-paths.conf`. Then look for a glob in the list that
+  holds a `/` but starts with neither `/` nor `*`: before 0.11.3 it never matched anything,
+  so tell the user it now protects those files.
+
 ## 0.11.0 — Style line
 
 - **Check:** the Architecture section of `CLAUDE.md` has a `**Style:**` line.

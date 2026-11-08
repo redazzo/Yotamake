@@ -37,6 +37,8 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from '
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+// The generator owns the front-matter reader, so the linter and the index agree.
+import { splitFrontMatter, readFrontMatter } from './generate-records-index.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(here, '../..');
@@ -94,13 +96,6 @@ function stripCode(source) {
     .replace(/`[^`\n]*`/g, blank);
 }
 
-/** Split YAML front-matter from the body. Returns `{ frontMatter, body }`. */
-function splitFrontMatter(source) {
-  const match = source.match(/^---\n([\s\S]*?)\n---\n?/);
-  if (!match) return { frontMatter: null, body: source };
-  return { frontMatter: match[1], body: source.slice(match[0].length) };
-}
-
 const LINK_RE = /\[[^\]]*\]\(\s*([^)\s]+)(?:\s+"[^"]*")?\s*\)/g;
 
 /** Every internal link target in a document, with the line it appears on. */
@@ -142,29 +137,6 @@ function internalLinks(source) {
 
 const VALID_KINDS = new Set(['reference', 'guide', 'decision', 'record']);
 const VALID_STATUSES = new Set(['current', 'superseded', 'historical']);
-
-/** Minimal scalar/list YAML reader — enough for the schema, no dependency. */
-function parseFrontMatter(text) {
-  const data = {};
-  for (const raw of text.split('\n')) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const match = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
-    if (!match) continue;
-    const [, key, rawValue] = match;
-    const value = rawValue.trim();
-    if (value.startsWith('[') && value.endsWith(']')) {
-      data[key] = value
-        .slice(1, -1)
-        .split(',')
-        .map((v) => v.trim().replace(/^["']|["']$/g, ''))
-        .filter(Boolean);
-    } else {
-      data[key] = value.replace(/^["']|["']$/g, '');
-    }
-  }
-  return data;
-}
 
 function frontMatterProblems(data) {
   const problems = [];
@@ -234,11 +206,8 @@ function lint() {
     const file = path.relative(REPO_ROOT, absolute);
     const source = readFileSync(absolute, 'utf8').replace(/\r\n/g, '\n');
 
-    const { frontMatter } = splitFrontMatter(source);
-    if (frontMatter !== null) {
-      for (const problem of frontMatterProblems(parseFrontMatter(frontMatter))) {
-        findings.push({ rule: 'front-matter', file, detail: problem, line: 1 });
-      }
+    for (const problem of frontMatterProblems(readFrontMatter(source).data)) {
+      findings.push({ rule: 'front-matter', file, detail: problem, line: 1 });
     }
 
     const outbound = new Set();

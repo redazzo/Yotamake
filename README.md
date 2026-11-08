@@ -51,7 +51,9 @@ the installer, and add the docs check to `scripts/check` by hand.
 
 **Updating.** `claude plugin update yotamake@yotamake` updates the method for every repo at
 once. Re-run `/yotamake:setup` (or `install.sh`) in a repo to refresh its harness-owned
-scripts; it never overwrites the files that belong to the project.
+scripts; it never overwrites the files that belong to the project. It also regenerates
+`docs/records/README.md` when it is stale. That file is generated, not written by hand, and
+a refreshed generator could otherwise leave the docs check failing.
 
 When a new version needs something added to those files, such as a new line in `CLAUDE.md`,
 `plugin/reference/upgrades.md` says what and how to check for it. The installer records the
@@ -220,7 +222,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds seventeen cases. Each runs against a small Node project built fresh by
+`plugin/evals/` holds eighteen cases. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
@@ -242,6 +244,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 15-follow-up-review | after a reported change, asked for one more, runs `/simplify` and `/code-review` exactly once more |
 | 16-multi-session-reuse | plans a multi-session feature whose `plan.md` Design section reuses the shared `titleCase` helper, edits no code, asks to agree the design |
 | 17-upgrade-offer | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
+| 18-multi-session-docs-ledger | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):

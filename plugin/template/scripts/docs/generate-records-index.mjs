@@ -13,6 +13,9 @@
  *
  * Run with --check to verify the committed index matches what the records imply
  * (used by scripts/docs/lint-docs.mjs so a stale index fails the build rather than rotting).
+ *
+ * Also exports the front-matter reader. lint-docs.mjs imports it, so the linter and
+ * this index always read a doc's front-matter the same way.
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -33,20 +36,44 @@ function walk(dir, acc = []) {
   return acc;
 }
 
-function frontMatter(source) {
-  const match = source.match(/^---\n([\s\S]*?)\n---\n/);
-  if (!match) return {};
+/** Split YAML front-matter from the body. Returns `{ frontMatter, body }`. */
+export function splitFrontMatter(source) {
+  const match = source.match(/^---\n([\s\S]*?)\n---\n?/);
+  if (!match) return { frontMatter: null, body: source };
+  return { frontMatter: match[1], body: source.slice(match[0].length) };
+}
+
+/** Minimal scalar/list YAML reader — enough for the schema, no dependency. */
+function parseFrontMatter(text) {
   const data = {};
-  for (const line of match[1].split('\n')) {
-    const m = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
-    if (m) data[m[1]] = m[2].trim();
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const match = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
+    if (!match) continue;
+    const [, key, rawValue] = match;
+    const value = rawValue.trim();
+    if (value.startsWith('[') && value.endsWith(']')) {
+      data[key] = value
+        .slice(1, -1)
+        .split(',')
+        .map((v) => v.trim().replace(/^["']|["']$/g, ''))
+        .filter(Boolean);
+    } else {
+      data[key] = value.replace(/^["']|["']$/g, '');
+    }
   }
   return data;
 }
 
+/** A doc's front-matter as `{ data, body }`; `data` is `{}` when there is none. */
+export function readFrontMatter(source) {
+  const { frontMatter, body } = splitFrontMatter(source);
+  return { data: frontMatter === null ? {} : parseFrontMatter(frontMatter), body };
+}
+
 /** First `# ` heading, or the filename humanised. */
-function title(source, file) {
-  const body = source.replace(/^---\n[\s\S]*?\n---\n/, '');
+function title(body, file) {
   const m = body.match(/^#\s+(.+)$/m);
   if (m) return m[1].replace(/\s*[·—-]\s*$/, '').trim();
   return path.basename(file, '.md').replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-/g, ' ');
@@ -83,13 +110,13 @@ function collect() {
     }
 
     const source = readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
-    const fm = frontMatter(source);
+    const { data: fm, body } = readFrontMatter(source);
 
     entries.push({
       href: `./${parts.join('/')}`,
       date: fm.date || (rel.match(/(\d{4}-\d{2}-\d{2})/)?.[1] ?? ''),
       status: fm.status || 'historical',
-      title: title(source, file),
+      title: title(body, file),
       isProject,
     });
   }
@@ -131,22 +158,27 @@ ${done.length ? `| Date | Record |\n|---|---|\n${done.map(row).join('\n')}` : '_
 `;
 }
 
-const entries = collect();
-const rendered = render(entries);
+function main() {
+  const entries = collect();
+  const rendered = render(entries);
 
-if (process.argv.includes('--check')) {
-  const current = existsSync(INDEX_FILE) ? readFileSync(INDEX_FILE, 'utf8') : '';
-  if (current !== rendered) {
-    console.error(
-      'docs/records/README.md is stale — a record was added, renamed, or had its status ' +
-        'changed without regenerating the index.\n' +
-        'Fix: node scripts/docs/generate-records-index.mjs'
-    );
-    process.exit(1);
+  if (process.argv.includes('--check')) {
+    const current = existsSync(INDEX_FILE) ? readFileSync(INDEX_FILE, 'utf8') : '';
+    if (current !== rendered) {
+      console.error(
+        'docs/records/README.md is stale — a record was added, renamed, or had its status ' +
+          'changed without regenerating the index.\n' +
+          'Fix: node scripts/docs/generate-records-index.mjs'
+      );
+      process.exit(1);
+    }
+    console.log(`records index: up to date (${entries.length} records)`);
+    process.exit(0);
   }
-  console.log(`records index: up to date (${entries.length} records)`);
-  process.exit(0);
+
+  writeFileSync(INDEX_FILE, rendered, 'utf8');
+  console.log(`records index: wrote ${entries.length} records to docs/records/README.md`);
 }
 
-writeFileSync(INDEX_FILE, rendered, 'utf8');
-console.log(`records index: wrote ${entries.length} records to docs/records/README.md`);
+// Run only when executed, not when lint-docs.mjs imports the front-matter reader.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

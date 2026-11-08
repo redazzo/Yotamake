@@ -10,6 +10,8 @@
 #                  Copied only when missing (--force overwrites). Yours to edit.
 #   Harness-owned  scripts/docs/*.mjs, .githooks/pre-commit, .claude/yotamake/version.
 #                  Always refreshed, so re-running this script updates them.
+#   Generated      docs/records/README.md: regenerated when stale, so a refreshed
+#                  generator never leaves the docs check failing.
 #   Merged         .claude/settings.json: the harness's marketplace, plugin and
 #                  permission entries are added to whatever is already there.
 #
@@ -161,6 +163,21 @@ if ! is_optout "$version_file"; then
         mkdir -p "$(dirname "$target/$version_file")"
         echo "$version" > "$target/$version_file"
         echo "recorded harness version $version in $version_file"
+    fi
+fi
+
+# docs/records/README.md is the generator's output, not hand-written. A refreshed
+# generator may render it differently, and the docs check fails on a stale index,
+# so regenerate it on every run. Skipped when the index is opted out, or the repo has
+# no generator of ours (opted out, or --lite).
+records_index=docs/records/README.md
+gen="$target/scripts/docs/generate-records-index.mjs"
+if ! is_optout "$records_index" && [[ -f "$gen" && -d "$target/docs/records" ]]; then
+    before=$(cat "$target/$records_index" 2>/dev/null || true)
+    if ! node "$gen" >/dev/null; then
+        echo "warning: could not regenerate $records_index; run: node scripts/docs/generate-records-index.mjs" >&2
+    elif [[ "$(cat "$target/$records_index")" != "$before" ]]; then
+        echo "regenerated $records_index"
     fi
 fi
 
