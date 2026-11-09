@@ -6,6 +6,9 @@
  *   node scripts/consistency.mjs upgrades   reads changed paths on stdin; fails when a
  *                                           project-owned template file changed and
  *                                           plugin/reference/upgrades.md did not
+ *   node scripts/consistency.mjs sync-graders
+ *                                           copies each plugin/evals/_graders/ file over
+ *                                           the case graders of the same name
  *
  * Rules:
  *   - version: plugin.json and marketplace.json name the same version.
@@ -17,13 +20,18 @@
  *   - step refs: a pointer to another skill's step names its heading, as
  *     `simple-session`, "Design and reuse", and that heading exists. No pointer uses a
  *     step number, which would break silently when the skill is renumbered.
+ *   - eval graders: a case grader named like one in plugin/evals/_graders/ is an exact
+ *     copy of it (the eval runner reads each case's graders/ folder, so cases cannot
+ *     share one file), and every shared grader is used by some case.
+ *   - portable sed: no script uses GNU-only `sed -i` without a backup suffix (CLAUDE.md,
+ *     Constraints: the harness runs on macOS too).
  *   - harness copies: this repository's own harness-owned files (it installs its own
  *     harness) match plugin/template/. Re-run ./plugin/install.sh . to refresh them.
  *
  * Exit 0 when every rule holds, 1 otherwise.
  */
 
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,6 +46,18 @@ function managedFiles() {
   const m = read('plugin/install.sh').match(/^managed=\(([^)]*)\)/m);
   if (!m) throw new Error('no managed=(...) line in plugin/install.sh');
   return m[1].split(/\s+/).filter(Boolean);
+}
+
+/** Tracked and untracked (not ignored) files matching the git pathspecs, deleted ones left out. */
+function listedFiles(...pathspecs) {
+  return execFileSync('git', ['ls-files', '-co', '--exclude-standard', ...pathspecs], { cwd: ROOT, encoding: 'utf8' })
+    .split('\n')
+    .filter((f) => f && existsSync(path.join(ROOT, f)));
+}
+
+/** The eval case folders in plugin/evals/, e.g. "02-small-change". */
+function evalCases() {
+  return readdirSync(path.join(ROOT, 'plugin/evals')).filter((d) => /^\d\d-/.test(d));
 }
 
 /** Each skill as [name, path of its SKILL.md]. */
@@ -110,7 +130,7 @@ function checkLabels() {
 }
 
 function checkEvals() {
-  const cases = new Set(readdirSync(path.join(ROOT, 'plugin/evals')).filter((d) => /^\d\d-/.test(d)));
+  const cases = new Set(evalCases());
   const rows = new Set([...read('README.md').matchAll(/^\| (\d\d-[\w-]+) \|/gm)].map((m) => m[1]));
   for (const c of cases) if (!rows.has(c)) fail('evals', `README.md's eval table has no row for ${c}`);
   for (const r of rows) if (!cases.has(r)) fail('evals', `README.md's eval table lists ${r}, not in plugin/evals/`);
@@ -125,10 +145,8 @@ function checkStepRefs() {
     new Set([...read(file).matchAll(/^## (.+)$/gm)].map((m) => stepName(m[1]))),
   ]));
   // Every doc and script under plugin/ (bar the evals), plus the root docs.
-  const files = execFileSync('git', ['ls-files', '-co', '--exclude-standard', 'plugin/*.md',
-    'plugin/*.sh', 'README.md', 'CLAUDE.md'], { cwd: ROOT, encoding: 'utf8' })
-    .split('\n')
-    .filter((f) => f && !f.startsWith('plugin/evals/') && existsSync(path.join(ROOT, f)));
+  const files = listedFiles('plugin/*.md', 'plugin/*.sh', 'README.md', 'CLAUDE.md')
+    .filter((f) => !f.startsWith('plugin/evals/'));
   for (const file of files) {
     const text = read(file).replace(/\s+/g, ' '); // a pointer may wrap across lines
     for (const m of text.matchAll(/`([a-z][a-z-]*)`, "([^"]+)"/g)) {
@@ -147,6 +165,57 @@ function checkStepRefs() {
         }
       }
     }
+  }
+}
+
+/** Each shared grader as [source path, [paths of the case graders with its name]]. */
+function sharedGraders() {
+  return readdirSync(path.join(ROOT, 'plugin/evals/_graders')).map((name) => [
+    `plugin/evals/_graders/${name}`,
+    evalCases()
+      .map((c) => `plugin/evals/${c}/graders/${name}`)
+      .filter((f) => existsSync(path.join(ROOT, f))),
+  ]);
+}
+
+function checkSharedGraders() {
+  for (const [source, copies] of sharedGraders()) {
+    if (!copies.length) fail('eval graders', `${source} is used by no case`);
+    for (const copy of copies) {
+      if (read(copy) !== read(source)) {
+        fail('eval graders', `${copy} differs from ${source}; run node scripts/consistency.mjs ` +
+          'sync-graders, or give a deliberate variant another name');
+      }
+    }
+  }
+}
+
+function syncGraders() {
+  for (const [source, copies] of sharedGraders()) {
+    for (const copy of copies) {
+      if (read(copy) !== read(source)) {
+        writeFileSync(path.join(ROOT, copy), read(source));
+        console.log(`updated ${copy}`);
+      }
+    }
+  }
+}
+
+function checkPortableSed() {
+  const files = listedFiles('*.sh', 'scripts/check', 'plugin/template/scripts/check', '*/pre-commit');
+  for (const file of files) {
+    read(file).split('\n').forEach((line, i) => {
+      if (line.trimStart().startsWith('#')) return;
+      // Each command in the line; in a sed command, an -i (alone or in a flag group) or
+      // --in-place with no suffix is GNU-only.
+      const bare = line.split(/\|\||&&|[|;]/).some((cmd) => {
+        const words = cmd.trim().split(/\s+/);
+        return words[0] === 'sed' && words.some((w) => /^-[a-zA-Z]*i$/.test(w) || w === '--in-place');
+      });
+      if (bare) {
+        fail('portable sed', `${file}:${i + 1} uses sed -i without a suffix; use sed -i.bak and remove the .bak`);
+      }
+    });
   }
 }
 
@@ -177,12 +246,16 @@ function checkUpgrades(changed) {
 
 if (process.argv[2] === 'upgrades') {
   checkUpgrades(readFileSync(0, 'utf8').split('\n').filter(Boolean));
+} else if (process.argv[2] === 'sync-graders') {
+  syncGraders();
 } else {
   checkVersion();
   checkSections();
   checkLabels();
   checkEvals();
   checkStepRefs();
+  checkSharedGraders();
+  checkPortableSed();
   checkHarnessCopies();
 }
 

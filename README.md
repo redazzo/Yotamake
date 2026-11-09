@@ -246,6 +246,11 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 17-upgrade-offer | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
 | 18-multi-session-docs-ledger | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
 
+Every case installs the harness with `evals/_fixture/install-harness.sh`; case 11 calls it
+directly because it builds its own repository. A grader several cases share has its source
+copy in `evals/_graders/`; `scripts/check` fails when a case's copy differs, and
+`node scripts/consistency.mjs sync-graders` copies it into every case that uses it.
+
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):
 

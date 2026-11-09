@@ -4,7 +4,6 @@
 # sandbox keeps .claude/ read-only, and cuts the branch because the agent cannot
 # write inside .git.
 set -euo pipefail
-plugin_root="$(cd "$(dirname "$0")/../.." && pwd)"
 git init -q -b main .
 mkdir -p src test
 cat > package.json <<'JSON'
@@ -28,13 +27,4 @@ printf '# counter\n\nAdds numbers.\n' > README.md
 git add -A
 git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Initial"
 git checkout -q -b chore/yotamake-harness
-bash "$plugin_root/install.sh" "$PWD" >/dev/null
-# As in the shared fixture: the runner loads the plugin itself.
-node - <<'JS'
-const fs = require("fs");
-const p = ".claude/settings.json";
-const d = JSON.parse(fs.readFileSync(p, "utf8"));
-delete d.extraKnownMarketplaces;
-delete d.enabledPlugins;
-fs.writeFileSync(p, JSON.stringify(d, null, 2));
-JS
+bash "$(dirname "$0")/../_fixture/install-harness.sh"

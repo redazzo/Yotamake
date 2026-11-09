@@ -7,24 +7,12 @@
 #                       case starts on an assigned working branch.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
-plugin_root="$here/../.."
 
 git init -q -b main . 2>/dev/null || true
-bash "$plugin_root/install.sh" "$PWD" >/dev/null
-
-# The runner loads the plugin itself; drop the marketplace entries so the
-# fixture never tries to fetch it.
-node - <<'JS'
-const fs = require("fs");
-const p = ".claude/settings.json";
-const d = JSON.parse(fs.readFileSync(p, "utf8"));
-delete d.extraKnownMarketplaces;
-delete d.enabledPlugins;
-fs.writeFileSync(p, JSON.stringify(d, null, 2));
-JS
+bash "$here/install-harness.sh"
 
 cp -R "$here/files/." .
-sed -i 's|^# full && run tests  pnpm run test --run|run tests npm test|' scripts/check
+sed -i.bak 's|^# full && run tests  pnpm run test --run|run tests npm test|' scripts/check && rm scripts/check.bak
 grep -q '^run tests npm test' scripts/check
 node - <<'JS'
 const fs = require("fs");

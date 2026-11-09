@@ -132,7 +132,9 @@ not list stops before any edit and is raised with the user, whoever asked for it
 - **Shared code:** `plugin/hooks/lib.sh` for the hooks (reading the tool call);
   `plugin/reference/` for text several skills need;
   `plugin/skills/multi-session/templates/` for working-folder files (`spec` uses `spec.md`);
-  `generate-records-index.mjs` exports the front-matter reader `lint-docs.mjs` uses.
+  `generate-records-index.mjs` exports the front-matter reader `lint-docs.mjs` uses;
+  `plugin/evals/_fixture/` builds and installs eval repositories, and
+  `plugin/evals/_graders/` holds the source copy of graders several cases share.
 - **Patterns:** hooks get the edited path with `tool_file_path` from `lib.sh`, and block with
   exit 2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`.
   Skills name the `CLAUDE.md` sections they read in bold and say what to do when one is
