@@ -23,8 +23,8 @@ top.
 
 ## CI is written but not active
 
-**Added:** 2026-10-29 · **Trigger to act:** someone who can push under `.github/workflows/`
-has a few minutes.
+**Priority: High** · **Added:** 2026-10-29 · **Trigger to act:** someone who can push under
+`.github/workflows/` has a few minutes.
 
 [`docs/ci.yml`](./ci.yml) runs `scripts/check --all`. The GitHub App cannot push under
 `.github/workflows/` (re-tried 2026-11-09: GitHub refused the push for lack of the
