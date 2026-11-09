@@ -13,12 +13,18 @@ Project specifics live in `CLAUDE.md`, not here. This skill reads these sections
 
 - **Checks** — how the project's one check command works (normally `scripts/check`).
 - **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
-  merge or a pull request), and whether code changes get a version bump.
+  merge or a pull request), whether code changes get a version bump, and which files count
+  as docs (the `Docs-only` line).
 - **Architecture** — the design a change follows: its `Style`, `Modules`, `Boundaries`,
   `Shared code`, `Patterns` and `Constraints` lines, and the accepted ADRs (step 3).
 
 If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
 report and use the defaults given below.
+
+**Docs-only.** A docs-only branch skips the design and review steps and the version bump. A
+branch is docs-only when every file it changes is a doc, as the `Docs-only` line names them.
+Without that line, the docs are the files under `docs/` and the Markdown files at the
+repository root. Markdown anywhere else counts as code. When unsure, treat the file as code.
 
 ## 0. Harness upgrades — first
 
@@ -88,7 +94,7 @@ discard them yourself.
 
 ## 3. Design and reuse — before any edit
 
-Skip this step when the change touches only docs. Otherwise read the **Architecture** section
+Skip this step when the branch is docs-only. Otherwise read the **Architecture** section
 of CLAUDE.md and decide how the change fits before you write it.
 
 1. **Reuse first.** Before you write a new function, type, component or module, search for
@@ -159,8 +165,8 @@ re-run only `scripts/check` (below). If the user asks for more changes after the
 the full review once more before the next report, on what changed since the last one: both
 skills again, however small the new change.
 
-Skip this step when the branch changes only docs (Markdown files and `docs/`). A branch that
-changes any code gets the full review, however small: a one-line diff still runs both skills.
+Skip this step when the branch is docs-only. A branch that changes any code gets the full
+review, however small: a one-line diff still runs both skills.
 Call each one with the Skill tool. Reading the diff yourself does not replace them, even
 when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
 checks below are only for a skill the Skill tool says is not available.
@@ -202,7 +208,7 @@ Do not commit yet. Tell the user:
   whether to delete the spec file once this is merged;
 - the check results (one line each);
 - the review: which skills you ran, what they found and fixed, what you left and why, or
-  that it was skipped because the branch changes only docs;
+  that it was skipped because the branch is docs-only;
 - any side-fixes and any suggestions you left out;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).

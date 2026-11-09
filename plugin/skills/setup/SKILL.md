@@ -54,9 +54,11 @@ from guesses:
   scripts, a Makefile, CI config). Add each as a `run` line. Put a check that takes more than
   a few seconds (usually the test suite) behind `full`, so the pre-commit hook skips it. Run
   `scripts/check --all` and show the result.
-- **`CLAUDE.md`** — Project overview, Commands, Branching and releases. Fill in Migrations and
-  Deploying only from what the repository shows; if it shows nothing, ask whether to delete
-  those sections.
+- **`CLAUDE.md`** — Project overview, Commands, Branching and releases. For its `Docs-only`
+  line, look for Markdown outside `docs/` and the root: name docs folders (a `guides/`, say)
+  in the line, and tell the user that Markdown holding prompts or skills counts as code. Fill
+  in Migrations and Deploying only from what the repository shows; if it shows nothing, ask
+  whether to delete those sections.
 - **`CLAUDE.md`, Architecture** — read the layout, the imports between top-level folders and
   any existing design docs or ADRs. Propose each line: **Style** (the style or styles the code
   follows and where, named from the "Signs in code" entries in
