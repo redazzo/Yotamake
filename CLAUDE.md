@@ -46,6 +46,7 @@ only superseded) · [docs/records/](./docs/records/README.md) (history) ·
 scripts/check                       # the gate; see Checks
 ./plugin/install.sh <repo> [--lite] # install or refresh the harness in a repository
 ./plugin/install.sh .               # refresh this repository's own harness copies
+claude --plugin-dir ./plugin        # start a session on this branch's plugin, not the released one
 cd plugin && claude plugin eval . --case <name> --runs 3 --ablation none \
   --scaffold --trust-plugin --allow-tools Bash Write Edit --no-publish   # costs money; ask first
 ```
