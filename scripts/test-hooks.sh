@@ -37,7 +37,7 @@ expect 0 pre-edit-protect.sh "$p/other/config/secrets/db.txt"
 expect 0 pre-edit-protect.sh "/elsewhere/config/secrets/db.txt"
 expect 0 pre-edit-protect.sh "$p/id_rsa_dir/notes.txt"
 expect 0 pre-edit-protect.sh "$p/src/app.js"
-expect 2 pre-edit-protect.sh "/x/.env" CLAUDE_PROJECT_DIR="$tmp/none"   # plugin default list
+expect 2 pre-edit-protect.sh "/x/.env" CLAUDE_PROJECT_DIR="$tmp/none"   # the template's list
 expect 0 pre-edit-protect.sh ""                               # no path: let it through
 
 # --- pre-edit-main-branch.sh --------------------------------------------------
@@ -76,5 +76,11 @@ expect 0 post-edit-check.sh "$c/a.good"             # first match wins
 expect 0 post-edit-check.sh "$c/a.other"            # no rule
 expect 0 post-edit-check.sh "$c/missing.bad"        # file gone
 expect 0 post-edit-check.sh "$c/a.bad" CLAUDE_PROJECT_DIR="$tmp/none"   # no conf
+
+# --- Every hook lets the edit through when it cannot read the tool call ---------
+for hook in pre-edit-protect.sh pre-edit-main-branch.sh post-edit-check.sh; do
+    echo 'not json' | bash "$hooks/$hook" >/dev/null 2>&1 ||
+        { echo "FAIL $hook: unreadable input should exit 0"; failed=1; }
+done
 
 exit $failed

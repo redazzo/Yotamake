@@ -89,7 +89,7 @@ plugin/
     pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
     post-edit-check.sh             runs a fast per-file check after each edit
-    protected-paths.default.conf   used when a repo has no list of its own
+    lib.sh                         shared by the hooks: reads the edited path from the tool call
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
   reference/upgrades.md            per version: what to add to a repo's own files, and how

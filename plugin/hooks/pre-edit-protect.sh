@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 # PreToolUse hook for Edit/Write: refuse edits to protected files.
-# The list is the project's .claude/yotamake/protected-paths.conf, or this
-# plugin's protected-paths.default.conf when the project has none.
+# The list is the project's .claude/yotamake/protected-paths.conf, or the plugin
+# template's copy of that file when the project has none.
 # Claude Code passes the tool call as JSON on stdin. Exit 2 blocks the call and
 # sends stderr back to Claude.
 
+here=${BASH_SOURCE[0]%/*}
+[[ "${BASH_SOURCE[0]}" == */* ]] || here=.
+. "$here/lib.sh"
+
 root="${CLAUDE_PROJECT_DIR:-$PWD}"
 conf="$root/.claude/yotamake/protected-paths.conf"
-[[ -f "$conf" ]] || conf="$(dirname "$0")/protected-paths.default.conf"
+[[ -f "$conf" ]] || conf="$here/../template/.claude/yotamake/protected-paths.conf"
 [[ -f "$conf" ]] || exit 0
 
-fp=$(node -e '
-let d = {};
-try { d = JSON.parse(require("fs").readFileSync(0, "utf8")).tool_input || {}; } catch {}
-process.stdout.write(String(d.file_path || d.notebook_path || ""));
-' 2>/dev/null)
+fp=$(tool_file_path)
 [[ -n "$fp" ]] || exit 0
 name=$(basename "$fp")
 

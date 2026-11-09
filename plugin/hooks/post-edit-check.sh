@@ -7,11 +7,11 @@
 conf="${CLAUDE_PROJECT_DIR:-.}/.claude/yotamake/post-edit-checks.conf"
 [[ -f "$conf" ]] || exit 0
 
-fp=$(node -e '
-let d = {};
-try { d = JSON.parse(require("fs").readFileSync(0, "utf8")).tool_input || {}; } catch {}
-process.stdout.write(String(d.file_path || d.notebook_path || ""));
-' 2>/dev/null)
+here=${BASH_SOURCE[0]%/*}
+[[ "${BASH_SOURCE[0]}" == */* ]] || here=.
+. "$here/lib.sh"
+
+fp=$(tool_file_path)
 [[ -n "$fp" && -f "$fp" ]] || exit 0
 
 case "$fp" in

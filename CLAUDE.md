@@ -125,11 +125,12 @@ not list stops before any edit and is raised with the user, whoever asked for it
   hook. Skills read project facts only from named `CLAUDE.md` sections. The installer never
   overwrites a project-owned file, and merges `.claude/settings.json` without removing
   anything. Hooks let the edit through (exit 0) when they cannot decide.
-- **Shared code:** `plugin/reference/` for text several skills need;
+- **Shared code:** `plugin/hooks/lib.sh` for the hooks (reading the tool call);
+  `plugin/reference/` for text several skills need;
   `plugin/skills/multi-session/templates/` for working-folder files (`spec` uses `spec.md`);
   `generate-records-index.mjs` exports the front-matter reader `lint-docs.mjs` uses.
-- **Patterns:** hooks read the tool call's JSON from stdin with `node -e`, and block with exit
-  2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`.
+- **Patterns:** hooks get the edited path with `tool_file_path` from `lib.sh`, and block with
+  exit 2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`.
   Skills name the `CLAUDE.md` sections they read in bold and say what to do when one is
   missing or unfilled. A change to a project-owned template file gets an `upgrades.md` entry.
 - **Constraints:** needs only `bash`, `git` and Node 18+; no npm dependencies. Runs on Linux
