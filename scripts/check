@@ -94,5 +94,10 @@ full && run validate validate
 full && touches '^plugin/(install\.sh|template/|evals/_fixture/|\.claude-plugin/)|^scripts/test-install' &&
     run install bash scripts/test-install.sh
 
+# Not a check: names the eval cases that cover what changed (README.md, Evals). They cost
+# money, so they stay out of the gate.
+full && [[ "$mode" == changed ]] && touches '^plugin/' &&
+    node scripts/consistency.mjs evals-for <<<"$changed"
+
 [[ $ran -gt 0 ]] || echo "note: no checks configured; add them to scripts/check." >&2
 exit $failed

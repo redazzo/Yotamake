@@ -9,6 +9,8 @@
  *   node scripts/consistency.mjs sync-graders
  *                                           copies each plugin/evals/_graders/ file over
  *                                           the case graders of the same name
+ *   node scripts/consistency.mjs evals-for  reads changed paths on stdin; prints the eval
+ *                                           cases that cover them (a note: always exit 0)
  *
  * Rules:
  *   - version: plugin.json and marketplace.json name the same version.
@@ -16,7 +18,8 @@
  *     "CLAUDE.md, **X**") or the template's top comment lists is a heading in the template.
  *   - labels: the template's Architecture labels are all in the eval fixture's CLAUDE.md
  *     and in this repository's own.
- *   - evals: README.md's eval table has one row per folder in plugin/evals/, and no other.
+ *   - evals: README.md's eval table has one row per folder in plugin/evals/, and no other,
+ *     and each row's Skills cell names one or more skills that exist.
  *   - step refs: a pointer to another skill's step names its heading, as
  *     `simple-session`, "Design and reuse", and that heading exists. No pointer uses a
  *     step number, which would break silently when the skill is renumbered.
@@ -129,11 +132,71 @@ function checkLabels() {
   }
 }
 
+/** README.md's eval table as a Map: case -> the skills its Skills cell names. */
+function evalRows() {
+  return new Map(
+    [...read('README.md').matchAll(/^\| (\d\d-[\w-]+) \| ([^|]*) \|/gm)].map((m) => [
+      m[1],
+      [...m[2].matchAll(/`([a-z][a-z-]*)`/g)].map((s) => s[1]),
+    ])
+  );
+}
+
 function checkEvals() {
   const cases = new Set(evalCases());
-  const rows = new Set([...read('README.md').matchAll(/^\| (\d\d-[\w-]+) \|/gm)].map((m) => m[1]));
+  const rows = evalRows();
+  const skills = new Set(skillFiles().map(([name]) => name));
   for (const c of cases) if (!rows.has(c)) fail('evals', `README.md's eval table has no row for ${c}`);
-  for (const r of rows) if (!cases.has(r)) fail('evals', `README.md's eval table lists ${r}, not in plugin/evals/`);
+  for (const [r, named] of rows) {
+    if (!cases.has(r)) fail('evals', `README.md's eval table lists ${r}, not in plugin/evals/`);
+    if (!named.length) fail('evals', `README.md's eval table row ${r} names no skill`);
+    for (const s of named) {
+      if (!skills.has(s)) fail('evals', `README.md's eval table row ${r} names ${s}, not in plugin/skills/`);
+    }
+  }
+}
+
+/**
+ * The eval cases that cover the changed paths, worked out from the eval table's Skills
+ * column. Prints a note to stderr; prints nothing when no case is affected.
+ */
+function evalsFor(changed) {
+  const casesOf = new Map(); // skill -> the cases that list it
+  for (const [c, named] of evalRows()) for (const s of named) casesOf.set(s, [...(casesOf.get(s) ?? []), c]);
+  const skillText = skillFiles().map(([name, file]) => [name, read(file)]);
+  const cases = new Set();
+  const uncovered = new Set();
+  const forSkill = (skill) => {
+    if (!casesOf.has(skill)) uncovered.add(skill);
+    for (const c of casesOf.get(skill) ?? []) cases.add(c);
+  };
+  for (const p of changed) {
+    let m;
+    if ((m = p.match(/^plugin\/skills\/([^/]+)\//))) {
+      forSkill(m[1]);
+    } else if (p.startsWith('plugin/reference/')) {
+      // A reference file reaches a case through the skills that read it.
+      const ref = p.slice('plugin/'.length);
+      const readers = skillText.filter(([, text]) => text.includes(ref));
+      if (!readers.length) uncovered.add(p);
+      readers.forEach(([name]) => forSkill(name));
+    } else if ((m = p.match(/^plugin\/evals\/(\d\d-[^/]+)\//))) {
+      cases.add(m[1]);
+    } else if (p.startsWith('plugin/evals/_graders/')) {
+      for (const c of evalCases()) if (existsSync(path.join(ROOT, `plugin/evals/${c}/graders/${path.basename(p)}`))) cases.add(c);
+    } else if (/^plugin\/(hooks\/|install\.sh|template\/|evals\/_fixture\/)/.test(p)) {
+      // Every case installs the harness from these.
+      evalCases().forEach((c) => cases.add(c));
+    } else if (p.startsWith('plugin/') && !p.startsWith('plugin/evals/')) {
+      // e.g. the output style, plugin.json, plugin/README.md: no case reads them.
+      uncovered.add(p);
+    }
+  }
+  if (cases.size) {
+    console.error(`note: eval cases that cover this change (they cost money; ask before running): ` +
+      [...cases].sort().join(', '));
+  }
+  if (uncovered.size) console.error(`note: no eval case covers ${[...uncovered].sort().join(', ')}`);
 }
 
 /** "## 3. Design and reuse — before any edit" -> "Design and reuse". */
@@ -248,6 +311,8 @@ if (process.argv[2] === 'upgrades') {
   checkUpgrades(readFileSync(0, 'utf8').split('\n').filter(Boolean));
 } else if (process.argv[2] === 'sync-graders') {
   syncGraders();
+} else if (process.argv[2] === 'evals-for') {
+  evalsFor(readFileSync(0, 'utf8').split('\n').filter(Boolean));
 } else {
   checkVersion();
   checkSections();

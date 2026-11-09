@@ -81,8 +81,9 @@ It prints one `PASS`/`FAIL` line per check. A person can skip the git hook once 
 For a hook change, add its case to `scripts/test-hooks.sh`. For an installer change, add one
 to `scripts/test-install.sh`.
 
-The eval cases are not in the gate: they cost money. For a skill change, name the affected
-cases in the report and ask before running them (see Commands).
+The eval cases are not in the gate: they cost money. On a branch that changes the plugin,
+`scripts/check` ends with a note naming the cases that cover the change (`README.md`, Evals,
+says how). Put them in the report and ask before running them (see Commands).
 
 ## Branching and releases
 

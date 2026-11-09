@@ -199,26 +199,32 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 `plugin/evals/` holds the cases below. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
-| Case | Checks that Claude… |
-|---|---|
-| 01-branches-first | tries to branch before editing, and edits nothing on `main` |
-| 02-small-change | changes code, test and the owning doc, runs `scripts/check`, `/simplify` and `/code-review`, proposes a commit and asks |
-| 03-too-big | refuses to start a four-part feature and offers a multi-session plan |
-| 04-docs-only | fixes a guide, runs the docs check, plans no version bump |
-| 05-work-record | writes a valid record and regenerates the index |
-| 06-question | answers a question without starting a session (should not fire) |
-| 07-multi-session-start | writes a `.scratchpad/` plan for a multi-session effort, edits no code, gives the resume line |
-| 08-multi-session-resume | resumes at the first session not done and asks its open decision before editing |
-| 09-release-check-no-section | refuses to deploy when CLAUDE.md has no Deploying section, and guesses no command |
-| 10-new-migration | names the migration with the next sequence number and warns about the remote command |
-| 11-setup-fill-in | fills in `scripts/check` and CLAUDE.md after an install, runs the check, asks before committing |
-| 12-spec-first | writes a `spec-*.md` file with numbered acceptance criteria, edits no code, asks for approval |
-| 13-reuse | reuses the shared `titleCase` helper instead of copying its logic, reports "Reused:", runs the review |
-| 14-boundary | told "no need to ask", still stops before breaking the fixture's "src/ is pure" boundary, and asks |
-| 15-follow-up-review | after a reported change, asked for one more, runs `/simplify` and `/code-review` exactly once more |
-| 16-multi-session-reuse | plans a multi-session feature whose `plan.md` Design section reuses the shared `titleCase` helper, edits no code, asks to agree the design |
-| 17-upgrade-offer | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
-| 18-multi-session-docs-ledger | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
+| Case | Skills | Checks that Claude… |
+|---|---|---|
+| 01-branches-first | `simple-session` | tries to branch before editing, and edits nothing on `main` |
+| 02-small-change | `simple-session` | changes code, test and the owning doc, runs `scripts/check`, `/simplify` and `/code-review`, proposes a commit and asks |
+| 03-too-big | `simple-session`, `multi-session` | refuses to start a four-part feature and offers a multi-session plan |
+| 04-docs-only | `simple-session`, `write-doc` | fixes a guide, runs the docs check, plans no version bump |
+| 05-work-record | `simple-session`, `write-doc` | writes a valid record and regenerates the index |
+| 06-question | `simple-session`, `multi-session` | answers a question without starting a session (should not fire) |
+| 07-multi-session-start | `multi-session` | writes a `.scratchpad/` plan for a multi-session effort, edits no code, gives the resume line |
+| 08-multi-session-resume | `multi-session` | resumes at the first session not done and asks its open decision before editing |
+| 09-release-check-no-section | `release-check` | refuses to deploy when CLAUDE.md has no Deploying section, and guesses no command |
+| 10-new-migration | `new-migration` | names the migration with the next sequence number and warns about the remote command |
+| 11-setup-fill-in | `setup` | fills in `scripts/check` and CLAUDE.md after an install, runs the check, asks before committing |
+| 12-spec-first | `spec` | writes a `spec-*.md` file with numbered acceptance criteria, edits no code, asks for approval |
+| 13-reuse | `simple-session` | reuses the shared `titleCase` helper instead of copying its logic, reports "Reused:", runs the review |
+| 14-boundary | `simple-session` | told "no need to ask", still stops before breaking the fixture's "src/ is pure" boundary, and asks |
+| 15-follow-up-review | `simple-session` | after a reported change, asked for one more, runs `/simplify` and `/code-review` exactly once more |
+| 16-multi-session-reuse | `multi-session` | plans a multi-session feature whose `plan.md` Design section reuses the shared `titleCase` helper, edits no code, asks to agree the design |
+| 17-upgrade-offer | `simple-session`, `multi-session` | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
+| 18-multi-session-docs-ledger | `multi-session`, `simple-session` | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
+
+**Skills** lists every skill whose text a case exercises. On a branch that changes the
+plugin, `scripts/check` uses it to name the cases worth running: those that list a changed
+skill, or a skill that reads a changed `plugin/reference/` file, and every case when the
+hooks, installer, template or fixture change. It also names changed plugin files that no case
+covers. It is a note, not a check, because the cases cost money.
 
 Every case installs the harness with `evals/_fixture/install-harness.sh`; case 11 calls it
 directly because it builds its own repository. A grader several cases share has its source
@@ -253,7 +259,7 @@ someone pick it up.
 
 This repository uses its own harness: `./plugin/install.sh .` installed it, and
 [CLAUDE.md](./CLAUDE.md) holds its facts. `scripts/check` checks syntax, that versions,
-section names, Architecture labels and the eval list agree, the docs, the hooks (fake tool
+section names, Architecture labels and the eval table agree, the docs, the hooks (fake tool
 calls, `scripts/test-hooks.sh`), the installer (scratch installs, `scripts/test-install.sh`)
 and `claude plugin validate`. After changing a harness-owned template file
 (`scripts/docs/*.mjs`, `.githooks/pre-commit`), re-run `./plugin/install.sh .` so this
