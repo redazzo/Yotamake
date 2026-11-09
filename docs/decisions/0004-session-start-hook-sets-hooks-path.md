@@ -30,7 +30,9 @@ session in a repository where it is enabled. A `SessionStart` hook would run onc
 of each of those sessions.
 
 This change would reach every repository that uses the harness, not just this one. So it needs
-a decision before it is built.
+a decision before it is built. It gets an ADR because it widens the **Style** line in
+`CLAUDE.md`, not because it would be costly to reverse: today the plugin's hooks only enforce
+(they check or block an edit), and this one would set something up on a person's machine.
 
 ## Decision
 
@@ -88,7 +90,8 @@ and that a person who never uses Claude Code still has to set it by hand.
   it is expected to be small.
 - Build work, if accepted: the hook script and its `hooks.json` entry, the shared detection
   script, test cases in `scripts/test-hooks.sh` and `scripts/test-install.sh`, updates to
-  `README.md` (the "One gate, run by everyone" paragraph), a minor version bump, and deleting
+  `README.md` (the "One gate, run by everyone" paragraph) and to the **Style** line in
+  `CLAUDE.md` (hooks may also do safe one-time setup), a minor version bump, and deleting
   the backlog entry.
 
 ## Open questions
