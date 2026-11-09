@@ -89,7 +89,8 @@ says how). Put them in the report and ask before running them (see Commands).
 - **Integration:** local `git merge --no-ff` into main. In a cloud session with an assigned
   branch, push to that branch instead.
 - **Docs-only:** a branch that changes only files under `docs/` and Markdown files at the
-  repository root. Markdown under `plugin/` is code.
+  repository root other than `CLAUDE.md`. `CLAUDE.md` and Markdown under `plugin/` are
+  code.
 - **Version bump:** a change under `plugin/` that reaches users (anything but `plugin/evals/`)
   bumps `version` in both `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json`: patch for a fix, minor for a feature. It is its own

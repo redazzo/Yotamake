@@ -24,10 +24,10 @@ project-owned template file.
 
 - **Check:** the Branching and releases section of `CLAUDE.md` has a `**Docs-only:**` line.
 - **Apply:** add a `**Docs-only:**` line to Branching and releases, after `Integration`,
-  from the plugin's `template/CLAUDE.md`. Before 0.12.0 any Markdown counted as docs. Look for
-  Markdown elsewhere in the repository: if it is docs (a `guides/` folder, say), name its
-  paths in the line; if it is prompts, skills or templates, tell the user it now gets design
-  and review.
+  from the plugin's `template/CLAUDE.md`. Before 0.12.0 any Markdown, `CLAUDE.md` included,
+  counted as docs. If other Markdown is docs (a `guides/` folder, say), name its paths in the
+  line. Tell the user that `CLAUDE.md`, and any Markdown that holds prompts, skills or
+  templates, now gets design and review.
 
 ## 0.11.3 — Paths from the project root in protected-paths.conf
 

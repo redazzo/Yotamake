@@ -24,7 +24,8 @@ report and use the defaults given below.
 **Docs-only.** A docs-only branch skips the design and review steps and the version bump. A
 branch is docs-only when every file it changes is a doc, as the `Docs-only` line names them.
 Without that line, the docs are the files under `docs/` and the Markdown files at the
-repository root. Markdown anywhere else counts as code. When unsure, treat the file as code.
+repository root other than `CLAUDE.md`. Everything else counts as code. When unsure, treat
+the file as code.
 
 ## 0. Harness upgrades — first
 
