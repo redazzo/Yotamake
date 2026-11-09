@@ -220,6 +220,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 16-multi-session-reuse | `multi-session` | plans a multi-session feature whose `plan.md` Design section reuses the shared `titleCase` helper, edits no code, asks to agree the design |
 | 17-upgrade-offer | `simple-session`, `multi-session` | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
 | 18-multi-session-docs-ledger | `multi-session`, `simple-session` | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
+| 19-claude-md-only | `simple-session` | with no `Docs-only` line, changes only `CLAUDE.md` and treats it as code by the default rule, runs `scripts/check`, `/simplify` and `/code-review`, asks before committing |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
 plugin, `scripts/check` uses it to name the cases worth running: those that list a changed
