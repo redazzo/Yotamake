@@ -74,7 +74,8 @@ cases in the report and ask before running them (see Commands).
 
 - **Main branch:** `main`. Feature work happens on branches cut from it, never on it directly.
   A hook blocks edits while this branch is checked out; it reads the name from this line.
-- **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`.
+- **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`. A
+  cloud session that is assigned a branch works on that branch as named, with no prefix.
 - **Commits:** Conventional Commits, `type(scope): summary`.
 - **Integration:** local `git merge --no-ff` into main. In a cloud session with an assigned
   branch, push to that branch instead.
