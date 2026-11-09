@@ -47,6 +47,19 @@ A lasting fix would set it for them, e.g. a plugin `SessionStart` hook that sets
 `core.hooksPath` when `.githooks/` exists and nothing else is set. That reaches every
 repository using the harness, so it needs its own decision. If it is built, delete this entry.
 
+## "Docs-only" in `simple-session` means any Markdown
+
+**Added:** 2026-11-09 · **Trigger to act:** a session skips design or review on a Markdown
+change that is code, here or in another repository.
+
+`simple-session` skips its design and review steps for a branch that "changes only docs
+(Markdown files and `docs/`)". In this repository, and in any whose prompts or skills are
+Markdown, that skips the steps that matter most. `CLAUDE.md`, How to work here, overrides it
+for this repository only. A lasting fix would define docs-only as the docs system's files and
+let a named `CLAUDE.md` line widen it. That changes a skill and the template, so it needs a
+version bump, an `upgrades.md` entry, the eval fixture's `CLAUDE.md`, and a re-run of
+`04-docs-only`. When it lands, drop the override from `CLAUDE.md` and delete this entry.
+
 ## Re-check two fixes on the next full eval run
 
 **Added:** 2026-10-29 · **Trigger to act:** the next full suite run
