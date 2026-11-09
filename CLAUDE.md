@@ -13,6 +13,12 @@ the exact edit, or says it is quick and not to ask: the skill covers working on 
 and its design check, checks, review, doc update and stop before commit still apply.
 Questions and explanations need no session.
 
+**Markdown here is often code.** The skills, hooks and template are the product, and many of
+them are Markdown. So Markdown under `plugin/` counts as code, not docs: a change to it gets
+`simple-session`, "Design and reuse" and `simple-session`, "Review", and a `multi-session`
+plan for it has a Design section. Only Markdown outside `plugin/` is docs-only. The version
+bump follows its own rule (see Branching and releases).
+
 ## Project overview
 
 `plugin/` is the plugin: Markdown skills hold the method, bash hooks enforce parts of it, and
