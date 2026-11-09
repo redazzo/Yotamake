@@ -47,6 +47,17 @@ A lasting fix would set it for them, e.g. a plugin `SessionStart` hook that sets
 `core.hooksPath` when `.githooks/` exists and nothing else is set. That reaches every
 repository using the harness, so it needs its own decision. If it is built, delete this entry.
 
+## `simple-session` can miss a `CLAUDE.md`-only edit
+
+**Added:** 2026-11-09 · **Trigger to act:** case `19-claude-md-only` fails `skill-fired` again.
+
+In its first 3 runs (2026-11-09, Claude Code 2.1.319, one model), case 19 passed twice. In
+the third run, `simple-session` never fired: Claude edited `CLAUDE.md` directly, ran no check
+or review, and asked about committing. When the skill did fire, it treated `CLAUDE.md` as code
+and ran the full review, as the Docs-only rule says. So the gap is the skill firing, not the
+rule. A guess, not checked: "Only change CLAUDE.md" makes the task look too small for a
+session. Re-run with `--keep-temp` to keep the transcript and see why.
+
 ## Re-check two fixes on the next full eval run
 
 **Added:** 2026-10-29 · **Trigger to act:** the next full suite run
