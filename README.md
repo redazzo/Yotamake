@@ -57,10 +57,9 @@ a refreshed generator could otherwise leave the docs check failing.
 
 When a new version needs something added to those files, such as a new line in `CLAUDE.md`,
 `plugin/reference/upgrades.md` says what and how to check for it. The installer records the
-version it ran in `.claude/yotamake/version`. When `simple-session` or `multi-session` starts in
-a repo older than the plugin, it lists the upgrades still missing and asks: apply now (on a
-`chore/yotamake-upgrade` branch of its own), not now, or skip these. `/yotamake:setup` applies
-them on a refresh.
+version it ran in `.claude/yotamake/version`. When a session starts in a repo older than the
+plugin, it offers the upgrades still missing (`simple-session`, "Harness upgrades").
+`/yotamake:setup` applies them on a refresh.
 
 ## How it is split
 
@@ -123,24 +122,13 @@ missing or unfilled, the skill says so and uses a stated default, or stops and a
 guesses a deploy or migration command.
 
 **Design comes before code.** The `Architecture` section of `CLAUDE.md` has six lines the
-skills read: **Style** (the architecture style or styles, such as layered, hexagonal or
-event-driven, and where each applies), **Modules** (the main parts and what each owns),
-**Boundaries** (rules a change must not break), **Shared code** (where reusable code lives),
-**Patterns** (the one way the project does errors, config, logging and other recurring things)
-and **Constraints** (limits from outside the code, such as runtime versions, size budgets,
-licences or data rules). In a full install it also points at the accepted ADRs.
-`/yotamake:setup` proposes these lines from the repo, naming the style from a catalogue in
-`plugin/reference/architecture-styles.md` that also lists the boundaries and gates each style
-implies. Before writing code, `simple-session` looks for existing code to reuse, starting in
-Shared code, and puts the change in the module that owns it. If a change would break a boundary
-or a constraint, step outside the style, go against an ADR, bring in a pattern the project does
-not use, or add a dependency that overlaps one it already has, it stops before any edit and
-asks, with options. Other new dependencies go ahead and are named in the report. It does this
-even when the user asked for exactly that change or said not to ask: changing the rule is a
-separate decision. The report says what was reused and why any new code was needed. If the
-section is unfilled, the skill follows the code's own structure and says so. `scripts/check`
-has commented examples for a boundary check and a duplicate-code check (dependency-cruiser,
-import-linter, jscpd); the project picks the tool.
+skills read: **Style**, **Modules**, **Boundaries**, **Shared code**, **Patterns** and
+**Constraints**, plus the accepted ADRs in a full install. The template explains each line.
+`/yotamake:setup` proposes them from the repo, naming the style from
+`plugin/reference/architecture-styles.md`. Before any edit, `simple-session` looks for code to
+reuse, and stops and asks when a change would break the design, even when told not to ask.
+The rules are in `simple-session`, "Design and reuse". `scripts/check` has commented examples
+for a boundary check and a duplicate-code check; the project picks the tool.
 
 **One gate, run by everyone.** `scripts/check` is the only list of checks. Claude runs it
 before proposing a commit. The pre-commit hook runs its fast checks on staged changes; slow
@@ -173,41 +161,27 @@ rules are separate, and `git -C . commit` still asked in a test (one run, Claude
 
 ## Sessions
 
-A session is one branch and one merge that fits in one context. `simple-session` first checks
-the size against concrete tests (a schema change plus other code, more than one new
-interface, more than one service, needs an ADR). If the change is too big, it offers
-`multi-session`, which keeps `plan.md`, `findings.md`, `decisions.md`, `log.md` and a docs
-ledger, `docs.md`, in a git-ignored `.scratchpad/<date>-<slug>/`. Each session logs the doc
-changes it made or put off in the ledger, and the last session works through it, so no doc
-update is lost by the end. You `/clear` between sessions and resume with:
+This section is an overview. Each skill's `SKILL.md` holds its rules and is the one to change.
+
+A session is one branch and one merge that fits in one context
+([`simple-session`](./plugin/skills/simple-session/SKILL.md)). It checks the size first. A
+change too big for one session becomes a
+[`multi-session`](./plugin/skills/multi-session/SKILL.md) effort, with a working folder that
+survives `/clear`: git-ignored at `.scratchpad/<date>-<slug>/`, or committed at
+`.sessions/<date>-<slug>/` in an ephemeral environment or on an assigned branch. You `/clear`
+between sessions and resume with:
 "Read .scratchpad/<folder>/README.md and start the next session."
 
-In an ephemeral environment (a cloud container), or when the environment assigns one branch,
-the folder is committed at `.sessions/<date>-<slug>/` instead, and each session is a set of
-commits on that branch, pushed at the end of the session.
+**Specs.** For a new feature, or a change where "done" is unclear, run `/yotamake:spec`
+first ([`spec`](./plugin/skills/spec/SKILL.md)). It agrees the scope and numbered acceptance
+criteria in one short file before any code, then hands over to a session. Fixes, renames and
+refactors skip it.
 
-**Specs.** For a new feature, or a behaviour change where "done" is unclear, run
-`/yotamake:spec` first. It asks one question at a time, then writes one short `spec.md`: the
-problem, scope, what is not in scope, and numbered acceptance criteria (A1, A2, …). It edits
-no code until you approve it. Then it hands over to `simple-session` (the report lists how
-each criterion was checked) or `multi-session` (the spec lives in the working folder and each
-session names the criteria it delivers). A multi-session effort that builds new behaviour
-writes the spec in S0 without the command. A spec written before any session is one file,
-`spec-<date>-<slug>.md`, in `.scratchpad/` (or committed in `.sessions/` in an ephemeral
-environment), so it is never mistaken for a working folder. The spec is deleted when the
-work is done; behaviour that lasts goes into the reference doc that owns it, so there is no
-second, drifting copy. Fixes, renames and refactors skip it. The skill is manual so that it
-does not compete with `simple-session` for the trigger.
-
-Once per session, after the checks pass and before it reports, `simple-session` reviews the
-whole branch diff in three parts: reuse (the built-in `/simplify`, keeping only fixes to the
-branch's own code), design (the diff against Architecture), and bugs (the built-in
-`/code-review` at low effort). It runs for any branch that changes code, however small, but
-never after each edit, and fixing its findings does not start a second review. Docs-only
-branches skip it. A `multi-session` plan for code has a Design section (modules touched, code
-reused, new interfaces, boundaries and constraints at risk), agreed before S1. When the `Integration` line in
-`CLAUDE.md` says the project works through pull requests, the last step pushes the branch and
-opens a pull request instead of merging locally.
+**Review.** Once per session, after the checks pass, `simple-session` reviews the whole
+branch diff with the built-in `/simplify` and `/code-review`, and against Architecture.
+Docs-only branches skip it (`simple-session`, "Review"). When the `Integration` line in
+`CLAUDE.md` says the project works through pull requests, the session ends by pushing and
+opening one instead of merging locally.
 
 ## Docs
 

@@ -31,8 +31,10 @@ thing is a bug in the docs.
 
 How the system works today. If one of these disagrees with the code, the doc is wrong.
 
-The harness's own behaviour (install, skills, hooks, sessions, docs, evals) is owned by the
-root [README.md](../README.md), which every user reads first.
+The root [README.md](../README.md), which every user reads first, owns the overview of the
+harness: install, how it is split, the hooks, the docs system and the evals. Each skill's
+rules are owned by its own `plugin/skills/<name>/SKILL.md`. The README sums up a skill and
+links to it, rather than restating its rules.
 
 | Document | Owns |
 |---|---|

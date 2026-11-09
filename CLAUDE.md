@@ -13,6 +13,13 @@ the exact edit, or says it is quick and not to ask: the skill covers working on 
 and its design check, checks, review, doc update and stop before commit still apply.
 Questions and explanations need no session.
 
+**If the plugin is not loaded** (no `yotamake:` skills are offered, as in a cloud session
+without it), read `plugin/skills/simple-session/SKILL.md` (or `multi-session`'s) and follow it
+as written. Its hooks are off too, so check you are not on the main branch before an edit, and
+leave the files in `.claude/yotamake/protected-paths.conf` alone. If
+`git config core.hooksPath` prints nothing, run `git config core.hooksPath .githooks` so the
+pre-commit hook runs.
+
 **Markdown here is often code.** The skills, hooks and template are the product, and many of
 them are Markdown. So Markdown under `plugin/` counts as code, not docs: a change to it gets
 `simple-session`, "Design and reuse" and `simple-session`, "Review", and a `multi-session`
@@ -41,8 +48,8 @@ how it is split.
   how to apply it. Older installs get it from there.
 
 **Docs:** [docs/README.md](./docs/README.md) (index — start here; explains the four kinds of
-doc and which doc owns what) · [README.md](./README.md) (what the harness is; it owns the
-harness's behaviour) · [docs/decisions/](./docs/decisions/README.md) (ADRs — never edited,
+doc and which doc owns what) · [README.md](./README.md) (the overview of the harness; each
+skill's `SKILL.md` owns its own rules) · [docs/decisions/](./docs/decisions/README.md) (ADRs — never edited,
 only superseded) · [docs/records/](./docs/records/README.md) (history) ·
 [docs/backlog.md](./docs/backlog.md) (open work)
 
@@ -105,7 +112,8 @@ must be raised and confirmed first.
 
 **One owner per subject.** Every subject has one doc that owns it (the "Owns" table in
 `docs/README.md`). A change in behaviour updates that doc in the same branch. Other docs link
-to it rather than restate it. The harness's own behaviour is owned by `README.md`.
+to it rather than restate it. `README.md` owns the overview of the harness. Each skill's
+`SKILL.md` owns its own rules, and the README links to it rather than restating them.
 
 **Plain English.** Skills and docs use plain English and short sentences (see
 `plugin/output-styles/plain-english.md`).
