@@ -2,8 +2,8 @@
 
 Changes a plugin version makes to the files each repository owns (`CLAUDE.md`,
 `scripts/check`). The installer never overwrites those, so a repository set up with an older
-version does not get them on its own. The sessions read this file at their start (step 0 of
-`simple-session`) and offer to apply what is missing.
+version does not get them on its own. The sessions read this file at their start
+(`simple-session`, "Harness upgrades") and offer to apply what is missing.
 
 `.claude/yotamake/version` in the repository holds the version its harness files were last
 installed or upgraded to. The installer writes it. A repository without it was set up before

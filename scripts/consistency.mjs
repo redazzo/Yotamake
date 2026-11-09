@@ -14,6 +14,9 @@
  *   - labels: the template's Architecture labels are all in the eval fixture's CLAUDE.md
  *     and in this repository's own.
  *   - evals: README.md's eval table has one row per folder in plugin/evals/, and no other.
+ *   - step refs: a pointer to another skill's step names its heading, as
+ *     `simple-session`, "Design and reuse", and that heading exists. No pointer uses a
+ *     step number, which would break silently when the skill is renumbered.
  *   - harness copies: this repository's own harness-owned files (it installs its own
  *     harness) match plugin/template/. Re-run ./plugin/install.sh . to refresh them.
  *
@@ -21,6 +24,7 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -34,6 +38,13 @@ function managedFiles() {
   const m = read('plugin/install.sh').match(/^managed=\(([^)]*)\)/m);
   if (!m) throw new Error('no managed=(...) line in plugin/install.sh');
   return m[1].split(/\s+/).filter(Boolean);
+}
+
+/** Each skill as [name, path of its SKILL.md]. */
+function skillFiles() {
+  return readdirSync(path.join(ROOT, 'plugin/skills'))
+    .map((name) => [name, `plugin/skills/${name}/SKILL.md`])
+    .filter(([, file]) => existsSync(path.join(ROOT, file)));
 }
 
 /** Paths in .claude/yotamake/skip, read the way plugin/install.sh reads them. */
@@ -77,10 +88,7 @@ function checkSections() {
   const named = new Map(); // section name -> where it is named
   const listed = template.match(/read the sections below BY NAME:\s*\n\s*([^\n]+)\./)?.[1];
   for (const name of listed?.split(/,\s*/) ?? []) named.set(name, "the template's top comment");
-  const skills = path.join(ROOT, 'plugin/skills');
-  for (const skill of readdirSync(skills)) {
-    const file = `plugin/skills/${skill}/SKILL.md`;
-    if (!existsSync(path.join(ROOT, file))) continue;
+  for (const [, file] of skillFiles()) {
     for (const re of SECTION_REFS) {
       for (const m of read(file).matchAll(re)) named.set(m[1], file);
     }
@@ -106,6 +114,40 @@ function checkEvals() {
   const rows = new Set([...read('README.md').matchAll(/^\| (\d\d-[\w-]+) \|/gm)].map((m) => m[1]));
   for (const c of cases) if (!rows.has(c)) fail('evals', `README.md's eval table has no row for ${c}`);
   for (const r of rows) if (!cases.has(r)) fail('evals', `README.md's eval table lists ${r}, not in plugin/evals/`);
+}
+
+/** "## 3. Design and reuse — before any edit" -> "Design and reuse". */
+const stepName = (heading) => heading.replace(/^\d+\.\s*/, '').replace(/\s+—.*$/, '').trim();
+
+function checkStepRefs() {
+  const steps = new Map(skillFiles().map(([name, file]) => [
+    name,
+    new Set([...read(file).matchAll(/^## (.+)$/gm)].map((m) => stepName(m[1]))),
+  ]));
+  // Every doc and script under plugin/ (bar the evals), plus the root docs.
+  const files = execFileSync('git', ['ls-files', '-co', '--exclude-standard', 'plugin/*.md',
+    'plugin/*.sh', 'README.md', 'CLAUDE.md'], { cwd: ROOT, encoding: 'utf8' })
+    .split('\n')
+    .filter((f) => f && !f.startsWith('plugin/evals/') && existsSync(path.join(ROOT, f)));
+  for (const file of files) {
+    const text = read(file).replace(/\s+/g, ' '); // a pointer may wrap across lines
+    for (const m of text.matchAll(/`([a-z][a-z-]*)`, "([^"]+)"/g)) {
+      if (steps.has(m[1]) && !steps.get(m[1]).has(m[2])) {
+        fail('step refs', `${file} points at ${m[1]}, "${m[2]}", but that skill has no such step`);
+      }
+    }
+    // A skill may number its own steps. Anything else names a step by its heading.
+    const numbered = file.endsWith('/SKILL.md')
+      ? [/`([a-z][a-z-]*)`(?:'s| skill)?,? step \d+/g, /step \d+ of `([a-z][a-z-]*)`/g]
+      : [/\bsteps? \d+/g];
+    for (const re of numbered) {
+      for (const m of text.matchAll(re)) {
+        if (m[1] === undefined || steps.has(m[1])) {
+          fail('step refs', `${file} points at a step by number ("${m[0]}"); name its heading`);
+        }
+      }
+    }
+  }
 }
 
 function checkHarnessCopies() {
@@ -140,6 +182,7 @@ if (process.argv[2] === 'upgrades') {
   checkSections();
   checkLabels();
   checkEvals();
+  checkStepRefs();
   checkHarnessCopies();
 }
 

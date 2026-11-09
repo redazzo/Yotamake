@@ -26,6 +26,10 @@ how it is split.
 - A skill that needs a project fact names the `CLAUDE.md` section it reads. If you rename a
   section in `plugin/template/CLAUDE.md`, update every skill that names it, the eval
   fixture's `CLAUDE.md`, and `README.md`.
+- A skill, hook or reference doc that points at another skill's step names its heading
+  without the number, as `simple-session`, "Design and reuse", so renumbering that skill
+  cannot break the pointer. Steps inside one skill may use numbers. `scripts/check` checks
+  both rules.
 - When you change a project-owned template file (anything in `plugin/template/` not listed as
   `managed`), add an entry to `plugin/reference/upgrades.md`: how to check it is applied, and
   how to apply it. Older installs get it from there.

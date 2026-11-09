@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PreToolUse hook for Edit/Write: refuse edits while the file's repository is on
-# its main branch. Work happens on a branch cut from main (simple-session, step 2).
+# its main branch. Work happens on a branch cut from main (`simple-session`, "Branch").
 #
 # The main branch is read from the repository's CLAUDE.md line
 # "- **Main branch:** `<name>`"; without one, both main and master count.
