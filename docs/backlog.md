@@ -45,7 +45,9 @@ only CI (once active) catches a failing check.
 
 A lasting fix would set it for them, e.g. a plugin `SessionStart` hook that sets
 `core.hooksPath` when `.githooks/` exists and nothing else is set. That reaches every
-repository using the harness, so it needs its own decision. If it is built, delete this entry.
+repository using the harness, so it needs its own decision:
+[ADR-0004](./decisions/0004-session-start-hook-sets-hooks-path.md) proposes it. If it is
+built, delete this entry.
 
 ## `simple-session` can miss a `CLAUDE.md`-only edit
 
