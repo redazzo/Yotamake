@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-08
+updated: 2026-11-09
 owns: [open-work-register]
 ---
 
@@ -27,9 +27,24 @@ top.
 has a few minutes.
 
 [`docs/ci.yml`](./ci.yml) runs `scripts/check --all`. The GitHub App cannot push under
-`.github/workflows/`, so a person has to add it there by hand. It pins the Claude Code CLI
-version; bump that on purpose. Then remove `.github/workflows/check.yml` from
-`.claude/yotamake/skip` only if the template's workflow is wanted instead.
+`.github/workflows/`, so a person adds it by hand: copy `docs/ci.yml` to
+`.github/workflows/ci.yml`, push it to main, and check that the first run passes. Then delete
+`docs/ci.yml` and this entry. The workflow pins the Claude Code CLI version; bump that on
+purpose.
+
+## Each clone needs the pre-commit hook set up
+
+**Added:** 2026-11-09 · **Trigger to act:** someone starts working in a new clone of this
+repository.
+
+The pre-commit hook runs `scripts/check --staged`, but git's `core.hooksPath` setting is local
+to a clone and is not cloned. So each person, in each clone, runs `./plugin/install.sh .`
+once (or `git config core.hooksPath .githooks`). Until then their commits skip the hook, and
+only CI (once active) catches a failing check.
+
+A lasting fix would set it for them, e.g. a plugin `SessionStart` hook that sets
+`core.hooksPath` when `.githooks/` exists and nothing else is set. That reaches every
+repository using the harness, so it needs its own decision. If it is built, delete this entry.
 
 ## Re-check two fixes on the next full eval run
 
