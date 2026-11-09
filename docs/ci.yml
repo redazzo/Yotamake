@@ -1,4 +1,5 @@
-# The checks in CLAUDE.md, "Before committing", run on every push and pull request.
+# Runs scripts/check --all, the same gate as Claude's sessions and the pre-commit hook.
+# To activate, copy to .github/workflows/ci.yml (the GitHub App cannot push there).
 name: ci
 
 on:
@@ -14,41 +15,9 @@ jobs:
         with:
           node-version: 22
 
-      - name: Syntax-check the scripts
-        run: |
-          git ls-files -z '*.sh' 'plugin/template/.githooks/*' 'plugin/template/scripts/check' \
-            | xargs -0 -n1 bash -n
-          git ls-files -z '*.mjs' | xargs -0 -n1 node --check
-
       # validate needs no login. Pinned so a new CLI release cannot turn CI red on its own;
       # bump it on purpose.
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code@2.1.312
 
-      - name: Validate the plugin and the marketplace
-        run: |
-          claude plugin validate plugin --strict
-          claude plugin validate . --strict
-
-      - name: Install into a scratch repo and run its checks
-        run: |
-          scratch=$(mktemp -d)
-          git -C "$scratch" init -q -b main
-          # The template CLAUDE.md links ./README.md, so the docs check needs one.
-          echo "# Scratch" > "$scratch/README.md"
-          ./plugin/install.sh "$scratch"
-          cd "$scratch" && scripts/check --all
-
-      - name: Install in lite mode and run its checks
-        run: |
-          scratch=$(mktemp -d)
-          git -C "$scratch" init -q -b main
-          ./plugin/install.sh "$scratch" --lite
-          test ! -e "$scratch/docs"
-          cd "$scratch" && scripts/check --all
-
-      - name: Build the eval fixture and run its checks
-        run: |
-          fixture=$(mktemp -d)
-          cd "$fixture" && bash "$GITHUB_WORKSPACE/plugin/evals/_fixture/setup.sh"
-          scripts/check --all
+      - run: scripts/check --all

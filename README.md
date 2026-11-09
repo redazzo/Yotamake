@@ -51,7 +51,9 @@ the installer, and add the docs check to `scripts/check` by hand.
 
 **Updating.** `claude plugin update yotamake@yotamake` updates the method for every repo at
 once. Re-run `/yotamake:setup` (or `install.sh`) in a repo to refresh its harness-owned
-scripts; it never overwrites the files that belong to the project.
+scripts; it never overwrites the files that belong to the project. It also regenerates
+`docs/records/README.md` when it is stale. That file is generated, not written by hand, and
+a refreshed generator could otherwise leave the docs check failing.
 
 When a new version needs something added to those files, such as a new line in `CLAUDE.md`,
 `plugin/reference/upgrades.md` says what and how to check for it. The installer records the
@@ -87,7 +89,7 @@ plugin/
     pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
     post-edit-check.sh             runs a fast per-file check after each edit
-    protected-paths.default.conf   used when a repo has no list of its own
+    lib.sh                         shared by the hooks: reads the edited path from the tool call
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
   reference/upgrades.md            per version: what to add to a repo's own files, and how
@@ -220,7 +222,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 
 ## Evals
 
-`plugin/evals/` holds seventeen cases. Each runs against a small Node project built fresh by
+`plugin/evals/` holds the cases below. Each runs against a small Node project built fresh by
 `evals/_fixture/setup.sh` with the harness installed (case 11 builds its own):
 
 | Case | Checks that Claude… |
@@ -242,6 +244,12 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 15-follow-up-review | after a reported change, asked for one more, runs `/simplify` and `/code-review` exactly once more |
 | 16-multi-session-reuse | plans a multi-session feature whose `plan.md` Design section reuses the shared `titleCase` helper, edits no code, asks to agree the design |
 | 17-upgrade-offer | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
+| 18-multi-session-docs-ledger | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
+
+Every case installs the harness with `evals/_fixture/install-harness.sh`; case 11 calls it
+directly because it builds its own repository. A grader several cases share has its source
+copy in `evals/_graders/`; `scripts/check` fails when a case's copy differs, and
+`node scripts/consistency.mjs sync-graders` copies it into every case that uses it.
 
 Run them (needs `bubblewrap` and `socat` on Linux for the sandbox; costs money on your
 account, about $7 for the full suite with the baseline arm):
@@ -264,31 +272,20 @@ costs one run and strips the user's email from the transcript).
 
 ## Open work
 
-- **CI is written but not active.** `docs/ci.yml` runs the "Before committing" checks from
-  `CLAUDE.md`. The GitHub App cannot push under `.github/workflows/`, so it needs adding there
-  by hand. Then add a line about it to `CLAUDE.md`, "Before committing" (it pins the Claude
-  Code CLI version; bump that on purpose).
-- **`simple-session` can miss when the user names a branch.** After a first fix it fired in
-  5 of 6 eval runs (`02-small-change`). Version 0.7.3 moves the trigger to the front of the
-  skill description and says the same in the template `CLAUDE.md`. It then fired in 10 of 10
-  runs (2026-10-29, Claude Code 2.1.312, one model). Likely fixed; re-check on the next full
-  suite run.
-- **`spec` is only partly tested.** Case 12 passed 3 of 3 runs (2026-10-29, Claude Code
-  2.1.312, one model). Nothing yet tests the question-at-a-time path or the hand-over to a
-  session. A recorded history, as in case 15, could test both.
-- **The review was often skipped.** Before 0.9.0, Claude skipped `/simplify` and
-  `/code-review` in about 5 of 6 code-change eval runs; after it, in 1 of 6, by reading the
-  diff by hand. Versions 0.9.1 to 0.9.3 say that reading the diff does not replace the two
-  skills, that the review runs once per session (never per edit), and that a follow-up
-  change gets one more full review. Latest runs (2026-10-29, Claude Code 2.1.312, one model):
-  13-reuse and 02-small-change passed 3 of 3 each, with each skill called exactly once per
-  run. Case 15 (0.9.4, with its clarified graders) passed 3 of 3, each skill called exactly
-  once per run. Likely fixed; re-check on the next full suite run.
-- **No plugin icon.** `claude plugin validate` warns `ICON_MISSING`.
-- **Untested paths.** No eval case for `simple-session`'s pull-request path, or for `setup`'s
-  install step (the eval sandbox keeps `.claude/` read-only).
-- **Stale-docs check: designed, not built.** See `docs/stale-docs-check.md`, which says when
-  to build it.
+[docs/backlog.md](./docs/backlog.md) lists it, each item with the trigger that should make
+someone pick it up.
+
+## Developing Yotamake
+
+This repository uses its own harness: `./plugin/install.sh .` installed it, and
+[CLAUDE.md](./CLAUDE.md) holds its facts. `scripts/check` checks syntax, that versions,
+section names, Architecture labels and the eval list agree, the docs, the hooks (fake tool
+calls, `scripts/test-hooks.sh`), the installer (scratch installs, `scripts/test-install.sh`)
+and `claude plugin validate`. After changing a harness-owned template file
+(`scripts/docs/*.mjs`, `.githooks/pre-commit`), re-run `./plugin/install.sh .` so this
+repository's own copies match; the check fails until they do. The docs baseline
+(`scripts/docs/docs-lint-baseline.txt`) holds one entry on purpose: the template `CLAUDE.md`
+links `./README.md`, which exists only once the template is installed.
 
 ## Requirements
 

@@ -2,8 +2,8 @@
 
 Changes a plugin version makes to the files each repository owns (`CLAUDE.md`,
 `scripts/check`). The installer never overwrites those, so a repository set up with an older
-version does not get them on its own. The sessions read this file at their start (step 0 of
-`simple-session`) and offer to apply what is missing.
+version does not get them on its own. The sessions read this file at their start
+(`simple-session`, "Harness upgrades") and offer to apply what is missing.
 
 `.claude/yotamake/version` in the repository holds the version its harness files were last
 installed or upgraded to. The installer writes it. A repository without it was set up before
@@ -19,6 +19,16 @@ Each entry has:
 
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
+
+## 0.11.3 — Paths from the project root in protected-paths.conf
+
+- **Check:** the comment at the top of `.claude/yotamake/protected-paths.conf` says a glob
+  with a `/` is also matched against the path from the project root, or the repository has
+  no such file.
+- **Apply:** replace the first comment paragraph with the one in the plugin's
+  `template/.claude/yotamake/protected-paths.conf`. Then look for a glob in the list that
+  holds a `/` but starts with neither `/` nor `*`: before 0.11.3 it never matched anything,
+  so tell the user it now protects those files.
 
 ## 0.11.0 — Style line
 

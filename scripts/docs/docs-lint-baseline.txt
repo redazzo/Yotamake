@@ -1,0 +1,8 @@
+# Known documentation lint findings, recorded 2026-11-08.
+#
+# This file is a RATCHET, not a suppression list. scripts/docs/lint-docs.mjs fails when a
+# link breaks that is not listed here, and equally when a line here is no longer
+# broken — fixing a link means deleting its line in the same commit.
+#
+# Format: <rule>\t<file>\t<detail>. Regenerate with `node scripts/docs/lint-docs.mjs --update-baseline`.
+broken-link	plugin/template/CLAUDE.md	./README.md

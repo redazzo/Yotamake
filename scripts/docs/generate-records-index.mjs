@@ -1,0 +1,184 @@
+#!/usr/bin/env node
+
+/**
+ * Generate docs/records/README.md from the records themselves.
+ *
+ * WHY GENERATED. A hand-curated index rots: adding a record means remembering to edit
+ * it, and records nobody lists become invisible. Deriving the index from front-matter
+ * means writing the file is what lists it.
+ *
+ * Reads `kind`/`date`/`status` front-matter and the first `# ` heading. Multi-file
+ * projects are represented by their README.md; the rest of the directory is reachable
+ * from there, not enumerated here.
+ *
+ * Run with --check to verify the committed index matches what the records imply
+ * (used by scripts/docs/lint-docs.mjs so a stale index fails the build rather than rotting).
+ *
+ * Also exports the front-matter reader. lint-docs.mjs imports it, so the linter and
+ * this index always read a doc's front-matter the same way.
+ */
+
+import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(here, '../..');
+const RECORDS_DIR = path.join(REPO_ROOT, 'docs/records');
+const INDEX_FILE = path.join(RECORDS_DIR, 'README.md');
+
+function walk(dir, acc = []) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walk(full, acc);
+    else if (entry.name.endsWith('.md')) acc.push(full);
+  }
+  return acc;
+}
+
+/** Split YAML front-matter from the body. Returns `{ frontMatter, body }`. */
+export function splitFrontMatter(source) {
+  const match = source.match(/^---\n([\s\S]*?)\n---\n?/);
+  if (!match) return { frontMatter: null, body: source };
+  return { frontMatter: match[1], body: source.slice(match[0].length) };
+}
+
+/** Minimal scalar/list YAML reader — enough for the schema, no dependency. */
+function parseFrontMatter(text) {
+  const data = {};
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const match = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
+    if (!match) continue;
+    const [, key, rawValue] = match;
+    const value = rawValue.trim();
+    if (value.startsWith('[') && value.endsWith(']')) {
+      data[key] = value
+        .slice(1, -1)
+        .split(',')
+        .map((v) => v.trim().replace(/^["']|["']$/g, ''))
+        .filter(Boolean);
+    } else {
+      data[key] = value.replace(/^["']|["']$/g, '');
+    }
+  }
+  return data;
+}
+
+/** A doc's front-matter as `{ data, body }`; `data` is `{}` when there is none. */
+export function readFrontMatter(source) {
+  const { frontMatter, body } = splitFrontMatter(source);
+  return { data: frontMatter === null ? {} : parseFrontMatter(frontMatter), body };
+}
+
+/** First `# ` heading, or the filename humanised. */
+function title(body, file) {
+  const m = body.match(/^#\s+(.+)$/m);
+  if (m) return m[1].replace(/\s*[·—-]\s*$/, '').trim();
+  return path.basename(file, '.md').replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-/g, ' ');
+}
+
+function collect() {
+  const entries = [];
+  const seenDirs = new Set();
+
+  for (const file of walk(RECORDS_DIR)) {
+    if (file === INDEX_FILE) continue;
+    const rel = path.relative(RECORDS_DIR, file);
+    const parts = rel.split(path.sep);
+
+    // Layout is <year>/<record>.md for a single-file record, or
+    // <year>/<record>/README.md for one that spans several documents. Anything
+    // deeper is reachable from that README and is not listed separately.
+    let isProject = false;
+    if (parts.length === 2) {
+      isProject = false;
+    } else if (parts.length === 3) {
+      const dir = path.dirname(file);
+      const hasReadme = existsSync(path.join(dir, 'README.md'));
+      if (hasReadme) {
+        // The README speaks for the whole project; its siblings hang off it.
+        if (parts[2] !== 'README.md') continue;
+        if (seenDirs.has(dir)) continue;
+        seenDirs.add(dir);
+        isProject = true;
+      }
+      // No README: list each document, rather than inventing a cover page for it.
+    } else {
+      continue;
+    }
+
+    const source = readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+    const { data: fm, body } = readFrontMatter(source);
+
+    entries.push({
+      href: `./${parts.join('/')}`,
+      date: fm.date || (rel.match(/(\d{4}-\d{2}-\d{2})/)?.[1] ?? ''),
+      status: fm.status || 'historical',
+      title: title(body, file),
+      isProject,
+    });
+  }
+
+  entries.sort((a, b) => (b.date || '').localeCompare(a.date || '') || a.title.localeCompare(b.title));
+  return entries;
+}
+
+function render(entries) {
+  const open = entries.filter((e) => e.status === 'current');
+  const done = entries.filter((e) => e.status !== 'current');
+
+  const row = (e) =>
+    `| ${e.date || '—'} | [${e.title}](${e.href})${e.isProject ? ' *(project)*' : ''} |`;
+
+  return `<!-- GENERATED BY scripts/docs/generate-records-index.mjs — DO NOT EDIT BY HAND -->
+
+# Records
+
+Dated accounts of work done: what was built or fixed, why, and what was decided along
+the way. **Records are written once and not revised** — where a record disagrees with
+today's code, the code is right and the record is history.
+
+A record's path never changes. Its date is when the work started, and its state lives in
+\`status:\` front-matter, so promoting one from open to complete is a one-line edit rather
+than a move that breaks every link pointing at it.
+
+New record: \`docs/records/<year>/<YYYY-MM-DD>-<slug>.md\`, or a directory of that name
+with a \`README.md\` when the work spans several documents. This index is generated —
+run \`node scripts/docs/generate-records-index.mjs\` after adding one.
+
+## Open
+
+${open.length ? `| Started | Record |\n|---|---|\n${open.map(row).join('\n')}` : '_None._'}
+
+## Complete
+
+${done.length ? `| Date | Record |\n|---|---|\n${done.map(row).join('\n')}` : '_None._'}
+`;
+}
+
+function main() {
+  const entries = collect();
+  const rendered = render(entries);
+
+  if (process.argv.includes('--check')) {
+    const current = existsSync(INDEX_FILE) ? readFileSync(INDEX_FILE, 'utf8') : '';
+    if (current !== rendered) {
+      console.error(
+        'docs/records/README.md is stale — a record was added, renamed, or had its status ' +
+          'changed without regenerating the index.\n' +
+          'Fix: node scripts/docs/generate-records-index.mjs'
+      );
+      process.exit(1);
+    }
+    console.log(`records index: up to date (${entries.length} records)`);
+    process.exit(0);
+  }
+
+  writeFileSync(INDEX_FILE, rendered, 'utf8');
+  console.log(`records index: wrote ${entries.length} records to docs/records/README.md`);
+}
+
+// Run only when executed, not when lint-docs.mjs imports the front-matter reader.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

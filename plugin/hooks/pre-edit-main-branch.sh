@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PreToolUse hook for Edit/Write: refuse edits while the file's repository is on
-# its main branch. Work happens on a branch cut from main (simple-session, step 2).
+# its main branch. Work happens on a branch cut from main (`simple-session`, "Branch").
 #
 # The main branch is read from the repository's CLAUDE.md line
 # "- **Main branch:** `<name>`"; without one, both main and master count.
@@ -10,11 +10,11 @@
 # opts out with an empty file at .claude/yotamake/allow-edits-on-main.
 # Exit 2 blocks the call and sends stderr back to Claude.
 
-fp=$(node -e '
-let d = {};
-try { d = JSON.parse(require("fs").readFileSync(0, "utf8")).tool_input || {}; } catch {}
-process.stdout.write(String(d.file_path || d.notebook_path || ""));
-' 2>/dev/null)
+here=${BASH_SOURCE[0]%/*}
+[[ "${BASH_SOURCE[0]}" == */* ]] || here=.
+. "$here/lib.sh"
+
+fp=$(tool_file_path)
 [[ -n "$fp" ]] || exit 0
 
 # The file may not exist yet: start from its nearest existing directory.

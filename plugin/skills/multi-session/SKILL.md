@@ -15,9 +15,9 @@ the folder survives to let the next session start quickly.
 Each session follows the `simple-session` skill for branching, checks, review, reporting and
 integration. This skill adds the working folder and the order of sessions.
 
-Before starting or resuming an effort, do step 0 of `simple-session` (harness upgrades), once
-per conversation. An upgrade applied then gets its own branch and merge, outside the effort's
-sessions and its `plan.md`.
+Before starting or resuming an effort, check for harness upgrades once per conversation, as
+in `simple-session`, "Harness upgrades". An upgrade applied then gets its own branch and
+merge, outside the effort's sessions and its `plan.md`.
 
 ## Where the folder lives, and how branches are used
 
@@ -68,17 +68,17 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
 2. Do the analysis once, in the first session (S0). Record what you found in `findings.md`
    with file:line references. Each finding gets an ID (F1, F2, …) and a severity. With a
    spec, first ask the questions that change scope or a criterion, one at a time, and wait for
-   each answer. Then write the acceptance criteria (A1, A2, …, rules in the `spec` skill,
-   step 3) and go on to `plan.md` in the same turn; the user approves the spec and the plan
-   together at the end of S0 (step 6). Questions about how to build it wait in
-   `decisions.md` for the session that needs them (step 5).
+   each answer. Then write the acceptance criteria (A1, A2, …) and go on to `plan.md` in the
+   same turn; the user approves the spec and the plan together at the end of S0 (step 6).
+   The rules for criteria are in `spec`, "Write `spec.md`". Questions about how to build it
+   wait in `decisions.md` for the session that needs them (step 5).
 3. If the effort changes code, fill in the Design section of `plan.md` before cutting sessions.
    Read the **Architecture** section of CLAUDE.md (and accepted ADRs) and the code, then write:
    the style the new parts follow, the modules touched, the existing code to reuse or extend,
    any new interfaces, and the boundaries and constraints at risk. Any plan that would break a
    boundary or a constraint, step outside the Style, or go against an ADR, is raised as a
-   question now, as in `simple-session`, step 3. Agree the Design section with the user before
-   S1 (step 6). Each session's design step then checks its work against it.
+   question now, as in `simple-session`, "Design and reuse". Agree the Design section with
+   the user before S1 (step 6). Each session's design step then checks its work against it.
 4. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
    (or, on an assigned branch, one set of commits) that fits in one context**, so a `/clear`
    never lands mid-change. Order them so each makes
@@ -97,8 +97,8 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
 
 - Branch from an up-to-date main branch, as in `simple-session`, or stay on the assigned
   branch in a committed setup. Never work on the main branch.
-- Before proposing a commit, run `scripts/check` (see `simple-session`, step 5). Save its
-  output to `s<N>-checks.log` in the folder and report only the summary lines.
+- Before proposing a commit, run `scripts/check` (see `simple-session`, "Run the checks").
+  Save its output to `s<N>-checks.log` in the folder and report only the summary lines.
 - Commit, version bump, push and merge only after the user says yes. In a committed setup,
   commit the folder's updates with the session's work.
 - Deploying is the user's decision, never part of a session.
@@ -106,11 +106,12 @@ there is a standalone spec from `/yotamake:spec`, not an effort.
   `docs/README.md`) in the same branch. The close-out sweep below catches what slips through; it
   is not the place to write them.
 - Keep the docs ledger, `docs.md`, as you go, not from memory at the end. Before the report
-  (`simple-session`, step 7), add a row for every behaviour, rule, interface, config or command
-  this session changed: the doc that owns it, and `done`, `open` or `none`. Also add every
-  name this session renamed or removed, any follow-up for the backlog, any decision that may
-  need an ADR, and a line for the record. A doc update you put off is an `open` row, never
-  just a line in `log.md`. The report's docs line names the rows this session added.
+  (`simple-session`, "Stop and report"), add a row for every behaviour, rule, interface,
+  config or command this session changed: the doc that owns it, and `done`, `open` or `none`.
+  Also add every name this session renamed or removed, any follow-up for the backlog, any
+  decision that may need an ADR, and a line for the record. A doc update you put off is an
+  `open` row, never just a line in `log.md`. The report's docs line names the rows this
+  session added.
 - At the end of a session: set its status in `plan.md`, append an entry to `log.md` (what was
   done, commit hashes, what is left, anything surprising), check `docs.md` is up to date, then
   tell the user it is a good point to `/clear`. In a committed setup, commit and push those
