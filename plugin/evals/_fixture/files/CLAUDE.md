@@ -33,6 +33,8 @@ npm test    # run the tests
 - **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`.
 - **Commits:** Conventional Commits, `type(scope): summary`.
 - **Integration:** local `git merge --no-ff` into main.
+- **Docs-only:** a branch that changes only files under `docs/` and Markdown files at the
+  repository root other than `CLAUDE.md`.
 - **Version bump:** code changes get `npm version patch --no-git-tag-version` as their own
   commit, `chore(release): bump version to X.Y.Z`. Docs-only branches do not.
 

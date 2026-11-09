@@ -179,7 +179,8 @@ refactors skip it.
 
 **Review.** Once per session, after the checks pass, `simple-session` reviews the whole
 branch diff with the built-in `/simplify` and `/code-review`, and against Architecture.
-Docs-only branches skip it (`simple-session`, "Review"). When the `Integration` line in
+Docs-only branches skip it; the `Docs-only` line in `CLAUDE.md` says which files are docs
+(`simple-session` has the default). When the `Integration` line in
 `CLAUDE.md` says the project works through pull requests, the session ends by pushing and
 opening one instead of merging locally.
 

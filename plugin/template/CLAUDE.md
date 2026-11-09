@@ -56,6 +56,9 @@ It prints one `PASS`/`FAIL` line per check. A person can skip the git hook once 
 - **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`.
 - **Commits:** Conventional Commits, `type(scope): summary`.
 - **Integration:** <!-- FILL IN: "local `git merge --no-ff` into main" (default) or "push and open a pull request" -->
+- **Docs-only:** a branch that changes only files under `docs/` and Markdown files at the
+  repository root other than `CLAUDE.md`. <!-- Change the paths if the docs live elsewhere,
+  or if some of these files are prompts or other Markdown that acts as code. -->
 - **Version bump:** <!-- FILL IN or delete: the command (e.g. `pnpm run version:patch`), the
   file it changes, and the rule (e.g. "code changes get a patch bump as its own commit,
   `chore(release): bump version to X.Y.Z`; docs-only branches do not"). -->

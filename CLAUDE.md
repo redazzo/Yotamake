@@ -20,12 +20,6 @@ leave the files in `.claude/yotamake/protected-paths.conf` alone. If
 `git config core.hooksPath` prints nothing, run `git config core.hooksPath .githooks` so the
 pre-commit hook runs.
 
-**Markdown here is often code.** The skills, hooks and template are the product, and many of
-them are Markdown. So Markdown under `plugin/` counts as code, not docs: a change to it gets
-`simple-session`, "Design and reuse" and `simple-session`, "Review", and a `multi-session`
-plan for it has a Design section. Only Markdown outside `plugin/` is docs-only. The version
-bump follows its own rule (see Branching and releases).
-
 ## Project overview
 
 `plugin/` is the plugin: Markdown skills hold the method, bash hooks enforce parts of it, and
@@ -94,6 +88,9 @@ says how). Put them in the report and ask before running them (see Commands).
 - **Commits:** Conventional Commits, `type(scope): summary`.
 - **Integration:** local `git merge --no-ff` into main. In a cloud session with an assigned
   branch, push to that branch instead.
+- **Docs-only:** a branch that changes only files under `docs/` and Markdown files at the
+  repository root other than `CLAUDE.md`. `CLAUDE.md` and Markdown under `plugin/` are
+  code.
 - **Version bump:** a change under `plugin/` that reaches users (anything but `plugin/evals/`)
   bumps `version` in both `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json`: patch for a fix, minor for a feature. It is its own
