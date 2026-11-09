@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-09
+updated: 2026-11-10
 owns: [open-work-register]
 ---
 
@@ -43,10 +43,10 @@ to a clone and is not cloned. So each person, in each clone, runs `./plugin/inst
 once (or `git config core.hooksPath .githooks`). Until then their commits skip the hook, and
 only CI (once active) catches a failing check.
 
-A lasting fix would set it for them, e.g. a plugin `SessionStart` hook that sets
-`core.hooksPath` when `.githooks/` exists and nothing else is set. That reaches every
-repository using the harness, so it needs its own decision:
-[ADR-0004](./decisions/0004-session-start-hook-sets-hooks-path.md) proposes it. If it is
+A lasting fix would set it for them: a `SessionStart` hook in the project's
+`.claude/settings.json` that sets `core.hooksPath` when `.githooks/` exists and nothing else
+is set. That reaches every repository using the harness, so it needs its own decision:
+[ADR-0004](./decisions/0004-project-session-start-hook-sets-hooks-path.md) proposes it. If it is
 built, delete this entry.
 
 ## `simple-session` can miss a `CLAUDE.md`-only edit

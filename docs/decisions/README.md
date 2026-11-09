@@ -25,7 +25,7 @@ dated amendment section at the end.
 | [0001](./0001-harness-owned-and-project-owned-files.md) | Template files are either harness-owned or project-owned | Accepted |
 | [0002](./0002-project-facts-in-named-claude-md-sections.md) | Skills read project facts only from named CLAUDE.md sections | Accepted |
 | [0003](./0003-stop-points-enforced-by-ask-rules.md) | Stop points are enforced by permission ask rules | Accepted |
-| [0004](./0004-session-start-hook-sets-hooks-path.md) | A plugin SessionStart hook points git at .githooks/ when nothing else is set | Proposed |
+| [0004](./0004-project-session-start-hook-sets-hooks-path.md) | A project SessionStart hook points git at .githooks/ when nothing else is set | Proposed |
 
 ## Template
 
