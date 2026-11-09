@@ -27,7 +27,8 @@ top.
 has a few minutes.
 
 [`docs/ci.yml`](./ci.yml) runs `scripts/check --all`. The GitHub App cannot push under
-`.github/workflows/`, so a person adds it by hand: copy `docs/ci.yml` to
+`.github/workflows/` (re-tried 2026-11-09: GitHub refused the push for lack of the
+`workflows` permission), so a person adds it by hand: copy `docs/ci.yml` to
 `.github/workflows/ci.yml`, push it to main, and check that the first run passes. Then delete
 `docs/ci.yml` and this entry. The workflow pins the Claude Code CLI version; bump that on
 purpose.

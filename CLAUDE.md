@@ -46,6 +46,7 @@ only superseded) · [docs/records/](./docs/records/README.md) (history) ·
 scripts/check                       # the gate; see Checks
 ./plugin/install.sh <repo> [--lite] # install or refresh the harness in a repository
 ./plugin/install.sh .               # refresh this repository's own harness copies
+claude --plugin-dir ./plugin        # start a session on this branch's plugin, not the released one
 cd plugin && claude plugin eval . --case <name> --runs 3 --ablation none \
   --scaffold --trust-plugin --allow-tools Bash Write Edit --no-publish   # costs money; ask first
 ```
@@ -74,7 +75,8 @@ cases in the report and ask before running them (see Commands).
 
 - **Main branch:** `main`. Feature work happens on branches cut from it, never on it directly.
   A hook blocks edits while this branch is checked out; it reads the name from this line.
-- **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`.
+- **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`. A
+  cloud session that is assigned a branch works on that branch as named, with no prefix.
 - **Commits:** Conventional Commits, `type(scope): summary`.
 - **Integration:** local `git merge --no-ff` into main. In a cloud session with an assigned
   branch, push to that branch instead.

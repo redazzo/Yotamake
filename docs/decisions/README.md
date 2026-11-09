@@ -22,7 +22,9 @@ dated amendment section at the end.
 
 | ADR | Title | Status |
 |-----|-------|--------|
-| — | _None yet._ | — |
+| [0001](./0001-harness-owned-and-project-owned-files.md) | Template files are either harness-owned or project-owned | Accepted |
+| [0002](./0002-project-facts-in-named-claude-md-sections.md) | Skills read project facts only from named CLAUDE.md sections | Accepted |
+| [0003](./0003-stop-points-enforced-by-ask-rules.md) | Stop points are enforced by permission ask rules | Accepted |
 
 ## Template
 
