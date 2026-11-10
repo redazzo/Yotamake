@@ -20,6 +20,14 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.13.0 — Session steps allowed without a prompt
+
+- **Check:** the `allow` list in `.claude/settings.json` has `Bash(git checkout -b:*)`,
+  `Bash(git switch -c:*)`, `Bash(git add:*)` and `Bash(git pull --ff-only:*)`, or the
+  repository has put them under `ask` or `deny` on purpose.
+- **Apply:** re-run the plugin's `install.sh` on the repository. It merges the four rules
+  into `.claude/settings.json` and keeps everything else. The `ask` rules are unchanged.
+
 ## 0.12.0 — Docs-only line
 
 - **Check:** the Branching and releases section of `CLAUDE.md` has a `**Docs-only:**` line.

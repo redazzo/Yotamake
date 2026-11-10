@@ -60,16 +60,6 @@ file under `.git/`. That turns the weakest step into enforcement, as the `ask` r
 commits. The hook must let the turn end when it cannot decide (**Boundaries**), and must not
 fire on questions or docs-only branches.
 
-## Fewer permission prompts in a session
-
-**Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** the next change to the
-template's `.claude/settings.json`.
-
-The template allows only read-only git commands, so every session prompts for steps it always
-takes: `git checkout -b`, `git switch -c`, `git add`, `git add -N` and `git pull --ff-only`.
-Adding them to `allow` weakens no stop point, since commit, merge and push stay under `ask`.
-It is a project-owned template file, so it needs an entry in `plugin/reference/upgrades.md`.
-
 ## Measure what a session costs
 
 **Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** the next full eval run, or a

@@ -19,7 +19,11 @@
       "Bash(git branch:*)",
       "Bash(scripts/check:*)",
       "Bash(node scripts/docs/lint-docs.mjs:*)",
-      "Bash(node scripts/docs/generate-records-index.mjs:*)"
+      "Bash(node scripts/docs/generate-records-index.mjs:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(git switch -c:*)",
+      "Bash(git add:*)",
+      "Bash(git pull --ff-only:*)"
     ],
     "ask": [
       "Bash(git commit:*)",

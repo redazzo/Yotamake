@@ -17,6 +17,10 @@
       "Bash(git log:*)",
       "Bash(git show:*)",
       "Bash(git branch:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(git switch -c:*)",
+      "Bash(git add:*)",
+      "Bash(git pull --ff-only:*)",
       "Bash(scripts/check:*)",
       "Bash(node scripts/docs/lint-docs.mjs:*)",
       "Bash(node scripts/docs/generate-records-index.mjs:*)"
