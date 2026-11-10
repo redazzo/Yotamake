@@ -229,7 +229,8 @@ whether to commit, push and open a pull request.
 Only after the user says yes. Claude Code will also ask before `git commit`, `git merge` and
 `git push` when the project's settings put them under `ask`; that is expected. Stage the files
 you changed by name, not `git add -A`. If the pre-commit hook fails, fix the cause; never pass
-`--no-verify` unless the user asks.
+`--no-verify`. The plugin's Bash hook refuses it; if the user wants the hook skipped, they run
+the command themselves with `! <command>`.
 
 ```bash
 git add <files>

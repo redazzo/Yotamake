@@ -7,7 +7,10 @@
 here=${BASH_SOURCE[0]%/*}
 [[ "${BASH_SOURCE[0]}" == */* ]] || here=.
 
-root=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --show-toplevel 2>/dev/null) || exit 0
+# Without git (denied, say), fall back to the project directory Claude Code names, so a
+# session is not told "up to date" by silence.
+root=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --show-toplevel 2>/dev/null) || root=$CLAUDE_PROJECT_DIR
+[[ -n "$root" ]] || exit 0
 if [[ -f "$root/.claude/yotamake/version" ]]; then
     read -r repo < "$root/.claude/yotamake/version"
 elif [[ -f "$root/scripts/check" ]]; then

@@ -20,23 +20,8 @@ fp=$(tool_file_path)
 # The file may not exist yet: repo_path_of starts from its nearest existing directory.
 root=$(repo_path_of "$fp" | head -n1)
 [[ -n "$root" ]] || exit 0
-[[ -f "$root/.claude/yotamake/allow-edits-on-main" ]] && exit 0
-git -C "$root" rev-parse --verify -q HEAD >/dev/null || exit 0
 git -C "$root" check-ignore -q -- "$fp" && exit 0
-main=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' "$root/CLAUDE.md" 2>/dev/null | head -n1)
-mains=${main:-main master}
+on=$(guarded_main_branch "$root") || exit 0
 
-# On a branch: block when it is a main branch. Detached: block when HEAD is a main branch's tip.
-on=""
-if branch=$(git -C "$root" symbolic-ref --short -q HEAD); then
-    for m in $mains; do [[ "$branch" == "$m" ]] && on=$m; done
-else
-    head=$(git -C "$root" rev-parse HEAD)
-    for m in $mains; do
-        [[ "$(git -C "$root" rev-parse -q --verify "refs/heads/$m")" == "$head" ]] && on="$m (detached HEAD at its tip)"
-    done
-fi
-[[ -n "$on" ]] || exit 0
-
-echo "BLOCKED: $root is on its main branch '$on'. Cut a branch first (e.g. git switch -c fix/<topic>), then edit. If this repository works on main on purpose, the user can create .claude/yotamake/allow-edits-on-main." >&2
+echo "BLOCKED: $root is on its main branch '$on'. Cut a branch first (e.g. git switch -c fix/<topic>), then edit. $MAIN_OPT_OUT" >&2
 exit 2

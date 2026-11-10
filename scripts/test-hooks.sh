@@ -65,6 +65,43 @@ expect 2 pre-edit-main-branch.sh "$r/a.js"
 git init -q -b main "$tmp/empty"
 expect 0 pre-edit-main-branch.sh "$tmp/empty/a.js"            # no commits yet
 
+# --- pre-bash-git.sh -----------------------------------------------------------
+# bash_call <command> [cwd]: the hook input for a Bash call.
+bash_call() { node -e 'process.stdout.write(JSON.stringify({cwd: process.argv[2] || undefined, tool_input: {command: process.argv[1]}}))' "$1" "${2:-}"; }
+b=$tmp/bash
+# git_expect <exit code> <command> [cwd, default $b]
+git_expect() { expect "$1" pre-bash-git.sh "$(bash_call "$2" "${3:-$b}")"; }
+git init -q -b main "$b" && git -C "$b" -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
+mkdir -p "$b/sub"
+git_expect 2 'git commit -m x'                  # on main
+git_expect 2 'git add a && git commit -am "x"' "$b/sub"   # compound, subfolder
+git_expect 2 "git -C $b commit -m x" "$tmp"          # git -C
+git_expect 2 "cd $b && git commit -m x" "$tmp"       # cd first
+git_expect 0 'git status'                       # not a commit
+git_expect 0 'echo "git commit"'                # quoted text
+git_expect 0 'git commit -m x' "$tmp"                # not a repository
+git -C "$b" switch -q -c feat/x
+git_expect 0 'git commit -m x'                  # on a branch
+git_expect 2 'git commit --no-verify -m x'      # skips the hook
+git_expect 2 'git commit -anm x'                # -n in a cluster
+git_expect 2 'git push --no-verify'
+git_expect 2 'git merge --squash --no-verify x'   # --squash takes no value here
+git_expect 2 'git status; git -c a=b commit -n'
+git_expect 0 'git commit -m "docs: mention --no-verify"'   # in the message
+git_expect 0 'git commit -mn'                   # n is the message
+git_expect 0 'git commit -m -n'                 # so is -n here
+git_expect 0 'git push -n'                      # push -n is a dry run
+git_expect 0 'git commit -m "unclosed'          # cannot read: let through
+git -C "$b" switch -q main
+mh=$(git -C "$b" rev-parse --absolute-git-dir)/MERGE_HEAD
+git -C "$b" rev-parse HEAD > "$mh"
+git_expect 0 'git commit --no-edit'             # finishing a merge
+rm "$mh"
+mkdir -p "$b/.claude/yotamake" && touch "$b/.claude/yotamake/allow-edits-on-main"
+git_expect 0 'git commit -m x'                  # opted out
+git_expect 2 'git commit --no-verify -m x'      # but never --no-verify
+git_expect 0 'git commit -m x' "$tmp/empty"     # no commits yet
+
 # --- post-edit-check.sh -------------------------------------------------------
 c=$tmp/check
 mkdir -p "$c/.claude/yotamake"
@@ -237,9 +274,12 @@ echo 1.x > "$u/.claude/yotamake/version"
 up_check 1 "speaks when it cannot compare"
 grep -qF "could not compare" <<<"$up_out" || { echo "FAIL session-upgrades.sh unclear when it cannot compare"; failed=1; }
 up_check 0 "is quiet outside a repository" "$tmp/none"
+mkdir -p "$tmp/nogit" && printf '#!/bin/sh\nexit 128\n' > "$tmp/nogit/git" && chmod +x "$tmp/nogit/git"
+echo 0.1.0 > "$u/.claude/yotamake/version"
+PATH="$tmp/nogit:$PATH" up_check 1 "falls back to the project directory without git" "$u"
 
 # --- Every hook lets the edit through when it cannot read the tool call ---------
-for hook in pre-edit-protect.sh pre-edit-main-branch.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do
+for hook in pre-edit-protect.sh pre-edit-main-branch.sh pre-bash-git.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do
     echo 'not json' | bash "$hooks/$hook" >/dev/null 2>&1 ||
         { echo "FAIL $hook: unreadable input should exit 0"; failed=1; }
 done

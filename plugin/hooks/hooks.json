@@ -23,6 +23,15 @@
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-edit-main-branch.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-bash-git.sh\""
+          }
+        ]
       }
     ],
     "PostToolUse": [
