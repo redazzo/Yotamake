@@ -20,6 +20,19 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.17.0 — SessionStart hook tells Claude where it is
+
+- **Check:** `.claude/settings.json` has a `SessionStart` hook whose command names
+  `session-context.sh`, or `.claude/yotamake/session-context.sh` is listed in
+  `.claude/yotamake/skip`.
+- **Apply:** re-run the plugin's `install.sh` against the repository root. It installs
+  `.claude/yotamake/session-context.sh` and merges its `SessionStart` entry into
+  `.claude/settings.json`, keeping the repository's own hooks. Tell the user that each
+  session now starts with a few lines in Claude's context: the branch and whether it is the
+  main branch, any active multi-session effort and its next session, and the session rule
+  (ADR-0004, amendment). The person does not see them. To opt out, list the script in
+  `.claude/yotamake/skip` and delete it.
+
 ## 0.16.0 — SessionStart hook sets core.hooksPath
 
 - **Check:** `.claude/settings.json` has a `SessionStart` hook whose command names

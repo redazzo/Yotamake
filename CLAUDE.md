@@ -132,11 +132,11 @@ against an accepted ADR, or bring in a way of doing things that **Style** or **P
 not list stops before any edit and is raised with the user, whoever asked for it.
 
 - **Style:** a Claude Code plugin: declarative Markdown skills (the method), small shell
-  hooks (enforcement, plus safe one-time setup), and a copy-in template installed by
-  `install.sh`, whose files are either harness-owned (refreshed) or project-owned (copied
-  once). Besides the plugin's hooks, the template's `.claude/settings.json` has one project
-  hook that runs harness-owned scripts in `.claude/yotamake/` (ADR-0004), so it works without
-  the plugin.
+  hooks (enforcement, safe one-time setup, and context at session start), and a copy-in
+  template installed by `install.sh`, whose files are either harness-owned (refreshed) or
+  project-owned (copied once). Besides the plugin's hooks, the template's
+  `.claude/settings.json` has project `SessionStart` hooks, one per harness-owned script in
+  `.claude/yotamake/` (ADR-0004), so they work without the plugin.
 - **Modules:** `plugin/skills/` the method, one folder per skill; `plugin/hooks/` edit-time
   enforcement; `plugin/install.sh` and `plugin/template/` the per-repository files;
   `plugin/reference/` material skills read on demand (style catalogue, upgrades);
