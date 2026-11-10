@@ -21,18 +21,6 @@ not a backlog entry. Items with substantial written analysis keep a detail docum
 
 ---
 
-## CI is written but not active
-
-**Priority: High** · **Added:** 2026-10-29 · **Trigger to act:** someone who can push under
-`.github/workflows/` has a few minutes.
-
-[`docs/ci.yml`](./ci.yml) runs `scripts/check --all`. The GitHub App cannot push under
-`.github/workflows/` (re-tried 2026-11-09: GitHub refused the push for lack of the
-`workflows` permission), so a person adds it by hand: copy `docs/ci.yml` to
-`.github/workflows/ci.yml`, push it to main, and check that the first run passes. Then delete
-`docs/ci.yml` and this entry. The workflow pins the Claude Code CLI version; bump that on
-purpose.
-
 ## A `SessionStart` hook that tells Claude where it is
 
 **Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** ADR-0004 is accepted, or an
@@ -127,7 +115,7 @@ repository.
 The pre-commit hook runs `scripts/check --staged`, but git's `core.hooksPath` setting is local
 to a clone and is not cloned. So each person, in each clone, runs `./plugin/install.sh .`
 once (or `git config core.hooksPath .githooks`). Until then their commits skip the hook, and
-only CI (once active) catches a failing check.
+only CI catches a failing check.
 
 A lasting fix would set it for them: a `SessionStart` hook in the project's
 `.claude/settings.json` that sets `core.hooksPath` when `.githooks/` exists and nothing else
