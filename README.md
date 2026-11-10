@@ -66,7 +66,8 @@ a refreshed generator could otherwise leave the docs check failing.
 When a new version needs something added to those files, such as a new line in `CLAUDE.md`,
 `plugin/reference/upgrades.md` says what and how to check for it. The installer records the
 version it ran in `.claude/yotamake/version`. When a session starts in a repo older than the
-plugin, it offers the upgrades still missing (`simple-session`, "Harness upgrades").
+plugin, the plugin's `SessionStart` hook tells Claude so in one line, and Claude offers the
+upgrades still missing (`simple-session`, "Harness upgrades").
 `/yotamake:setup` applies them on a refresh.
 
 ## How it is split
@@ -92,12 +93,13 @@ plugin/
     setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
     drawio/           draw.io diagrams
   hooks/
-    hooks.json                     registers the five hooks below
+    hooks.json                     registers the six hooks below
     pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
     post-edit-check.sh             runs a fast per-file check after each edit
     post-edit-mark.sh              notes that this session edited a code file
     stop-check-ran.sh              blocks the end of a turn once when scripts/check has not passed since
+    session-upgrades.sh            at session start, tells Claude when the repo's harness is older than the plugin
     lib.sh                         shared by the hooks: reads the hook input, finds the gate files
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies

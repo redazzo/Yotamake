@@ -29,11 +29,18 @@ the file as code.
 
 ## 0. Harness upgrades — first
 
-Do this once per conversation, before step 1. Read the plugin's version from
-`<this skill's directory>/../../.claude-plugin/plugin.json` and the repository's from
-`.claude/yotamake/version`. If the file is missing, the repository was set up before 0.11.0.
-If it is older than the plugin, read `<this skill's directory>/../../reference/upgrades.md`
-and run the **Check** of each entry newer than the repository's version. If every check
+Do this once per conversation, before step 1. When the repository's harness is older than
+the plugin, the plugin's `SessionStart` hook puts a line starting `Harness upgrades:` in your
+context, with both versions, or saying it could not compare them (then read them yourself,
+as below). With the plugin loaded, no such line means the versions match: carry on without
+comment.
+
+Without the plugin, compare the versions yourself: the plugin's is in
+`<this skill's directory>/../../.claude-plugin/plugin.json`, the repository's in
+`.claude/yotamake/version`. If that file is missing, the repository was set up before 0.11.0.
+
+If the repository's version is older, read
+`<this skill's directory>/../../reference/upgrades.md` and run the **Check** of each entry newer than the repository's version. If every check
 passes, carry on without comment.
 
 Otherwise list the entries whose check fails, one line each, and ask the user to pick one:
