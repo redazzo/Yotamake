@@ -307,7 +307,8 @@ section names, Architecture labels and the eval table agree, the docs, the hooks
 calls, `scripts/test-hooks.sh`), the installer (scratch installs, `scripts/test-install.sh`)
 and `claude plugin validate`. After changing a harness-owned template file
 (`scripts/docs/*.mjs`, `.githooks/pre-commit`), re-run `./plugin/install.sh .` so this
-repository's own copies match; the check fails until they do. The docs baseline
+repository's own copies match; the check fails until they do. Releases re-run it too (CLAUDE.md,
+Version bump). The docs baseline
 (`scripts/docs/docs-lint-baseline.txt`) holds one entry on purpose: the template `CLAUDE.md`
 links `./README.md`, which exists only once the template is installed.
 

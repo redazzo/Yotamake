@@ -13,7 +13,8 @@
  *                                           cases that cover them (a note: always exit 0)
  *
  * Rules:
- *   - version: plugin.json and marketplace.json name the same version.
+ *   - version: plugin.json, marketplace.json and .claude/yotamake/version name the same
+ *     version.
  *   - sections: every CLAUDE.md section a skill names ("the **X** section",
  *     "CLAUDE.md, **X**") or the template's top comment lists is a heading in the template.
  *   - labels: the template's Architecture labels are all in the eval fixture's CLAUDE.md
@@ -96,6 +97,10 @@ function checkVersion() {
   )?.version;
   if (plugin !== listed) {
     fail('version', `plugin.json says ${plugin}, marketplace.json says ${listed}; bump both`);
+  }
+  const installed = read('.claude/yotamake/version').trim();
+  if (installed !== plugin) {
+    fail('version', `.claude/yotamake/version says ${installed}, plugin.json says ${plugin}; run ./plugin/install.sh .`);
   }
 }
 
