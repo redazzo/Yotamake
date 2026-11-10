@@ -48,3 +48,30 @@ gate_file() {
 # uses_gate_stamp <repo root>: true when the repository's scripts/check writes the stamp.
 # Older installs do not, and then the gate hooks stay out of the way.
 uses_gate_stamp() { grep -qs 'yotamake-check-passed' "$1/scripts/check"; }
+
+# guarded_main_branch <repo root>: print the main branch the repository is on, and succeed;
+# fail (printing nothing) when it is on another branch, has no commits yet, or works on main
+# on purpose (an empty file at .claude/yotamake/allow-edits-on-main). The main branch is read
+# from CLAUDE.md's "- **Main branch:** `<name>`" line; without one, both main and master
+# count. A detached HEAD counts when it sits at a main branch's tip.
+guarded_main_branch() {
+    local main m branch head
+    [[ -f "$1/.claude/yotamake/allow-edits-on-main" ]] && return 1
+    git -C "$1" rev-parse --verify -q HEAD >/dev/null || return 1
+    main=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' "$1/CLAUDE.md" 2>/dev/null | head -n1)
+    if branch=$(git -C "$1" symbolic-ref --short -q HEAD); then
+        for m in ${main:-main master}; do
+            [[ "$branch" == "$m" ]] && { printf '%s' "$m"; return 0; }
+        done
+    else
+        head=$(git -C "$1" rev-parse HEAD)
+        for m in ${main:-main master}; do
+            [[ "$(git -C "$1" rev-parse -q --verify "refs/heads/$m")" == "$head" ]] &&
+                { printf '%s (detached HEAD at its tip)' "$m"; return 0; }
+        done
+    fi
+    return 1
+}
+
+# MAIN_OPT_OUT: the sentence both main-branch hooks end their message with.
+MAIN_OPT_OUT="If this repository works on main on purpose, the user can create .claude/yotamake/allow-edits-on-main."

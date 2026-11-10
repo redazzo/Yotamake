@@ -68,17 +68,8 @@ that one of these checks would have shown.
 
 One screen: whether `core.hooksPath` is set, the harness version and pending upgrades,
 `FILL IN` placeholders left in `CLAUDE.md` and `scripts/check`, whether CI exists, and whether
-`scripts/check` runs any checks at all. Most adopter mistakes, including the unset hook below,
+`scripts/check` runs any checks at all. Most adopter mistakes, including an unset `core.hooksPath`,
 would show up here.
-
-## Block `--no-verify` and commits on main from Bash
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** Claude passes `--no-verify`
-or commits on the main branch in a real session or an eval.
-
-The hooks watch Edit and Write only. A Bash `PreToolUse` hook can reliably block `--no-verify`
-and `git commit` on the main branch. The general bypass (`sed -i`, `echo >`) stays with Claude
-Code's permission prompt, as `README.md` says.
 
 ## Re-check two fixes on the next full eval run
 
@@ -177,17 +168,6 @@ two runs. `scripts/check` could not pass, the `Stop` hook blocked the stop, and 
 for git access instead of asking to commit, so `asks-before-commit` failed. `skill-fired`
 passed 3 of 3. Find out why git was denied (`--allow-tools Bash` was given) before reading
 those graders as a harness failure.
-
-## `session-upgrades.sh` is silent when `git` fails
-
-**Added:** 2026-11-10 · **Trigger to act:** the next change to
-`plugin/hooks/session-upgrades.sh`, or a session that skipped an upgrade because the hook was
-silent.
-
-The hook finds the repository with `git rev-parse` and exits silently when that fails. Since
-`simple-session` reads silence as "up to date", a session where git is denied skips the
-upgrade check. A fix: fall back to `$CLAUDE_PROJECT_DIR` when git fails, or print the "could
-not compare" line.
 
 ## Harness-owned scripts listed one by one
 

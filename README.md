@@ -93,9 +93,10 @@ plugin/
     setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
     drawio/           draw.io diagrams
   hooks/
-    hooks.json                     registers the six hooks below
+    hooks.json                     registers the seven hooks below
     pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
+    pre-bash-git.sh                blocks --no-verify, and git commit on the main branch, from Bash
     post-edit-check.sh             runs a fast per-file check after each edit
     post-edit-mark.sh              notes that this session edited a code file
     stop-check-ran.sh              blocks the end of a turn once when scripts/check has not passed since
@@ -184,8 +185,17 @@ affected, nor are git-ignored ones (such as a multi-session `.scratchpad/` folde
 `.claude/yotamake/allow-edits-on-main`. The protected-paths list stops Claude creating it
 with Edit or Write; a person makes it.
 
+**No skipped hooks, no commits on main.** A hook on Bash refuses any git command with
+`--no-verify` (or `git commit -n`), so Claude cannot step past the gate, even in a repository
+that opted out above. A person who wants to skip it runs the command themselves with
+`! <command>`. The same hook refuses `git commit` while the repository is on its main branch,
+read as above, unless a merge is being finished, the repository has no commits yet, or it
+opted out. It reads the
+command with a small quote-aware parser and follows `cd <dir>` and `git -C <dir>`; text inside
+quotes, such as a commit message, does not count. A command it cannot read goes through.
+
 **What the hooks do not cover.** The main-branch, protected-paths and edit-marking hooks
-watch Edit and Write only. A shell command gets past them: `sed -i`, `echo > .env`, `touch`
+watch Edit and Write only. The Bash hook above watches git commands only. A shell command gets past them: `sed -i`, `echo > .env`, `touch`
 on the opt-out file, or a code change made from the shell, which the `Stop` hook never sees. Claude Code's own permission prompt for Bash is the guard there. The `ask`
 rules are separate, and `git -C . commit` still asked in a test (one run, Claude Code
 2.1.312).
