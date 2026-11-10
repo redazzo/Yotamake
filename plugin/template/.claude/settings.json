@@ -18,7 +18,7 @@
       "Bash(git show:*)",
       "Bash(git branch:*)",
       "Bash(git checkout -b:*)",
-      "Bash(git switch -c:*)",
+      "Bash(git switch:*)",
       "Bash(git add:*)",
       "Bash(git pull --ff-only:*)",
       "Bash(scripts/check:*)",
@@ -31,7 +31,12 @@
       "Bash(git push:*)",
       "Bash(git rebase:*)",
       "Bash(git reset --hard:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(git switch -f:*)",
+      "Bash(git switch --force:*)",
+      "Bash(git switch --discard-changes:*)",
+      "Bash(git switch -C:*)",
+      "Bash(git switch --force-create:*)"
     ]
   }
 }

@@ -41,7 +41,7 @@ If it is not clear which applies, ask in S0 and record the answer in `decisions.
 The user resumes with: **"Read <folder>/README.md and start the next session."**
 
 1. In a committed setup, first make sure you are on the effort's branch with its latest
-   commits (`git pull --ff-only`), since the folder lives there.
+   commits (`git switch <branch> && git pull --ff-only`), since the folder lives there.
 2. Read that `README.md`, then `plan.md`, then the last entry in `log.md`, then `docs.md`.
    An effort started before the ledger existed has no `docs.md`: copy the template now, and
    fill it from `log.md` and the diffs of the sessions already done, before going on.
