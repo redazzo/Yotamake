@@ -17,6 +17,19 @@ the exact edit, or says it is quick and not to ask: the skill covers working on 
 and its design check, checks, review, doc update and stop before commit still apply.
 Questions and explanations need no session.
 
+**If the plugin is not loaded** (no `yotamake:` skills are offered), its skills and hooks are
+off. Follow these steps by hand:
+
+1. Before an edit, cut a branch as **Branching and releases** says.
+2. Follow **Architecture**, and update the doc that owns what you change.
+3. Leave the files in `.claude/yotamake/protected-paths.conf` alone, if it exists.
+4. Run `scripts/check` and fix what fails.
+5. Stop and ask before commit, merge or push.
+
+If `git config core.hooksPath` prints nothing, run `git config core.hooksPath .githooks`, so
+the pre-commit hook runs. To get the skills: `claude plugin marketplace add redazzo/Yotamake`,
+then `claude plugin install yotamake@yotamake`.
+
 ## Project overview
 
 <!-- FILL IN: one paragraph. What the project is, the stack, the repo layout. -->

@@ -20,6 +20,15 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.20.1 — CLAUDE.md says what to do without the plugin
+
+- **Check:** `CLAUDE.md`, "How to work here", has a paragraph starting
+  `**If the plugin is not loaded**`.
+- **Apply:** copy that paragraph, its list and the short paragraph after it from the plugin's
+  `template/CLAUDE.md` to the end of "How to work here". If the repository has no
+  `scripts/check`, name its check commands instead. Tell the user that a session without the
+  plugin now has steps to follow.
+
 ## 0.17.0 — SessionStart hook tells Claude where it is
 
 - **Check:** `.claude/settings.json` has a `SessionStart` hook whose command names
