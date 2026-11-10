@@ -207,6 +207,37 @@ lines=$(cd "$c/sub" && bash "$scx" | wc -l)
 ctx_has "says how many efforts it left out" '^  and 4 more$'
 session_start_basics "$scx"
 
+# --- session-upgrades.sh: one line when the repo's harness is older (ADR-0004) ---
+u=$tmp/upgrades
+git init -q "$u" && mkdir -p "$u/.claude/yotamake" "$u/sub"
+pv=$(node -p 'require(process.argv[1]).version' "$hooks/../.claude-plugin/plugin.json")
+# up_check <want lines> <name> [project dir]: the hook exits 0, prints that many lines, and
+# any line names the step. Leaves the output in $up_out.
+up_check() {
+    local status n
+    up_out=$(CLAUDE_PROJECT_DIR="${3:-$u/sub}" bash "$hooks/session-upgrades.sh" </dev/null 2>&1); status=$?
+    n=$(grep -c . <<<"$up_out")
+    [[ $status -eq 0 && $n == "$1" ]] && { [[ $1 == 0 ]] || grep -qF 'simple-session, "Harness upgrades"' <<<"$up_out"; } ||
+        { echo "FAIL session-upgrades.sh $2: status $status, output '$up_out'"; failed=1; }
+}
+up_check 0 "is quiet in a repo without the harness"
+mkdir -p "$u/scripts" && touch "$u/scripts/check"
+up_check 1 "speaks when the version file is missing"
+echo 0.1.0 > "$u/.claude/yotamake/version"
+up_check 1 "speaks when the repo is older"
+grep -qF "is 0.1.0; the plugin is $pv" <<<"$up_out" ||
+    { echo "FAIL session-upgrades.sh does not name both versions"; failed=1; }
+echo "$pv" > "$u/.claude/yotamake/version"
+up_check 0 "is quiet when the versions match"
+echo 999.0.0 > "$u/.claude/yotamake/version"
+up_check 0 "is quiet when the repo is newer"
+echo 0.9.0 > "$u/.claude/yotamake/version"
+up_check 1 "compares numbers, not text"
+echo 1.x > "$u/.claude/yotamake/version"
+up_check 1 "speaks when it cannot compare"
+grep -qF "could not compare" <<<"$up_out" || { echo "FAIL session-upgrades.sh unclear when it cannot compare"; failed=1; }
+up_check 0 "is quiet outside a repository" "$tmp/none"
+
 # --- Every hook lets the edit through when it cannot read the tool call ---------
 for hook in pre-edit-protect.sh pre-edit-main-branch.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do
     echo 'not json' | bash "$hooks/$hook" >/dev/null 2>&1 ||

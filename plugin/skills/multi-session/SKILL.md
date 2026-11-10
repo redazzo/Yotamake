@@ -52,9 +52,14 @@ The user resumes with: **"Read <folder>/README.md and start the next session."**
    copy into a durable doc. Code moves, and the log can be wrong: a stale inventory row can
    name the wrong file and slip into a permanent record.
 
-If the user says "start the next session" without naming a folder, look in `.scratchpad/`
-and `.sessions/`. If several folders exist, list them and ask which. A `spec-*.md` file
-there is a standalone spec from `/yotamake:spec`, not an effort.
+If the user says "start the next session" without naming a folder, use the efforts listed
+in your session-start context (the project's `session-context.sh` names each folder and its
+next session). Without that list, look in `.scratchpad/` and `.sessions/`. If there are
+several efforts, list them and ask which. A `spec-*.md` file there is a standalone spec from
+`/yotamake:spec`, not an effort.
+
+When the context lists an effort and the user asks for work that looks like its next
+session, offer to resume that effort instead of starting a new one.
 
 ## Starting a new effort
 
