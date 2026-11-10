@@ -91,6 +91,7 @@ plugin/
     release-check/    guided deploy with pre-flight and gotchas      (manual: /yotamake:release-check)
     new-migration/    scaffold a timestamped migration file         (manual: /yotamake:new-migration)
     setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
+    doctor/           check the harness works in this repo, read-only (manual: /yotamake:doctor)
     drawio/           draw.io diagrams
   hooks/
     hooks.json                     registers the seven hooks below

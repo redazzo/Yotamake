@@ -61,15 +61,6 @@ template `CLAUDE.md` (for example under **Checks**: "Test-first: yes") could mak
 file and a section skills read, so it needs an `upgrades.md` entry and the section-name
 updates `CLAUDE.md` lists.
 
-## A `/yotamake:doctor` command
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a user hits a setup problem
-that one of these checks would have shown.
-
-One screen: whether `core.hooksPath` is set, the harness version and pending upgrades,
-`FILL IN` placeholders left in `CLAUDE.md` and `scripts/check`, whether CI exists, and whether
-`scripts/check` runs any checks at all. Most adopter mistakes, including an unset `core.hooksPath`,
-would show up here.
 
 ## Re-check two fixes on the next full eval run
 
@@ -96,6 +87,8 @@ Both look fixed. Delete this entry if the full run agrees.
 - `spec`: case 12 passed 3 of 3 runs, but nothing tests the question-at-a-time path or the
   hand-over to a session. A recorded history, as in case 15, could test both.
 - `simple-session`'s pull-request path has no eval case.
+- `doctor` has no eval case. A fixture with `core.hooksPath` unset and `FILL IN` left in
+  `CLAUDE.md` could check that it names both and edits nothing.
 - `setup`'s install step has no eval case (the eval sandbox keeps `.claude/` read-only).
   `scripts/test-install.sh` covers `install.sh` itself.
 
