@@ -23,8 +23,8 @@ not a backlog entry. Items with substantial written analysis keep a detail docum
 
 ## A `SessionStart` hook that tells Claude where it is
 
-**Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** ADR-0004 is accepted, or an
-eval case fails `skill-fired` again.
+**Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** ADR-0004 was accepted on
+2026-11-10; the build runs as a multi-session effort.
 
 Superpowers uses a `SessionStart` hook to make sure its skills fire. Ours would print a few
 lines at the start of each session: the branch and whether it is the main branch, pending
