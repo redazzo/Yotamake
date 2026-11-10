@@ -145,8 +145,11 @@ bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `pus
 skill says. Add your deploy command there too. An `ask` rule wins over a matching `allow`
 rule, including a broad one such as `Bash(git:*)` and one from a higher-priority settings
 source (tested 2026-10-28 with Claude Code 2.1.312, in the same file and across sources).
-Cutting a new branch, staging files and a fast-forward pull are under `allow`, so they do not
-prompt.
+Cutting or switching branches with `git switch`, staging files and a fast-forward pull are
+under `allow`, so they do not prompt. `git switch` with `-f`, `--force`,
+`--discard-changes`, `-C` or `--force-create` first in its options is under `ask`, since it
+drops uncommitted work or resets a branch. The rules match from the start of the command, so
+the same flag later on is not caught.
 
 **No edits on the main branch.** A hook refuses Edit and Write while the file's repository is
 on its main branch (the `Main branch` line in `CLAUDE.md`, else `main` or `master`). Claude

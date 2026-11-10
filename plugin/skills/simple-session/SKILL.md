@@ -82,8 +82,8 @@ skip to step 3.
 Otherwise cut a new branch:
 
 ```bash
-git checkout <main-branch> && git pull --ff-only
-git checkout -b <prefix>/<short-slug>
+git switch <main-branch> && git pull --ff-only
+git switch -c <prefix>/<short-slug>
 ```
 
 Default main branch: `main`. Default prefixes: `feat/`, `fix/`, `refactor/`, `perf/`,
@@ -237,7 +237,7 @@ Then integrate the way the `Integration` line in CLAUDE.md says.
 **Local merge** (the default, when the line is missing or unfilled):
 
 ```bash
-git checkout <main-branch>
+git switch <main-branch>
 git merge --no-ff <branch> -m "Merge <branch> into <main-branch>"
 ```
 

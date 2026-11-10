@@ -20,6 +20,16 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.14.0 — Switching branches without a prompt
+
+- **Check:** the `allow` list in `.claude/settings.json` has `Bash(git switch:*)`, and the
+  `ask` list has `Bash(git switch -f:*)`, `Bash(git switch --force:*)`,
+  `Bash(git switch --discard-changes:*)`, `Bash(git switch -C:*)` and
+  `Bash(git switch --force-create:*)`, or the repository chose otherwise on purpose.
+- **Apply:** re-run the plugin's `install.sh` on the repository. It merges the new rules into
+  `.claude/settings.json` and keeps everything else. An old `Bash(git switch -c:*)` rule
+  can stay; `Bash(git switch:*)` covers it.
+
 ## 0.13.0 — Session steps allowed without a prompt
 
 - **Check:** the `allow` list in `.claude/settings.json` has `Bash(git checkout -b:*)`,
