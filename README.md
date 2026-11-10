@@ -35,11 +35,15 @@ teammates who open the repo in Claude Code are prompted to install it.
 The installer points git at `.githooks/` (`core.hooksPath`). It leaves that setting alone when
 the repo already uses another hook tool (a `.pre-commit-config.yaml`, a lefthook config, or a
 hook in `.git/hooks/`), because git would stop running that tool's hooks. It then prints the
-lines that call `.githooks/pre-commit` from the other tool.
+lines that call `.githooks/pre-commit` from the other tool. The same tests run at the start of
+every Claude Code session, from a `SessionStart` hook in the repo's `.claude/settings.json`
+(ADR-0004), so a fresh clone gets the setting too.
 
 If the repo already has its own version of a template file, such as a docs linter, list the
 harness path in `.claude/yotamake/skip` (one per line). The installer never writes a listed
-path, and adds no `allow` rule for a listed script the repo does not have.
+path, and adds no `allow` rule or hook entry for a listed script the repo does not have.
+To turn off the `SessionStart` hook that sets `core.hooksPath`, list
+`.claude/yotamake/set-hooks-path.sh` there and delete the file.
 
 **Lite mode.** For a small repo that does not want the docs system (ADRs, records, backlog),
 run `install.sh <repo> --lite`, or ask `/yotamake:setup` for lite mode. It installs
@@ -67,7 +71,7 @@ plugin, it offers the upgrades still missing (`simple-session`, "Harness upgrade
 |---|---|---|
 | The plugin (`plugin/`) | Skills, hooks, output style, the installer and template | This repo; reaches every project on update |
 | Each repository | `CLAUDE.md` facts, `scripts/check`, `docs/`, hook config, CI workflow | The project |
-| Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit`, `.claude/yotamake/version` | Refreshed by the installer |
+| Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit`, `.claude/yotamake/set-hooks-path.sh`, `.claude/yotamake/version` | Refreshed by the installer |
 
 ### The plugin
 
@@ -106,8 +110,10 @@ CLAUDE.md                       facts the skills read, by section name
 scripts/check                   the one gate: skills, the pre-commit hook and CI all run it
 .githooks/pre-commit            runs scripts/check --staged (fast checks only)
 .github/workflows/check.yml     runs scripts/check --all
-.claude/settings.json           enables the plugin; "ask" rules for commit, merge, push, …
+.claude/settings.json           enables the plugin; "ask" rules for commit, merge, push, …;
+                                a SessionStart hook that runs set-hooks-path.sh
 .claude/yotamake/
+  set-hooks-path.sh             sets core.hooksPath to .githooks in a clone that lacks it
   protected-paths.conf          files Claude may not edit
   post-edit-checks.conf         glob → per-file check command
   skip                          optional: template paths the installer must never write
@@ -136,10 +142,10 @@ for a boundary check and a duplicate-code check; the project picks the tool.
 before proposing a commit. The pre-commit hook runs its fast checks on staged changes; slow
 ones (usually tests) sit behind `full` in the script and wait for Claude's run and CI. CI runs
 all of it. A person's commit passes the same gate as Claude's, with one catch:
-`core.hooksPath` is a local git setting and is not cloned. A teammate gets the pre-commit
-hook only after running `/yotamake:setup` or `install.sh` (or
-`git config core.hooksPath .githooks`) in their clone. Enabling the plugin alone does not set
-it. CI covers everyone.
+`core.hooksPath` is a local git setting and is not cloned. The project's `SessionStart` hook
+sets it at a teammate's first Claude Code session in the clone, with or without the plugin
+loaded, and says so in one line. A teammate who never opens Claude Code there must run
+`git config core.hooksPath .githooks` themselves. CI covers everyone.
 
 **Claude cannot end a turn with unchecked code.** When `scripts/check` passes (not with
 `--staged`), it touches `yotamake-check-passed` in the git directory. When Claude edits a code

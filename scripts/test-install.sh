@@ -81,6 +81,56 @@ settings_merge_keeps_ours() {
         if (d.model !== "x" || !d.permissions.allow.includes("Bash(make:*)")) process.exit(1);'
 }
 
+# The SessionStart entry: added once, beside the repository's own hooks (ADR-0004).
+session_start_count() {
+    node -p 'const h = (require("./.claude/settings.json").hooks || {}).SessionStart || [];
+        h.filter((e) => JSON.stringify(e).includes("set-hooks-path.sh")).length'
+}
+
+settings_merge_adds_hook_once() {
+    cd "$full"
+    node -e '
+        const fs = require("fs"), p = ".claude/settings.json", d = JSON.parse(fs.readFileSync(p));
+        d.hooks = { SessionStart: [{ hooks: [{ type: "command", command: "echo mine" }] }] };
+        // Reword our command, as a project might: the merge must not add it again.
+        d.hooks.SessionStart.push({ hooks: [{ type: "command",
+            command: "bash .claude/yotamake/set-hooks-path.sh || true" }] });
+        fs.writeFileSync(p, JSON.stringify(d));'
+    "$plugin/install.sh" "$full" >/dev/null
+    "$plugin/install.sh" "$full" >/dev/null
+    [[ "$(session_start_count)" == 1 ]]
+    grep -q 'echo mine' .claude/settings.json
+    test -x .claude/yotamake/set-hooks-path.sh
+}
+
+skipped_script_leaves_hook_out() {
+    local r=$tmp/skip
+    git init -q -b main "$r" && mkdir -p "$r/.claude/yotamake"
+    echo .claude/yotamake/set-hooks-path.sh > "$r/.claude/yotamake/skip"
+    "$plugin/install.sh" "$r" >/dev/null
+    cd "$r"
+    test ! -e .claude/yotamake/set-hooks-path.sh
+    [[ "$(session_start_count)" == 0 ]]
+    [[ "$(git config --get core.hooksPath)" == .githooks ]]   # the installer still sets it
+}
+
+# The installer's hooks-path notes, now printed by set-hooks-path.sh --install.
+installer_hooks_path_notes() {
+    local r
+    r=$tmp/notes-pc && git init -q -b main "$r" && : > "$r/.pre-commit-config.yaml"
+    grep -q 'note: found .pre-commit-config.yaml' <<<"$("$plugin/install.sh" "$r")"
+    [[ -z "$(git -C "$r" config --get core.hooksPath)" ]]
+    r=$tmp/notes-lh && git init -q -b main "$r" && : > "$r/lefthook.yml"
+    grep -q 'note: found a lefthook config' <<<"$("$plugin/install.sh" "$r")"
+    r=$tmp/notes-own && git init -q -b main "$r" && git -C "$r" config core.hooksPath mine
+    grep -q "note: core.hooksPath is already 'mine'" <<<"$("$plugin/install.sh" "$r")"
+    r=$tmp/notes-set && git init -q -b main "$r"
+    grep -q 'set git core.hooksPath to .githooks' <<<"$("$plugin/install.sh" "$r")"
+    ! grep -q 'core.hooksPath' <<<"$("$plugin/install.sh" "$r")"
+}
+
+export GIT_CONFIG_GLOBAL=$tmp/gitconfig GIT_CONFIG_NOSYSTEM=1
+: > "$GIT_CONFIG_GLOBAL"
 step "full install passes its own check" full_install
 step "lite install has no docs system and passes its check" lite_install
 step "a lite refresh adds no files" lite_refresh_adds_nothing
@@ -88,5 +138,8 @@ step "the eval fixture passes its check" eval_fixture
 step "a refresh regenerates a stale records index" refresh_regenerates_stale_index
 step "a quoted status is read the same by the index and the linter" quoted_status_agrees
 step "the settings merge keeps the repository's own entries" settings_merge_keeps_ours
+step "the settings merge adds the SessionStart hook once" settings_merge_adds_hook_once
+step "a skipped hooks-path script leaves the hook entry out" skipped_script_leaves_hook_out
+step "the installer's hooks-path notes are unchanged" installer_hooks_path_notes
 
 exit $failed

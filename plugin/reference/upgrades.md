@@ -20,6 +20,18 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.16.0 — SessionStart hook sets core.hooksPath
+
+- **Check:** `.claude/settings.json` has a `SessionStart` hook whose command names
+  `set-hooks-path.sh`, or `.claude/yotamake/set-hooks-path.sh` is listed in
+  `.claude/yotamake/skip`.
+- **Apply:** re-run the plugin's `install.sh` against the repository root. It installs
+  `.claude/yotamake/set-hooks-path.sh` and merges the `SessionStart` entry into
+  `.claude/settings.json`, keeping the repository's own hooks. Tell the user that, from now
+  on, a clone without `core.hooksPath` gets it set to `.githooks` at the first Claude Code
+  session, unless another hook tool is in use, and that the person sees one line when it
+  happens (ADR-0004). To opt out, list the script in `.claude/yotamake/skip` and delete it.
+
 ## 0.15.0 — scripts/check stamps a passing run
 
 - **Check:** `scripts/check` contains `yotamake-check-passed`, or the repository chose to go

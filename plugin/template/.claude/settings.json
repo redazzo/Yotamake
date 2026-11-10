@@ -38,5 +38,17 @@
       "Bash(git switch -C:*)",
       "Bash(git switch --force-create:*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/.claude/yotamake/set-hooks-path.sh\"; [ -f \"$f\" ] && bash \"$f\" \"$CLAUDE_PROJECT_DIR\"; exit 0"
+          }
+        ]
+      }
+    ]
   }
 }

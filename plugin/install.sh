@@ -8,12 +8,13 @@
 #
 #   Project-owned  CLAUDE.md, scripts/check, docs/, .claude/yotamake/*.conf, CI workflow.
 #                  Copied only when missing (--force overwrites). Yours to edit.
-#   Harness-owned  scripts/docs/*.mjs, .githooks/pre-commit, .claude/yotamake/version.
+#   Harness-owned  scripts/docs/*.mjs, .githooks/pre-commit, .claude/yotamake/version,
+#                  .claude/yotamake/set-hooks-path.sh.
 #                  Always refreshed, so re-running this script updates them.
 #   Generated      docs/records/README.md: regenerated when stale, so a refreshed
 #                  generator never leaves the docs check failing.
-#   Merged         .claude/settings.json: the harness's marketplace, plugin and
-#                  permission entries are added to whatever is already there.
+#   Merged         .claude/settings.json: the harness's marketplace, plugin, permission
+#                  and hook entries are added to whatever is already there.
 #
 # A repository can opt out of any template file, harness-owned or not, by listing
 # its path in .claude/yotamake/skip (one per line, # for comments). The installer
@@ -48,7 +49,8 @@ src="$(cd "$(dirname "$0")" && pwd)/template"
 target="$(cd "$target" && pwd)"
 today=$(date +%Y-%m-%d)
 
-managed=(scripts/docs/lint-docs.mjs scripts/docs/generate-records-index.mjs .githooks/pre-commit)
+managed=(scripts/docs/lint-docs.mjs scripts/docs/generate-records-index.mjs .githooks/pre-commit
+         .claude/yotamake/set-hooks-path.sh)
 is_managed() { local f; for f in "${managed[@]}"; do [[ "$1" == "$f" ]] && return 0; done; return 1; }
 
 skip_file="$target/.claude/yotamake/skip"
@@ -120,8 +122,9 @@ while IFS= read -r -d '' file; do
     fi
 done < <(find "$src" -type f -print0 | sort -z)
 
-# Merge settings.json: add the harness's entries, keep everything else. An allow
-# rule that names a script the repository opted out of, and does not have, is left out.
+# Merge settings.json: add the harness's entries, keep everything else. An allow rule
+# or hook entry that names a script the repository opted out of, and does not have, is
+# left out. A hook entry is added once per event, known by the scripts it runs.
 mkdir -p "$target/.claude"
 node - "$src/.claude/settings.json" "$target/.claude/settings.json" "$target" "${optout[@]-}" <<'EOF'
 const fs = require("fs");
@@ -146,13 +149,31 @@ for (const kind of ["allow", "ask"]) {
         have.push(rule);
     }
 }
+// A harness hook entry is known by the scripts it runs, so a reworded command is not
+// added twice. An entry is added when the event has no command naming its scripts yet.
+const commands = (entry) => (entry.hooks || []).map((h) => h.command || "").join("\n");
+const scripts = (entry) => commands(entry).match(/\.claude\/yotamake\/[\w.-]+\.sh/g) || [];
+for (const [event, entries] of Object.entries(ours.hooks || {})) {
+    for (const entry of entries) {
+        if (missing.some((f) => commands(entry).includes(f))) continue;
+        const have = (theirs.hooks || {})[event] || [];
+        const present = have.map(commands).join("\n");
+        const known = scripts(entry).length
+            ? scripts(entry).every((f) => present.includes(f))
+            : have.some((e) => commands(e) === commands(entry));
+        if (known) continue;
+        theirs.hooks = theirs.hooks || {};
+        (theirs.hooks[event] = theirs.hooks[event] || []).push(entry);
+    }
+}
 if (JSON.stringify(theirs) !== before) {
     fs.writeFileSync(destPath, JSON.stringify(theirs, null, 2) + "\n");
     console.log("merged harness entries into .claude/settings.json");
 }
 EOF
 
-chmod +x "$target/scripts/check" "$target/.githooks/pre-commit" 2>/dev/null || true
+chmod +x "$target/scripts/check" "$target/.githooks/pre-commit" \
+    "$target/.claude/yotamake/set-hooks-path.sh" 2>/dev/null || true
 
 # Record the plugin version these files came from. The sessions compare it with the
 # plugin's own and offer the upgrades in reference/upgrades.md.
@@ -192,55 +213,10 @@ if ! grep -qxF '.scratchpad/' "$gi" 2>/dev/null; then
     echo "added .scratchpad/ to .gitignore"
 fi
 
-if git -C "$target" rev-parse --git-dir >/dev/null 2>&1; then
-    hooks_path=$(git -C "$target" config --get core.hooksPath || true)
-    # Setting core.hooksPath makes git stop reading .git/hooks, which is where the
-    # pre-commit framework and lefthook install. Never switch it off silently.
-    other_tool=""
-    if [[ -z "$hooks_path" ]]; then
-        git_hook=$(cd "$target" && git rev-parse --git-path hooks/pre-commit)
-        [[ "$git_hook" == /* ]] || git_hook="$target/$git_hook"
-        for f in lefthook.yml lefthook.yaml lefthook.json lefthook.toml \
-                 .lefthook.yml .lefthook.yaml .lefthook.json .lefthook.toml; do
-            if [[ -f "$target/$f" ]]; then other_tool=lefthook; fi
-        done
-        if [[ -f "$target/.pre-commit-config.yaml" ]]; then
-            other_tool=pre-commit
-        elif [[ -z "$other_tool" && -f "$git_hook" ]]; then
-            other_tool=existing
-        fi
-    fi
-
-    if [[ -z "$hooks_path" && -z "$other_tool" ]]; then
-        git -C "$target" config core.hooksPath .githooks
-        echo "set git core.hooksPath to .githooks (pre-commit runs scripts/check --staged)"
-    elif [[ "$other_tool" == pre-commit ]]; then
-        cat <<'EOF'
-note: found .pre-commit-config.yaml, so core.hooksPath was left alone. To run the checks
-      on commit, add this to .pre-commit-config.yaml:
-        - repo: local
-          hooks:
-            - id: scripts-check
-              name: scripts/check --staged
-              entry: .githooks/pre-commit
-              language: script
-              pass_filenames: false
-EOF
-    elif [[ "$other_tool" == lefthook ]]; then
-        cat <<'EOF'
-note: found a lefthook config, so core.hooksPath was left alone. To run the checks on
-      commit, add this to it:
-        pre-commit:
-          commands:
-            scripts-check:
-              run: .githooks/pre-commit
-EOF
-    elif [[ "$other_tool" == existing ]]; then
-        echo "note: .git/hooks/pre-commit already exists, so core.hooksPath was left alone; call .githooks/pre-commit from it to run the checks"
-    elif [[ "$hooks_path" != ".githooks" ]]; then
-        echo "note: core.hooksPath is already '$hooks_path'; call .githooks/pre-commit from your own hook to run the checks"
-    fi
-fi
+# Point git at .githooks/, unless another hook tool is in use. The template's copy runs
+# here, so a repository that opted out of the script still gets this on install. The
+# project's SessionStart hook runs the installed copy (ADR-0004).
+bash "$src/.claude/yotamake/set-hooks-path.sh" --install "$target"
 
 echo "copied ${#copied[@]} file(s), refreshed ${#refreshed[@]} harness file(s) in $target"
 [[ ${#refreshed[@]} -gt 0 ]] && printf '  refreshed: %s\n' "${refreshed[@]}"
