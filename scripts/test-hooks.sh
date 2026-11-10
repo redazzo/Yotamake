@@ -113,6 +113,52 @@ expect 0 stop-check-ran.sh "$(stop s1)"                   # an older scripts/che
 expect 0 stop-check-ran.sh "$(stop s1)" CLAUDE_PROJECT_DIR="$tmp/none"   # not a repository
 unset CLAUDE_PROJECT_DIR
 
+# --- set-hooks-path.sh: the template's SessionStart hook (ADR-0004) -------------
+shp="$hooks/../template/.claude/yotamake/set-hooks-path.sh"
+# hp_case <name> <want: set|unset|keep> <want output: notice|none> [setup commands...]
+# Runs the hook in a fresh repository with .githooks/pre-commit, after the setup.
+hp_case() {
+    local name=$1 want=$2 say=$3 r out status value; shift 3
+    r=$(mktemp -d "$tmp/hp.XXXX")
+    git init -q "$r" && mkdir -p "$r/.githooks" && : > "$r/.githooks/pre-commit"
+    (cd "$r" && for c in "$@"; do eval "$c"; done)
+    out=$(cd "$r/.githooks" && bash "$shp" 2>&1); status=$?   # from a subfolder too
+    value=$(git -C "$r" config --get core.hooksPath)
+    local ok=1
+    [[ $status -eq 0 ]] || ok=0
+    case $want in
+        set) [[ "$value" == .githooks && "$(git -C "$r" config --local --get core.hooksPath)" == .githooks ]] || ok=0 ;;
+        unset) [[ -z "$value" ]] || ok=0 ;;
+        keep) [[ "$value" == mine ]] || ok=0 ;;
+    esac
+    if [[ $say == notice ]]; then
+        [[ $(wc -l <<<"$out") -eq 1 ]] && grep -q '"systemMessage".*git config --unset core.hooksPath' <<<"$out" || ok=0
+    else
+        [[ -z "$out" ]] || ok=0
+    fi
+    [[ $ok -eq 1 ]] || { echo "FAIL set-hooks-path.sh $name: status $status, value '$value', output '$out'"; failed=1; }
+}
+export GIT_CONFIG_GLOBAL=$tmp/gitconfig GIT_CONFIG_NOSYSTEM=1
+: > "$GIT_CONFIG_GLOBAL"
+hp_case "sets it in a clean clone" set notice
+hp_case "leaves a local value" keep none 'git config core.hooksPath mine'
+hp_case "leaves a global value" keep none 'git config --global core.hooksPath mine'
+git config --global --unset core.hooksPath
+hp_case "leaves pre-commit alone" unset none ': > .pre-commit-config.yaml'
+hp_case "leaves lefthook alone" unset none ': > lefthook.yml'
+hp_case "leaves a hook in .git/hooks alone" unset none ': > .git/hooks/pre-commit'
+hp_case "needs .githooks/pre-commit" unset none 'rm .githooks/pre-commit'
+hp_case "is quiet on a second run" set none 'git config core.hooksPath .githooks'
+out=$(cd "$tmp" && bash "$shp" 2>&1); status=$?
+[[ $status -eq 0 && -z "$out" ]] || { echo "FAIL set-hooks-path.sh outside a repository: status $status, output '$out'"; failed=1; }
+# The template's hook command: exits 0 and prints nothing when the script is missing.
+cmd=$(node -p 'require(process.argv[1]).hooks.SessionStart.flatMap((e) => e.hooks)
+    .find((h) => h.command.includes("set-hooks-path.sh")).command' "$hooks/../template/.claude/settings.json")
+out=$(CLAUDE_PROJECT_DIR="$tmp/none" bash -c "$cmd" 2>&1); status=$?
+[[ $status -eq 0 && -z "$out" ]] || { echo "FAIL SessionStart command with no script: status $status, output '$out'"; failed=1; }
+grep -q CLAUDE_PLUGIN_ROOT "$shp" && { echo "FAIL set-hooks-path.sh must not need the plugin"; failed=1; }
+unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
+
 # --- Every hook lets the edit through when it cannot read the tool call ---------
 for hook in pre-edit-protect.sh pre-edit-main-branch.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do
     echo 'not json' | bash "$hooks/$hook" >/dev/null 2>&1 ||

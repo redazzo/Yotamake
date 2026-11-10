@@ -16,9 +16,9 @@ Questions and explanations need no session.
 **If the plugin is not loaded** (no `yotamake:` skills are offered, as in a cloud session
 without it), read `plugin/skills/simple-session/SKILL.md` (or `multi-session`'s) and follow it
 as written. Its hooks are off too, so check you are not on the main branch before an edit, and
-leave the files in `.claude/yotamake/protected-paths.conf` alone. If
-`git config core.hooksPath` prints nothing, run `git config core.hooksPath .githooks` so the
-pre-commit hook runs.
+leave the files in `.claude/yotamake/protected-paths.conf` alone. The project's `SessionStart`
+hook still sets `core.hooksPath`; if `git config core.hooksPath` prints nothing anyway, run
+`git config core.hooksPath .githooks` so the pre-commit hook runs.
 
 ## Project overview
 
@@ -132,8 +132,11 @@ against an accepted ADR, or bring in a way of doing things that **Style** or **P
 not list stops before any edit and is raised with the user, whoever asked for it.
 
 - **Style:** a Claude Code plugin: declarative Markdown skills (the method), small shell
-  hooks (enforcement), and a copy-in template installed by `install.sh`, whose files are
-  either harness-owned (refreshed) or project-owned (copied once).
+  hooks (enforcement, plus safe one-time setup), and a copy-in template installed by
+  `install.sh`, whose files are either harness-owned (refreshed) or project-owned (copied
+  once). Besides the plugin's hooks, the template's `.claude/settings.json` has one project
+  hook that runs harness-owned scripts in `.claude/yotamake/` (ADR-0004), so it works without
+  the plugin.
 - **Modules:** `plugin/skills/` the method, one folder per skill; `plugin/hooks/` edit-time
   enforcement; `plugin/install.sh` and `plugin/template/` the per-repository files;
   `plugin/reference/` material skills read on demand (style catalogue, upgrades);
