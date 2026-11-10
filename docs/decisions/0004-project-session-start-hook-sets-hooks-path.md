@@ -130,3 +130,89 @@ Claude Code still has to set it by hand.
 - [docs/backlog.md](../backlog.md), "Each clone needs the pre-commit hook set up"
 - [ADR-0001](./0001-harness-owned-and-project-owned-files.md)
 - [ADR-0003](./0003-stop-points-enforced-by-ask-rules.md)
+
+## Amendment (2026-11-10): the hook also tells Claude where it is
+
+Added while the ADR is still Proposed, so both parts are accepted or rejected together. The
+decision above stands. This section adds a second job for the same hook entry.
+
+**Context.** Skills do not always fire. In case `19-claude-md-only`, `simple-session` did not
+fire in one of three runs, and Claude edited `CLAUDE.md` with no session (backlog, "`simple-session`
+can miss a `CLAUDE.md`-only edit"). ADR-0003 already notes that a skill may not fire.
+Superpowers deals with this through a `SessionStart` hook that puts its rules into Claude's
+context at the start of every session. Our skills also do file reads at the start that a hook
+could do instead: `simple-session`, "Harness upgrades", compares two version files, and
+resuming a multi-session effort means finding its folder and its next session by hand.
+
+**Decision.** In the context of the start of a session, facing skills that do not always fire
+and start-up facts that each skill looks up for itself, we propose that the `SessionStart` entry
+in the template's `.claude/settings.json` run a second script,
+`.claude/yotamake/session-context.sh`. It prints a few plain lines that Claude Code adds to
+Claude's context:
+
+1. The current branch, and whether it is the main branch. The main branch comes from the
+   `**Main branch:**` line in `CLAUDE.md`, read the way `pre-edit-main-branch.sh` reads it.
+2. Each active multi-session effort: a folder under `.scratchpad/` or `.sessions/` that has a
+   `plan.md`, with the first session in it whose heading is not marked `done`.
+3. One fixed line: every change to code, tests or docs runs as a session, through
+   `yotamake:simple-session` or `yotamake:multi-session`, and when those skills are not
+   offered, Claude follows the fallback in `CLAUDE.md`, "How to work here". The script does
+   not repeat that fallback, so `CLAUDE.md` stays its one owner.
+
+It prints at most about ten lines, and nothing about an effort when there is none. Like
+`set-hooks-path.sh`, it is harness-owned, uses only `bash` and `git`, always exits 0, and is
+skipped when it is missing or listed in `.claude/yotamake/skip`. The two scripts are separate,
+so a repository can opt out of one and keep the other, and the installer goes on calling only
+`set-hooks-path.sh`.
+
+**Pending harness upgrades go in a plugin hook, not the project script.** Only the plugin knows
+its own version and has `upgrades.md`. A project script cannot find the plugin reliably,
+and the upgrades only matter when the plugin is loaded. So a `SessionStart` entry in
+`plugin/hooks/hooks.json` runs `session-upgrades.sh`. It compares
+`.claude/yotamake/version` with the plugin's version and, when they differ, prints one line
+that says so and names `simple-session`, "Harness upgrades". It does not run the entries'
+checks; the skill still does that, so the hook stays fast and the method stays in the skill.
+
+We decided against these alternatives:
+
+- **A stronger skill description, or more lines in `CLAUDE.md`.** Both are already in place
+  (version 0.7.3 moved the trigger to the front of the description, and the template
+  `CLAUDE.md` says the same), and case 19 still missed. Text Claude reads when it decides is
+  what is not enough. A hook puts the rule in front of Claude every time.
+- **Everything in the plugin hook.** It would not run in a clone without the plugin, which is
+  the case this ADR started from, and when the session rule matters most.
+- **Everything in one project script.** It cannot see the plugin's version, so it could not
+  report pending upgrades. It would also tie the hooks-path setup and the context lines to one
+  opt-out.
+
+**Consequences.**
+
+- **Style** in `CLAUDE.md` widens again: hooks now enforce, set up, and add context. The Style
+  line says so when this is built.
+- Every session starts with a few extra lines in Claude's context. That costs tokens in every
+  session, including ones with no edit. The lines are kept few and factual for that reason.
+- What the hook prints must stay true. A wrong branch or a stale effort would mislead Claude
+  more than no line at all. So the script prints only what git and the files say, and tests
+  cover each line.
+- `simple-session`, "Harness upgrades", can then start from the hook's line instead of reading
+  the two version files. It keeps its own reads as the fallback when the line is not there
+  (an older install, or the plugin hook skipped).
+- `multi-session` can say: when the context names an active effort, offer to resume it.
+- Whether this makes skills fire is not proven. Case `19-claude-md-only` and the
+  `skill-fired` grader are the measure: run it before and after, with `--runs 3` or more.
+- More build work, on top of the list above: `session-context.sh` and its `managed` entry, a
+  second command in the template's `SessionStart` entry, `session-upgrades.sh` and its entry
+  in `plugin/hooks/hooks.json`, test cases in `scripts/test-hooks.sh`, the `upgrades.md`
+  entry covering both scripts, the edits to `simple-session` and `multi-session` above,
+  `README.md` (the hooks list), and deleting the backlog entries "A `SessionStart` hook that
+  tells Claude where it is" and, if case 19 then passes, "`simple-session` can miss a
+  `CLAUDE.md`-only edit".
+
+**Open questions.**
+
+- The open question above, on whether the person sees `SessionStart` output, matters here
+  too. These lines are meant for Claude. If Claude Code also shows plain output to the person,
+  the context lines may need the JSON `additionalContext` field so they stay out of sight.
+- Does a project `SessionStart` hook also run after `/clear` and on resume? If it does, an
+  effort's next session shows up right after the `/clear` that `multi-session` asks for.
+  Tested before building.

@@ -33,8 +33,8 @@ that every edit runs as a session. It would answer `simple-session` missing a `C
 edit (below), replace `simple-session`'s "Harness upgrades" file reads, and make resuming a
 multi-session effort automatic. Build it with the script
 [ADR-0004](./decisions/0004-project-session-start-hook-sets-hooks-path.md) proposes, since both
-need a project `SessionStart` hook. A hook that adds context, not just enforcement, widens
-**Style**, so it may need that ADR amended or a new one.
+need a project `SessionStart` hook. ADR-0004's amendment (2026-11-10) sets out the design:
+a project script for the branch, efforts and session rule, and a plugin hook for upgrades.
 
 ## Measure what a session costs
 
