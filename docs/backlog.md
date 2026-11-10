@@ -21,21 +21,6 @@ not a backlog entry. Items with substantial written analysis keep a detail docum
 
 ---
 
-## A `SessionStart` hook that tells Claude where it is
-
-**Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** ADR-0004 was accepted on
-2026-11-10; the build runs as a multi-session effort.
-
-Superpowers uses a `SessionStart` hook to make sure its skills fire. Ours would print a few
-lines at the start of each session: the branch and whether it is the main branch, pending
-harness upgrades, any active `.scratchpad/` or `.sessions/` effort and its next session, and
-that every edit runs as a session. It would answer `simple-session` missing a `CLAUDE.md`-only
-edit (below), replace `simple-session`'s "Harness upgrades" file reads, and make resuming a
-multi-session effort automatic. Build it with the script
-[ADR-0004](./decisions/0004-project-session-start-hook-sets-hooks-path.md) proposes, since both
-need a project `SessionStart` hook. ADR-0004's amendment (2026-11-10) sets out the design:
-a project script for the branch, efforts and session rule, and a plugin hook for upgrades.
-
 ## Measure what a session costs
 
 **Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** the next full eval run, or a
@@ -94,33 +79,6 @@ or commits on the main branch in a real session or an eval.
 The hooks watch Edit and Write only. A Bash `PreToolUse` hook can reliably block `--no-verify`
 and `git commit` on the main branch. The general bypass (`sed -i`, `echo >`) stays with Claude
 Code's permission prompt, as `README.md` says.
-
-## Each clone needs the pre-commit hook set up
-
-**Added:** 2026-11-09 · **Trigger to act:** someone starts working in a new clone of this
-repository.
-
-The pre-commit hook runs `scripts/check --staged`, but git's `core.hooksPath` setting is local
-to a clone and is not cloned. So each person, in each clone, runs `./plugin/install.sh .`
-once (or `git config core.hooksPath .githooks`). Until then their commits skip the hook, and
-only CI catches a failing check.
-
-A lasting fix would set it for them: a `SessionStart` hook in the project's
-`.claude/settings.json` that sets `core.hooksPath` when `.githooks/` exists and nothing else
-is set. That reaches every repository using the harness, so it needs its own decision:
-[ADR-0004](./decisions/0004-project-session-start-hook-sets-hooks-path.md) proposes it. If it is
-built, delete this entry.
-
-## `simple-session` can miss a `CLAUDE.md`-only edit
-
-**Added:** 2026-11-09 · **Trigger to act:** case `19-claude-md-only` fails `skill-fired` again.
-
-In its first 3 runs (2026-11-09, Claude Code 2.1.319, one model), case 19 passed twice. In
-the third run, `simple-session` never fired: Claude edited `CLAUDE.md` directly, ran no check
-or review, and asked about committing. When the skill did fire, it treated `CLAUDE.md` as code
-and ran the full review, as the Docs-only rule says. So the gap is the skill firing, not the
-rule. A guess, not checked: "Only change CLAUDE.md" makes the task look too small for a
-session. Re-run with `--keep-temp` to keep the transcript and see why.
 
 ## Re-check two fixes on the next full eval run
 
@@ -208,6 +166,45 @@ Markdown at the root other than `CLAUDE.md`), because the `Docs-only` line is pr
 paths count as code, so Claude runs `scripts/check` once more than it needs to. A fix could be
 a `.claude/yotamake/docs-paths.conf` of globs that the installer seeds and `setup` fills in
 from that line.
+
+## Eval sandbox can deny `git`
+
+**Added:** 2026-11-10 · **Trigger to act:** an eval run where a grader fails because a
+transcript says `git` was denied.
+
+In case `19-claude-md-only` (2026-11-10, `--runs 3`), the sandbox denied `/usr/bin/git` in
+two runs. `scripts/check` could not pass, the `Stop` hook blocked the stop, and Claude waited
+for git access instead of asking to commit, so `asks-before-commit` failed. `skill-fired`
+passed 3 of 3. Find out why git was denied (`--allow-tools Bash` was given) before reading
+those graders as a harness failure.
+
+## `session-upgrades.sh` is silent when `git` fails
+
+**Added:** 2026-11-10 · **Trigger to act:** the next change to
+`plugin/hooks/session-upgrades.sh`, or a session that skipped an upgrade because the hook was
+silent.
+
+The hook finds the repository with `git rev-parse` and exits silently when that fails. Since
+`simple-session` reads silence as "up to date", a session where git is denied skips the
+upgrade check. A fix: fall back to `$CLAUDE_PROJECT_DIR` when git fails, or print the "could
+not compare" line.
+
+## Harness-owned scripts listed one by one
+
+**Added:** 2026-11-10 · **Trigger to act:** a third script in `.claude/yotamake/`.
+
+`install.sh`'s `managed` list and `scripts/consistency.mjs` name each harness-owned script in
+`.claude/yotamake/`. Matching `.claude/yotamake/*.sh` by pattern would save an edit in both
+for each new script.
+
+## Template `CLAUDE.md` has no plugin-not-loaded fallback
+
+**Added:** 2026-11-10 · **Trigger to act:** a target repository used without the plugin
+(a cloud session, say).
+
+`session-context.sh` tells Claude to see `CLAUDE.md`, "How to work here", when the skills are
+not offered. This repository's `CLAUDE.md` says what to do then; the template's does not.
+Adding it is a project-owned template change, so it needs an `upgrades.md` entry.
 
 ## Small harness ideas
 

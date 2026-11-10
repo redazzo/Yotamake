@@ -20,4 +20,6 @@ _None._
 
 ## Complete
 
-_None._
+| Date | Record |
+|---|---|
+| 2026-11-10 | [SessionStart hooks: hooks path, session context, upgrades](./2026/2026-11-10-session-start-hooks.md) |
