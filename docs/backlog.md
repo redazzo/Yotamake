@@ -170,15 +170,6 @@ those graders as a harness failure.
 `.claude/yotamake/`. Matching `.claude/yotamake/*.sh` by pattern would save an edit in both
 for each new script.
 
-## Template `CLAUDE.md` has no plugin-not-loaded fallback
-
-**Added:** 2026-11-10 · **Trigger to act:** a target repository used without the plugin
-(a cloud session, say).
-
-`session-context.sh` tells Claude to see `CLAUDE.md`, "How to work here", when the skills are
-not offered. This repository's `CLAUDE.md` says what to do then; the template's does not.
-Adding it is a project-owned template change, so it needs an `upgrades.md` entry.
-
 ## Small harness ideas
 
 **Added:** 2026-11-10 · **Trigger to act:** a change to the area each one touches.
