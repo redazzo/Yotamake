@@ -1,0 +1,23 @@
+# Runs scripts/check --all, the same gate as Claude's sessions and the pre-commit hook.
+# To activate, copy to .github/workflows/ci.yml (the GitHub App cannot push there).
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # validate needs no login. Pinned so a new CLI release cannot turn CI red on its own;
+      # bump it on purpose.
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2.1.312
+
+      - run: scripts/check --all
