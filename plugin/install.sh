@@ -9,7 +9,7 @@
 #   Project-owned  CLAUDE.md, scripts/check, docs/, .claude/yotamake/*.conf, CI workflow.
 #                  Copied only when missing (--force overwrites). Yours to edit.
 #   Harness-owned  scripts/docs/*.mjs, .githooks/pre-commit, .claude/yotamake/version,
-#                  .claude/yotamake/set-hooks-path.sh.
+#                  .claude/yotamake/set-hooks-path.sh, .claude/yotamake/session-context.sh.
 #                  Always refreshed, so re-running this script updates them.
 #   Generated      docs/records/README.md: regenerated when stale, so a refreshed
 #                  generator never leaves the docs check failing.
@@ -50,7 +50,7 @@ target="$(cd "$target" && pwd)"
 today=$(date +%Y-%m-%d)
 
 managed=(scripts/docs/lint-docs.mjs scripts/docs/generate-records-index.mjs .githooks/pre-commit
-         .claude/yotamake/set-hooks-path.sh)
+         .claude/yotamake/set-hooks-path.sh .claude/yotamake/session-context.sh)
 is_managed() { local f; for f in "${managed[@]}"; do [[ "$1" == "$f" ]] && return 0; done; return 1; }
 
 skip_file="$target/.claude/yotamake/skip"
@@ -173,7 +173,7 @@ if (JSON.stringify(theirs) !== before) {
 EOF
 
 chmod +x "$target/scripts/check" "$target/.githooks/pre-commit" \
-    "$target/.claude/yotamake/set-hooks-path.sh" 2>/dev/null || true
+    "$target"/.claude/yotamake/*.sh 2>/dev/null || true
 
 # Record the plugin version these files came from. The sessions compare it with the
 # plugin's own and offer the upgrades in reference/upgrades.md.

@@ -43,7 +43,11 @@ If the repo already has its own version of a template file, such as a docs linte
 harness path in `.claude/yotamake/skip` (one per line). The installer never writes a listed
 path, and adds no `allow` rule or hook entry for a listed script the repo does not have.
 To turn off the `SessionStart` hook that sets `core.hooksPath`, list
-`.claude/yotamake/set-hooks-path.sh` there and delete the file.
+`.claude/yotamake/set-hooks-path.sh` there and delete the file. The same goes for
+`.claude/yotamake/session-context.sh`, the second `SessionStart` hook: at the start of each
+session it adds a few lines to Claude's context (the branch and whether it is the main
+branch, any active multi-session effort and its next session, and the rule that every change
+runs as a session), so the method holds even when a skill does not fire.
 
 **Lite mode.** For a small repo that does not want the docs system (ADRs, records, backlog),
 run `install.sh <repo> --lite`, or ask `/yotamake:setup` for lite mode. It installs
@@ -71,7 +75,7 @@ plugin, it offers the upgrades still missing (`simple-session`, "Harness upgrade
 |---|---|---|
 | The plugin (`plugin/`) | Skills, hooks, output style, the installer and template | This repo; reaches every project on update |
 | Each repository | `CLAUDE.md` facts, `scripts/check`, `docs/`, hook config, CI workflow | The project |
-| Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit`, `.claude/yotamake/set-hooks-path.sh`, `.claude/yotamake/version` | Refreshed by the installer |
+| Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit`, `.claude/yotamake/set-hooks-path.sh`, `.claude/yotamake/session-context.sh`, `.claude/yotamake/version` | Refreshed by the installer |
 
 ### The plugin
 
@@ -111,9 +115,10 @@ scripts/check                   the one gate: skills, the pre-commit hook and CI
 .githooks/pre-commit            runs scripts/check --staged (fast checks only)
 .github/workflows/check.yml     runs scripts/check --all
 .claude/settings.json           enables the plugin; "ask" rules for commit, merge, push, …;
-                                a SessionStart hook that runs set-hooks-path.sh
+                                SessionStart hooks that run the two scripts below
 .claude/yotamake/
   set-hooks-path.sh             sets core.hooksPath to .githooks in a clone that lacks it
+  session-context.sh            tells Claude the branch, active efforts and the session rule
   protected-paths.conf          files Claude may not edit
   post-edit-checks.conf         glob → per-file check command
   skip                          optional: template paths the installer must never write

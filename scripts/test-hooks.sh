@@ -149,15 +149,63 @@ hp_case "leaves lefthook alone" unset none ': > lefthook.yml'
 hp_case "leaves a hook in .git/hooks alone" unset none ': > .git/hooks/pre-commit'
 hp_case "needs .githooks/pre-commit" unset none 'rm .githooks/pre-commit'
 hp_case "is quiet on a second run" set none 'git config core.hooksPath .githooks'
-out=$(cd "$tmp" && bash "$shp" 2>&1); status=$?
-[[ $status -eq 0 && -z "$out" ]] || { echo "FAIL set-hooks-path.sh outside a repository: status $status, output '$out'"; failed=1; }
-# The template's hook command: exits 0 and prints nothing when the script is missing.
-cmd=$(node -p 'require(process.argv[1]).hooks.SessionStart.flatMap((e) => e.hooks)
-    .find((h) => h.command.includes("set-hooks-path.sh")).command' "$hooks/../template/.claude/settings.json")
-out=$(CLAUDE_PROJECT_DIR="$tmp/none" bash -c "$cmd" 2>&1); status=$?
-[[ $status -eq 0 && -z "$out" ]] || { echo "FAIL SessionStart command with no script: status $status, output '$out'"; failed=1; }
-grep -q CLAUDE_PLUGIN_ROOT "$shp" && { echo "FAIL set-hooks-path.sh must not need the plugin"; failed=1; }
+# session_start_basics <script>: what every SessionStart script in the template must do.
+# Quiet outside a repository; its hook command exits 0 and prints nothing when the
+# script is missing; it does not need the plugin.
+session_start_basics() {
+    local name=${1##*/} out status cmd
+    out=$(cd "$tmp" && bash "$1" 2>&1); status=$?
+    [[ $status -eq 0 && -z "$out" ]] || { echo "FAIL $name outside a repository: status $status, output '$out'"; failed=1; }
+    cmd=$(node -p 'require(process.argv[1]).hooks.SessionStart.flatMap((e) => e.hooks)
+        .find((h) => h.command.includes(process.argv[2])).command' "$hooks/../template/.claude/settings.json" "$name")
+    out=$(CLAUDE_PROJECT_DIR="$tmp/none" bash -c "$cmd" 2>&1); status=$?
+    [[ $status -eq 0 && -z "$out" ]] || { echo "FAIL $name hook command with no script: status $status, output '$out'"; failed=1; }
+    grep -q CLAUDE_PLUGIN_ROOT "$1" && { echo "FAIL $name must not need the plugin"; failed=1; }
+}
+session_start_basics "$shp"
 unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
+
+# --- session-context.sh: the template's SessionStart context lines (ADR-0004) ---
+scx="$hooks/../template/.claude/yotamake/session-context.sh"
+c=$tmp/context
+git init -q -b main "$c" && git -C "$c" -c user.name=t -c user.email=t@t commit -q --allow-empty -m init && mkdir "$c/sub"
+# ctx_has / ctx_lacks <name> <regex>: the script, run from a subfolder, exits 0 and its
+# output does or does not match.
+ctx_check() {
+    local want=$1 name=$2 out status found=no; shift 2
+    out=$(cd "$c/sub" && bash "$scx" 2>&1); status=$?
+    grep -qE -- "$1" <<<"$out" && found=yes
+    [[ $status -eq 0 && $found == "$want" ]] ||
+        { echo "FAIL session-context.sh $name: status $status, output '$out'"; failed=1; }
+}
+ctx_has() { ctx_check yes "$@"; }
+ctx_lacks() { ctx_check no "$@"; }
+ctx_has "says main is main without CLAUDE.md" '^Branch: main, the main branch'
+git -C "$c" switch -q -c master
+ctx_has "counts master too without CLAUDE.md" '^Branch: master, the main branch'
+printf -- '- **Main branch:** `trunk`. Work on branches.\n' > "$c/CLAUDE.md"
+ctx_has "reads the main branch from CLAUDE.md" '^Branch: master \(not the main branch, trunk\)'
+git -C "$c" switch -q -c trunk
+ctx_has "knows the CLAUDE.md main branch" '^Branch: trunk, the main branch'
+expect 2 pre-edit-main-branch.sh "$c/a.txt"   # the edit hook agrees on the main branch
+git -C "$c" switch -q -c feat/x
+ctx_has "names a feature branch" '^Branch: feat/x \(not the main branch, trunk\)'
+git -C "$c" switch -q --detach
+ctx_has "says when HEAD is detached" '^Branch: none \(detached HEAD at [0-9a-f]+\)'
+ctx_lacks "prints nothing about efforts without one" 'efforts'
+ctx_has "prints the session rule" 'yotamake:simple-session.*yotamake:multi-session'
+mkdir -p "$c/.scratchpad/2026-01-01-a" "$c/.sessions/2026-01-02-b" "$c/.scratchpad/no-plan"
+printf '## Design\n\n## S1 — First (F1) — `done`\n\n## S2 — Second (F2) — `todo`\n\n## S3 — Third — `todo`\n' \
+    > "$c/.scratchpad/2026-01-01-a/plan.md"
+printf '## S1 — Only — `done`\n' > "$c/.sessions/2026-01-02-b/plan.md"
+ctx_has "names an effort's next session" '^  \.scratchpad/2026-01-01-a: next is S2 — Second \(F2\)$'
+ctx_has "names a committed effort that is all done" '^  \.sessions/2026-01-02-b: every session is done'
+ctx_lacks "skips a folder without plan.md" 'no-plan'
+for i in 1 2 3 4 5 6 7; do mkdir -p "$c/.scratchpad/x$i" && cp "$c/.sessions/2026-01-02-b/plan.md" "$c/.scratchpad/x$i/"; done
+lines=$(cd "$c/sub" && bash "$scx" | wc -l)
+[[ $lines -le 10 ]] || { echo "FAIL session-context.sh prints $lines lines with many efforts"; failed=1; }
+ctx_has "says how many efforts it left out" '^  and 4 more$'
+session_start_basics "$scx"
 
 # --- Every hook lets the edit through when it cannot read the tool call ---------
 for hook in pre-edit-protect.sh pre-edit-main-branch.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do

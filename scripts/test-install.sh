@@ -9,12 +9,12 @@ full=$tmp/full
 lite=$tmp/lite
 failed=0
 
-# step <name> <function>: run it in a subshell, quietly; on failure show its output.
+# step <name> <function> [args...]: run it in a subshell, quietly; on failure show its output.
 # The status is read after a plain assignment: inside `if`, `!`, `&&` or `||`, bash
 # ignores set -e, and only the step's last command would count.
 step() {
     local out status
-    out=$( (set -e; "$2") 2>&1 )
+    out=$( (set -e; "${@:2}") 2>&1 )
     status=$?
     if [[ $status -ne 0 ]]; then
         echo "FAIL $1"
@@ -82,9 +82,10 @@ settings_merge_keeps_ours() {
 }
 
 # The SessionStart entry: added once, beside the repository's own hooks (ADR-0004).
+# session_start_count [script]: SessionStart entries naming it (default set-hooks-path.sh).
 session_start_count() {
     node -p 'const h = (require("./.claude/settings.json").hooks || {}).SessionStart || [];
-        h.filter((e) => JSON.stringify(e).includes("set-hooks-path.sh")).length'
+        h.filter((e) => JSON.stringify(e).includes(process.argv[1])).length' "${1:-set-hooks-path.sh}"
 }
 
 settings_merge_adds_hook_once() {
@@ -99,18 +100,22 @@ settings_merge_adds_hook_once() {
     "$plugin/install.sh" "$full" >/dev/null
     "$plugin/install.sh" "$full" >/dev/null
     [[ "$(session_start_count)" == 1 ]]
+    [[ "$(session_start_count session-context.sh)" == 1 ]]
     grep -q 'echo mine' .claude/settings.json
     test -x .claude/yotamake/set-hooks-path.sh
+    test -x .claude/yotamake/session-context.sh
 }
 
-skipped_script_leaves_hook_out() {
-    local r=$tmp/skip
+# skipped_script_leaves_only_its_hook_out <skipped script> <other script>
+skipped_script_leaves_only_its_hook_out() {
+    local r=$tmp/skip-$1
     git init -q -b main "$r" && mkdir -p "$r/.claude/yotamake"
-    echo .claude/yotamake/set-hooks-path.sh > "$r/.claude/yotamake/skip"
+    echo ".claude/yotamake/$1" > "$r/.claude/yotamake/skip"
     "$plugin/install.sh" "$r" >/dev/null
     cd "$r"
-    test ! -e .claude/yotamake/set-hooks-path.sh
-    [[ "$(session_start_count)" == 0 ]]
+    test ! -e ".claude/yotamake/$1"
+    [[ "$(session_start_count "$1")" == 0 ]]
+    [[ "$(session_start_count "$2")" == 1 ]]
     [[ "$(git config --get core.hooksPath)" == .githooks ]]   # the installer still sets it
 }
 
@@ -139,7 +144,10 @@ step "a refresh regenerates a stale records index" refresh_regenerates_stale_ind
 step "a quoted status is read the same by the index and the linter" quoted_status_agrees
 step "the settings merge keeps the repository's own entries" settings_merge_keeps_ours
 step "the settings merge adds the SessionStart hook once" settings_merge_adds_hook_once
-step "a skipped hooks-path script leaves the hook entry out" skipped_script_leaves_hook_out
+step "a skipped hooks-path script leaves only its hook entry out" \
+    skipped_script_leaves_only_its_hook_out set-hooks-path.sh session-context.sh
+step "a skipped session-context script leaves only its hook entry out" \
+    skipped_script_leaves_only_its_hook_out session-context.sh set-hooks-path.sh
 step "the installer's hooks-path notes are unchanged" installer_hooks_path_notes
 
 exit $failed
