@@ -93,4 +93,8 @@ run docs node scripts/docs/lint-docs.mjs
 # full && touches '^proxy/'         && run proxy-tests bash -c 'cd proxy && npm test'
 
 [[ $ran -gt 0 ]] || echo "note: no checks configured; add them to scripts/check." >&2
+# A passing run outside the pre-commit hook leaves a stamp in the git directory. The
+# plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
+# pass. Keep this line when you edit the file.
+[[ $failed -eq 0 && "$mode" != --staged ]] && touch "$(git rev-parse --git-path yotamake-check-passed)"
 exit $failed

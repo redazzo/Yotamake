@@ -20,6 +20,24 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.15.0 — scripts/check stamps a passing run
+
+- **Check:** `scripts/check` contains `yotamake-check-passed`, or the repository chose to go
+  without the `Stop` hook on purpose.
+- **Apply:** add these lines to `scripts/check`, just before its final `exit $failed`, as in
+  the plugin's `template/scripts/check`:
+
+  ```bash
+  # A passing run outside the pre-commit hook leaves a stamp in the git directory. The
+  # plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
+  # pass. Keep this line when you edit the file.
+  [[ $failed -eq 0 && "$mode" != --staged ]] && touch "$(git rev-parse --git-path yotamake-check-passed)"
+  ```
+
+  If the script names its mode or failure variables differently, use its names. Tell the
+  user that, from now on, Claude cannot end a turn with code edited since the last passing
+  run (`README.md` explains the hook).
+
 ## 0.14.0 — Switching branches without a prompt
 
 - **Check:** the `allow` list in `.claude/settings.json` has `Bash(git switch:*)`, and the

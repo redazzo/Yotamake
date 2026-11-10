@@ -84,11 +84,13 @@ plugin/
     setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
     drawio/           draw.io diagrams
   hooks/
-    hooks.json                     registers the three hooks below
+    hooks.json                     registers the five hooks below
     pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
     post-edit-check.sh             runs a fast per-file check after each edit
-    lib.sh                         shared by the hooks: reads the edited path from the tool call
+    post-edit-mark.sh              notes that this session edited a code file
+    stop-check-ran.sh              blocks the end of a turn once when scripts/check has not passed since
+    lib.sh                         shared by the hooks: reads the hook input, finds the gate files
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
   reference/upgrades.md            per version: what to add to a repo's own files, and how
@@ -139,6 +141,17 @@ hook only after running `/yotamake:setup` or `install.sh` (or
 `git config core.hooksPath .githooks`) in their clone. Enabling the plugin alone does not set
 it. CI covers everyone.
 
+**Claude cannot end a turn with unchecked code.** When `scripts/check` passes (not with
+`--staged`), it touches `yotamake-check-passed` in the git directory. When Claude edits a code
+file with Edit or Write, a hook writes the session id to `yotamake-edited` there. Docs and
+git-ignored files do not count. The hook uses the default `Docs-only` rule (files under
+`docs/`, and Markdown at the root other than `CLAUDE.md`): it cannot read a project's own
+`Docs-only` line, so other doc paths count as code and cost one extra check run. When Claude ends a turn after
+editing code in this session and the stamp is older than that edit, a `Stop` hook blocks
+once and tells it to run the check. A second stop goes through, so Claude can still stop to
+ask a question. A turn that edited no code, such as a question, is never blocked, and neither
+is a repository whose `scripts/check` does not write the stamp (one set up before 0.15.0).
+
 **Stop points are enforced, not just asked for.** The skills stop before commit, version
 bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `push`,
 `rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks every time, whatever a
@@ -158,9 +171,9 @@ affected, nor are git-ignored ones (such as a multi-session `.scratchpad/` folde
 `.claude/yotamake/allow-edits-on-main`. The protected-paths list stops Claude creating it
 with Edit or Write; a person makes it.
 
-**What the hooks do not cover.** The main-branch and protected-paths hooks watch Edit and
-Write only. A shell command gets past them: `sed -i`, `echo > .env`, or `touch` on the
-opt-out file. Claude Code's own permission prompt for Bash is the guard there. The `ask`
+**What the hooks do not cover.** The main-branch, protected-paths and edit-marking hooks
+watch Edit and Write only. A shell command gets past them: `sed -i`, `echo > .env`, `touch`
+on the opt-out file, or a code change made from the shell, which the `Stop` hook never sees. Claude Code's own permission prompt for Bash is the guard there. The `ask`
 rules are separate, and `git -C . commit` still asked in a test (one run, Claude Code
 2.1.312).
 

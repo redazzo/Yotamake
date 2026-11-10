@@ -17,12 +17,9 @@ here=${BASH_SOURCE[0]%/*}
 fp=$(tool_file_path)
 [[ -n "$fp" ]] || exit 0
 
-# The file may not exist yet: start from its nearest existing directory.
-dir=$(dirname "$fp")
-while [[ ! -d "$dir" && "$dir" != / && "$dir" != . ]]; do dir=$(dirname "$dir"); done
-[[ -d "$dir" ]] || exit 0
-
-root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || exit 0
+# The file may not exist yet: repo_path_of starts from its nearest existing directory.
+root=$(repo_path_of "$fp" | head -n1)
+[[ -n "$root" ]] || exit 0
 [[ -f "$root/.claude/yotamake/allow-edits-on-main" ]] && exit 0
 git -C "$root" rev-parse --verify -q HEAD >/dev/null || exit 0
 git -C "$root" check-ignore -q -- "$fp" && exit 0
