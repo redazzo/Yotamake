@@ -36,18 +36,6 @@ multi-session effort automatic. Build it with the script
 need a project `SessionStart` hook. A hook that adds context, not just enforcement, widens
 **Style**, so it may need that ADR amended or a new one.
 
-## A `Stop` hook that checks the gate ran
-
-**Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** an eval run or a real session
-reports a code change without running `scripts/check`, `/simplify` or `/code-review`.
-
-Running the check and the review before the report is asked for in text only, and earlier eval
-runs skipped them. A `Stop` hook could block the end of a turn while the branch has code edits
-newer than the last passing `scripts/check`, for example by having the script write a stamp
-file under `.git/`. That turns the weakest step into enforcement, as the `ask` rules did for
-commits. The hook must let the turn end when it cannot decide (**Boundaries**), and must not
-fire on questions or docs-only branches.
-
 ## Measure what a session costs
 
 **Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** the next full eval run, or a
@@ -209,6 +197,17 @@ listed somewhere public.
 Store each full run's per-case scores, costs, plugin version and Claude Code version as a
 record, so a drop shows up as a regression. Running each case several times would also show
 flaky skill firing more clearly.
+
+## The `Stop` hook ignores a project's own `Docs-only` line
+
+**Added:** 2026-11-10 · **Trigger to act:** a project whose `Docs-only` line names other doc
+paths reports that editing those docs blocks the end of a turn.
+
+`post-edit-mark.sh` counts an edit as docs with the default rule only (files under `docs/`, and
+Markdown at the root other than `CLAUDE.md`), because the `Docs-only` line is prose. Other doc
+paths count as code, so Claude runs `scripts/check` once more than it needs to. A fix could be
+a `.claude/yotamake/docs-paths.conf` of globs that the installer seeds and `setup` fills in
+from that line.
 
 ## Small harness ideas
 

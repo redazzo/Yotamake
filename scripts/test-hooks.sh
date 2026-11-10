@@ -7,11 +7,12 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 failed=0
 
-# expect <exit code> <hook> <file path> [env assignments...]
+# expect <exit code> <hook> <file path or whole JSON input> [env assignments...]
 expect() {
     local want=$1 hook=$2 fp=$3; shift 3
-    local got
-    printf '{"tool_input":{"file_path":"%s"}}' "$fp" | env "$@" bash "$hooks/$hook" >/dev/null 2>&1
+    local got input=$fp
+    [[ "$fp" == \{* ]] || input=$(printf '{"tool_input":{"file_path":"%s"}}' "$fp")
+    printf '%s' "$input" | env "$@" bash "$hooks/$hook" >/dev/null 2>&1
     got=$?
     if [[ $got != "$want" ]]; then
         echo "FAIL $hook ${fp#"$tmp"/}: want $want, got $got"
@@ -77,8 +78,43 @@ expect 0 post-edit-check.sh "$c/a.other"            # no rule
 expect 0 post-edit-check.sh "$c/missing.bad"        # file gone
 expect 0 post-edit-check.sh "$c/a.bad" CLAUDE_PROJECT_DIR="$tmp/none"   # no conf
 
+# --- post-edit-mark.sh and stop-check-ran.sh -----------------------------------
+edit() { printf '{"session_id":"%s","tool_input":{"file_path":"%s"}}' "$1" "$2"; }
+stop() { printf '{"session_id":"%s","stop_hook_active":%s}' "$1" "${2:-false}"; }
+g=$tmp/gate
+git init -q -b feat/x "$g"
+mkdir -p "$g/scripts" "$g/docs" "$g/src" "$g/.scratchpad"
+printf 'touch "$(git rev-parse --git-path yotamake-check-passed)"\n' > "$g/scripts/check"
+printf '.scratchpad/\n' > "$g/.gitignore"
+for f in src/a.js docs/x.md README.md CLAUDE.md .scratchpad/plan.md; do printf 'x\n' > "$g/$f"; done
+export CLAUDE_PROJECT_DIR=$g
+marker=$g/.git/yotamake-edited stamp=$g/.git/yotamake-check-passed
+expect 0 stop-check-ran.sh "$(stop s1)"                   # nothing edited: a question
+for f in docs/x.md README.md .scratchpad/plan.md; do
+    expect 0 post-edit-mark.sh "$(edit s1 "$g/$f")"
+done
+[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc or ignored file was marked"; failed=1; }
+ln -s "$g" "$tmp/gate-link"
+expect 0 post-edit-mark.sh "$(edit s1 "$tmp/gate-link/docs/x.md")"   # a doc through a symlink
+[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc or ignored file was marked"; failed=1; }
+expect 0 post-edit-mark.sh "$(edit s1 "$g/CLAUDE.md")"   # CLAUDE.md is code
+[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: CLAUDE.md not marked"; failed=1; }
+rm -f "$marker"
+expect 0 post-edit-mark.sh "$(edit s1 "$g/src/a.js")"
+expect 2 stop-check-ran.sh "$(stop s1)"                   # code edited, no check yet
+expect 0 stop-check-ran.sh "$(stop s1 true)"              # already continuing: block once
+expect 0 stop-check-ran.sh "$(stop s2)"                   # another session's edit
+sleep 0.05; (cd "$g" && bash scripts/check)
+expect 0 stop-check-ran.sh "$(stop s1)"                   # check passed after the edit
+sleep 0.05; expect 0 post-edit-mark.sh "$(edit s1 "$g/src/a.js")"
+expect 2 stop-check-ran.sh "$(stop s1)"                   # edited again after the pass
+: > "$g/scripts/check"
+expect 0 stop-check-ran.sh "$(stop s1)"                   # an older scripts/check: no stamp
+expect 0 stop-check-ran.sh "$(stop s1)" CLAUDE_PROJECT_DIR="$tmp/none"   # not a repository
+unset CLAUDE_PROJECT_DIR
+
 # --- Every hook lets the edit through when it cannot read the tool call ---------
-for hook in pre-edit-protect.sh pre-edit-main-branch.sh post-edit-check.sh; do
+for hook in pre-edit-protect.sh pre-edit-main-branch.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do
     echo 'not json' | bash "$hooks/$hook" >/dev/null 2>&1 ||
         { echo "FAIL $hook: unreadable input should exit 0"; failed=1; }
 done
