@@ -6,7 +6,7 @@ status: current
 
 # ADR-0004: A project SessionStart hook points git at .githooks/ when nothing else is set
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-11-10)
 - **Date:** 2026-11-10 (first drafted 2026-11-09 as a plugin hook; rewritten before it was
   accepted)
 - **Work record:** none
@@ -216,3 +216,18 @@ We decided against these alternatives:
 - Does a project `SessionStart` hook also run after `/clear` and on resume? If it does, an
   effort's next session shows up right after the `/clear` that `multi-session` asks for.
   Tested before building.
+
+## Note (2026-11-10): the open questions, answered
+
+Accepted on 2026-11-10, with the amendment. Both open questions were tested on Claude Code
+2.1.322, in a scratch repository whose project `SessionStart` hooks logged the `source` field
+of their input.
+
+- **Who sees the output.** Plain stdout reaches Claude's context, and the person does not see
+  it. JSON with a `systemMessage` is shown to the person (as `SessionStart:startup says: …`),
+  and does not reach Claude. So `set-hooks-path.sh` prints its one-line notice as a
+  `systemMessage`, and `session-context.sh` and `session-upgrades.sh` print plain lines.
+- **When it runs.** The hook ran with `source` `startup` at the start, `resume` for
+  `claude --continue`, and `clear` after `/clear`. So an effort's next session reaches Claude
+  right after the `/clear` that `multi-session` asks for, and the branch line is current each
+  time. `set-hooks-path.sh` does nothing on a re-run, since its test 3 then fails.
