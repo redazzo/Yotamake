@@ -94,8 +94,10 @@ says how). Put them in the report and ask before running them (see Commands).
 - **Version bump:** a change under `plugin/` that reaches users (anything but `plugin/evals/`)
   bumps `version` in both `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json`: patch for a fix, minor for a feature. It is its own
-  commit, `chore(release): bump version to X.Y.Z`. Docs-only, evals-only and `scripts/`-only
-  branches do not bump. `scripts/check` fails when the two files disagree.
+  commit, `chore(release): bump version to X.Y.Z`, which also runs `./plugin/install.sh .`
+  and includes what it changes, so this repository's own harness moves with the release.
+  Docs-only, evals-only and `scripts/`-only branches do not bump. `scripts/check` fails when
+  the two files or `.claude/yotamake/version` disagree.
 - **Release:** merging to main is the release. Users get it with
   `claude plugin update yotamake@yotamake`.
 
