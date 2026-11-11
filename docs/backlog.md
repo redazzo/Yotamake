@@ -95,12 +95,10 @@ updates `CLAUDE.md` lists.
 parallel worktree sessions is reported as too costly, even with the opt-in that skips the
 stop-and-report exchange (ADR-0005, rule 6).
 
-A `PreToolUse` hook cannot approve past an `ask` rule. The documented route: drop
-`Bash(git commit:*)` from the `ask` list, and add a project `PreToolUse` hook (in the
-template, so it works without the plugin, as in ADR-0004) that returns "ask" for every commit
-except on an opted-in session branch in a linked worktree. Needs an `upgrades.md` entry to
-remove the rule from existing installs, test cases, a test that the hook's "ask" still
-prompts under a broad `Bash(git:*)` allow rule, and a new ADR amending ADR-0003.
+[ADR-0006](./decisions/0006-commit-stop-by-project-hook.md) (Proposed) has the design: drop
+`Bash(git commit:*)` from the `ask` list and add a project `PreToolUse` hook that fails
+closed, asking for every commit except on an opted-in worktree branch. When the trigger
+fires, run the tests it lists under "Before acceptance" first, then build it.
 
 ## Spawn worktree sessions from the main conversation
 
