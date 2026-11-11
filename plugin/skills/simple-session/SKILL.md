@@ -177,7 +177,9 @@ Skip this step when the branch is docs-only. A branch that changes any code gets
 review, however small: a one-line diff still runs both skills.
 Call each one with the Skill tool. Reading the diff yourself does not replace them, even
 when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
-checks below are only for a skill the Skill tool says is not available.
+checks below are only for a skill the Skill tool says is not available. Call them from this
+context, not from a subagent you start for the review. Each already runs its own agents, so
+their reading stays out of this context.
 
 Both skills read the diff with `git diff HEAD`, which leaves out new files git does not track
 yet. So first run `git add -N` on each new file this branch adds (`git status --short` marks
