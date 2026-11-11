@@ -34,6 +34,18 @@ repo_path_of() {
     printf '%s\n%s%s\n' "${out%%$'\n'*}" "$prefix" "$rest"
 }
 
+# hook_root <hook input>: print the project directory the hook runs for: the top level of
+# the first set of the input's cwd, CLAUDE_PROJECT_DIR and the current directory, or that
+# directory itself when it is not in a git repository. The input's cwd comes first because
+# it follows EnterWorktree and CLAUDE_PROJECT_DIR does not (ADR-0005). Hooks that edit a
+# file use that file's repository first (repo_path_of), and this only as the fallback.
+hook_root() {
+    local d
+    d=$(hook_field cwd <<<"$1")
+    d=${d:-${CLAUDE_PROJECT_DIR:-$PWD}}
+    git -C "$d" rev-parse --show-toplevel 2>/dev/null || printf '%s' "$d"
+}
+
 # gate_file <repo root> <name>: print the absolute path of <name> in the repository's git
 # directory (per worktree). The gate files:
 #   yotamake-check-passed  touched by the project's scripts/check when it passes

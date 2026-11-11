@@ -25,9 +25,19 @@ else
     echo "Branch: none (detached HEAD at $(git -C "$root" rev-parse --short HEAD 2>/dev/null))."
 fi
 
+# A linked worktree has no .scratchpad/ of its own (it is git-ignored): parallel sessions
+# share the main worktree's (ADR-0005), so list its efforts too, by full path. The main
+# worktree is the first one git lists.
+plans=("$root"/.scratchpad/*/plan.md "$root"/.sessions/*/plan.md)
+main_tree=$(git -C "$root" worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')
+if [[ -n "$main_tree" && "$main_tree" != "$root" ]]; then
+    echo "Worktree of $main_tree; efforts in its .scratchpad/ are listed by full path."
+    plans+=("$main_tree"/.scratchpad/*/plan.md)
+fi
+
 # Active efforts: a folder with a plan.md, and its first session not marked `done`.
 efforts=()
-for plan in "$root"/.scratchpad/*/plan.md "$root"/.sessions/*/plan.md; do
+for plan in "${plans[@]}"; do
     [[ -f "$plan" ]] || continue
     folder=${plan#"$root"/}
     folder=${folder%/plan.md}

@@ -195,6 +195,14 @@ opted out. It reads the
 command with a small quote-aware parser and follows `cd <dir>` and `git -C <dir>`; text inside
 quotes, such as a commit message, does not count. A command it cannot read goes through.
 
+**Worktrees.** Every hook acts on the repository of the file being edited, else on the
+session's own directory (the `cwd` in the hook's input), and only then on
+`CLAUDE_PROJECT_DIR`, which stays at the main checkout after `EnterWorktree`. So the
+protected-paths list, the per-file checks, the `Stop` gate and the upgrade notice work the
+same in a linked worktree (ADR-0005). In a linked worktree, `session-context.sh` also lists
+the efforts in the main worktree's `.scratchpad/`, by full path, because a worktree has no
+copy of that git-ignored folder.
+
 **What the hooks do not cover.** The main-branch, protected-paths and edit-marking hooks
 watch Edit and Write only. The Bash hook above watches git commands only. A shell command gets past them: `sed -i`, `echo > .env`, `touch`
 on the opt-out file, or a code change made from the shell, which the `Stop` hook never sees. Claude Code's own permission prompt for Bash is the guard there. The `ask`

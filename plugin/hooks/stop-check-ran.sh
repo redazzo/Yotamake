@@ -13,7 +13,8 @@ here=${BASH_SOURCE[0]%/*}
 . "$here/lib.sh"
 
 in=$(cat)
-root=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse --show-toplevel 2>/dev/null) || exit 0
+root=$(hook_root "$in")
+git -C "$root" rev-parse 2>/dev/null || exit 0
 uses_gate_stamp "$root" || exit 0
 marker=$(gate_file "$root" yotamake-edited) || exit 0
 [[ -f "$marker" ]] || exit 0
