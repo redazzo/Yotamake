@@ -306,6 +306,20 @@ expect 0 post-edit-mark.sh "$(wt_call s1 "$w/src/a.bad")"
 expect 2 stop-check-ran.sh "$(wt_call s1)"                     # the worktree's marker
 sleep 0.05; (cd "$w" && bash scripts/check)
 expect 0 stop-check-ran.sh "$(wt_call s1)"                     # the worktree's stamp
+# From the main tree, an edit by absolute path into the worktree marks the worktree.
+main_stop() { printf '{"session_id":"%s","cwd":"%s","stop_hook_active":false}' "$1" "$m"; }
+sleep 0.05; expect 0 post-edit-mark.sh "$(edit s2 "$w/src/a.bad")"
+expect 2 stop-check-ran.sh "$(main_stop s2)"                   # the other tree's marker
+out=$(main_stop s2 | bash "$hooks/stop-check-ran.sh" 2>&1)
+grep -qF "$w" <<<"$out" || { echo "FAIL stop-check-ran.sh does not name the worktree: '$out'"; failed=1; }
+expect 0 stop-check-ran.sh "$(main_stop s3)"                   # another session's edit there
+sleep 0.05; (cd "$w" && bash scripts/check)
+expect 0 stop-check-ran.sh "$(main_stop s2)"                   # checked in the worktree
+git -C "$m" worktree add -q -b feat/z "$tmp/wt-gone"
+sleep 0.05; expect 0 post-edit-mark.sh "$(edit s2 "$tmp/wt-gone/scripts/check")"
+expect 2 stop-check-ran.sh "$(main_stop s2)"
+rm -rf "$tmp/wt-gone"
+expect 0 stop-check-ran.sh "$(main_stop s2)"                   # its folder is gone
 plugin_version=$(node -p 'require(process.argv[1]).version' "$hooks/../.claude-plugin/plugin.json")
 printf '%s\n' "$plugin_version" > "$m/.claude/yotamake/version"
 printf '0.1.0\n' > "$w/.claude/yotamake/version"

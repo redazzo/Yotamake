@@ -199,7 +199,9 @@ quotes, such as a commit message, does not count. A command it cannot read goes 
 session's own directory (the `cwd` in the hook's input), and only then on
 `CLAUDE_PROJECT_DIR`, which stays at the main checkout after `EnterWorktree`. So the
 protected-paths list, the per-file checks, the `Stop` gate and the upgrade notice work the
-same in a linked worktree (ADR-0005). In a linked worktree, `session-context.sh` also lists
+same in a linked worktree (ADR-0005). The `Stop` gate also looks in the repository's other
+worktrees, so an edit made by absolute path into a linked worktree from the main checkout
+still needs a passing `scripts/check` in that worktree. In a linked worktree, `session-context.sh` also lists
 the efforts in the main worktree's `.scratchpad/`, by full path, because a worktree has no
 copy of that git-ignored folder.
 

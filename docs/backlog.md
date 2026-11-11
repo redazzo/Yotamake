@@ -111,9 +111,7 @@ before a commit.
 [ADR-0005](./decisions/0005-parallel-sessions-in-worktrees.md) has the user open a
 conversation in each worktree, so every session keeps its own stop before commit
 (ADR-0003). The other option: the main conversation starts one `isolation: "worktree"`
-subagent per session. Before that, the hooks would need to handle an edit made by absolute
-path in a linked worktree whose `cwd` is the main tree: today it escapes the `Stop` gate.
-It would also need a new ADR.
+subagent per session. That would need a new ADR.
 
 ## Plugin agent definitions
 
@@ -212,6 +210,19 @@ Markdown at the root other than `CLAUDE.md`), because the `Docs-only` line is pr
 paths count as code, so Claude runs `scripts/check` once more than it needs to. A fix could be
 a `.claude/yotamake/docs-paths.conf` of globs that the installer seeds and `setup` fills in
 from that line.
+
+## Two gaps left in the `Stop` gate
+
+**Added:** 2026-11-12 · **Trigger to act:** a session edits code in a separate repository by
+absolute path and ends its turn unchecked, or two sessions edit the same tree and one of them
+stops without its check.
+
+The review of the worktree fix (0.22.1) found two gaps it does not close. `stop-check-ran.sh`
+finds trees through `git worktree list`, so an edit by absolute path into a separate
+repository, not a worktree of this one, still gets past the gate. Closing it would need a
+per-session list of edited roots kept outside any one repository. And `yotamake-edited` holds
+one session id: when two sessions edit the same tree, the last writer wins and the other
+session's turn ends unchecked. Both gaps were there before the fix.
 
 ## Harness-owned scripts listed one by one
 
