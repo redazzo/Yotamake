@@ -21,6 +21,33 @@ not a backlog entry. Items with substantial written analysis keep a detail docum
 
 ---
 
+## Eval sandbox denies `git`
+
+**Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** a new Claude Code release,
+or a fix posted on [claude-code#108887](https://github.com/anthropics/claude-code/issues/108887).
+
+The cause is a Claude Code bug (confirmed 2026-11-11, Claude Code 2.1.322, git 2.56.0,
+Linux). An eval run puts git's credential helpers on the sandbox's deny list
+(`sandbox.credentials.files`, `mode: deny`) after resolving symlinks. Here
+`git-credential-store`, `git-credential-cache` and `git-credential-cache--daemon` in
+`/usr/lib/git-core/` are links to `/usr/bin/git`, so the deny list holds git itself. The
+agent's Bash then gets `/usr/bin/git: Permission denied`. Scaffold scripts run outside the
+sandbox and are not affected. The issue is tagged macOS only; it affects Linux too.
+
+So in every run where the agent calls git, `scripts/check` cannot pass, and the `Stop` hook
+holds Claude at the stop. Claude then asks for git access instead of finishing the report.
+Graders that need the check, the review skills, the proposed commit message, the commit
+question or the report fail for that reason, not because of the harness. Saved results show
+git denied in most runs from 2026-10-29 (2.1.312) on, including the runs that "Re-check
+two fixes on the next full eval run" cites. Graders that need no git (cases 06, 07, 08) are
+still valid.
+
+To recheck on a new release: run `claude plugin eval . --case 06-question --runs 1
+--ablation none --scaffold --trust-plugin --allow-tools Bash Write Edit --no-publish
+--keep-temp` (about $0.10), then look for `/usr/bin/git` in the kept run's
+`config/settings.json`. When it is gone, re-run the cases that need git and delete this
+entry. Do not change the fixture or `scripts/check` to get around the sandbox.
+
 ## Measure what a session costs
 
 **Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** the next full eval run, or a
@@ -186,17 +213,6 @@ Markdown at the root other than `CLAUDE.md`), because the `Docs-only` line is pr
 paths count as code, so Claude runs `scripts/check` once more than it needs to. A fix could be
 a `.claude/yotamake/docs-paths.conf` of globs that the installer seeds and `setup` fills in
 from that line.
-
-## Eval sandbox can deny `git`
-
-**Added:** 2026-11-10 · **Trigger to act:** an eval run where a grader fails because a
-transcript says `git` was denied.
-
-In case `19-claude-md-only` (2026-11-10, `--runs 3`), the sandbox denied `/usr/bin/git` in
-two runs. `scripts/check` could not pass, the `Stop` hook blocked the stop, and Claude waited
-for git access instead of asking to commit, so `asks-before-commit` failed. `skill-fired`
-passed 3 of 3. Find out why git was denied (`--allow-tools Bash` was given) before reading
-those graders as a harness failure.
 
 ## Harness-owned scripts listed one by one
 

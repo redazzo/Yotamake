@@ -304,6 +304,9 @@ The headline number is Δ: the score with the plugin minus the score without it.
 sandbox does not let Claude write inside `.git`, so cases that need work done start on a
 pre-made branch (as an assigned branch would in a cloud session). It also keeps `.claude/`
 read-only, so `install.sh` cannot run inside a case; case 11's scaffold runs it instead.
+Until a Claude Code bug is fixed, the sandbox also denies the agent `git` itself, so graders
+that need `scripts/check` or the review fail for that reason (backlog, "Eval sandbox denies
+`git`").
 Cases 09–12 start with a slash command, since those skills are not model-invoked.
 Case 15 resumes a recorded first turn (`history.jsonl`, a run of case 13) and its prompt is
 the next message. The history holds the `simple-session` text, the system prompt and the
