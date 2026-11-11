@@ -2,6 +2,9 @@
 # Feeds fake tool calls to the plugin's hooks and checks each exit code
 # (0 lets the edit through, 2 blocks it). Prints failures only; exit 1 if any.
 set -uo pipefail
+# Run from the pre-commit hook, git exports these for this repository; the test repositories
+# below must not inherit them.
+unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_PREFIX
 hooks="$(cd "$(dirname "$0")/../plugin/hooks" && pwd)"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -277,6 +280,45 @@ up_check 0 "is quiet outside a repository" "$tmp/none"
 mkdir -p "$tmp/nogit" && printf '#!/bin/sh\nexit 128\n' > "$tmp/nogit/git" && chmod +x "$tmp/nogit/git"
 echo 0.1.0 > "$u/.claude/yotamake/version"
 PATH="$tmp/nogit:$PATH" up_check 1 "falls back to the project directory without git" "$u"
+
+# --- From a linked worktree (ADR-0005) -----------------------------------------
+# Claude Code's CLAUDE_PROJECT_DIR stays at the main worktree after EnterWorktree, while the
+# hook input's cwd follows the worktree. The hooks must act on the worktree.
+m=$tmp/wt-main w=$tmp/wt-feat
+git init -q -b main "$m"
+mkdir -p "$m/.claude/yotamake" "$m/scripts" "$m/.scratchpad/2026-02-02-e"
+printf 'config/secrets/*\n' > "$m/.claude/yotamake/protected-paths.conf"
+printf 'touch "$(git rev-parse --git-path yotamake-check-passed)"\n' > "$m/scripts/check"
+printf '.scratchpad/\n' > "$m/.gitignore"
+git -C "$m" add -A && git -C "$m" -c user.name=t -c user.email=t@t commit -q -m init
+printf '## S1 — Shared — `todo`\n' > "$m/.scratchpad/2026-02-02-e/plan.md"
+git -C "$m" worktree add -q -b feat/y "$w"
+mkdir -p "$w/src" "$w/sub"
+printf 'x\n' > "$w/src/a.bad"
+printf '*.bad false {file}\n' > "$w/.claude/yotamake/post-edit-checks.conf"   # this tree only
+export CLAUDE_PROJECT_DIR=$m
+# wt_call <session id> [file]: hook input from the worktree, for that session and file.
+wt_call() { node -e 'const [s, c, f] = process.argv.slice(1); process.stdout.write(JSON.stringify({session_id: s, cwd: c, stop_hook_active: false, tool_input: f ? {file_path: f} : undefined}))' "$1" "$w" "${2:-}"; }
+expect 2 pre-edit-protect.sh "$w/config/secrets/db.txt"         # slash pattern, other tree
+expect 2 pre-edit-protect.sh "$(wt_call s1 "$w/config/secrets/db.txt")"
+expect 2 post-edit-check.sh "$(wt_call s1 "$w/src/a.bad")"     # the worktree's conf
+expect 0 post-edit-mark.sh "$(wt_call s1 "$w/src/a.bad")"
+expect 2 stop-check-ran.sh "$(wt_call s1)"                     # the worktree's marker
+sleep 0.05; (cd "$w" && bash scripts/check)
+expect 0 stop-check-ran.sh "$(wt_call s1)"                     # the worktree's stamp
+plugin_version=$(node -p 'require(process.argv[1]).version' "$hooks/../.claude-plugin/plugin.json")
+printf '%s\n' "$plugin_version" > "$m/.claude/yotamake/version"
+printf '0.1.0\n' > "$w/.claude/yotamake/version"
+out=$(wt_call s1 | bash "$hooks/session-upgrades.sh" 2>&1)
+grep -qF "harness is 0.1.0" <<<"$out" ||
+    { echo "FAIL session-upgrades.sh does not read the worktree's version: '$out'"; failed=1; }
+out=$(cd "$w/sub" && bash "$scx" 2>&1)
+grep -qF "Worktree of $m;" <<<"$out" && grep -qxF "  $m/.scratchpad/2026-02-02-e: next is S1 — Shared" <<<"$out" ||
+    { echo "FAIL session-context.sh from a worktree: '$out'"; failed=1; }
+out=$(cd "$m" && bash "$scx" 2>&1)
+grep -qF "Worktree of" <<<"$out" &&
+    { echo "FAIL session-context.sh calls the main worktree a worktree: '$out'"; failed=1; }
+unset CLAUDE_PROJECT_DIR
 
 # --- Every hook lets the edit through when it cannot read the tool call ---------
 for hook in pre-edit-protect.sh pre-edit-main-branch.sh pre-bash-git.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do
