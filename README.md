@@ -302,6 +302,12 @@ cd plugin
 claude plugin eval . --scaffold --allow-tools Bash Write Edit --ablation with-without
 ```
 
+Each run is saved as `plugin/evals/results/<timestamp>/aggregate-result.json` (git-ignored),
+with every run's pass, cost, turns and seconds, and the Claude Code and plugin versions. To
+see what the cases cost, run `node scripts/eval-costs.mjs` from the repository root. It
+prints one row per case: runs, pass rate, and mean cost, turns and seconds. Name one results
+folder to cover only that run. The results hold no token counts.
+
 The headline number is Δ: the score with the plugin minus the score without it. The eval
 sandbox does not let Claude write inside `.git`, so cases that need work done start on a
 pre-made branch (as an assigned branch would in a cloud session). It also keeps `.claude/`
