@@ -77,6 +77,16 @@ session, offer to resume that effort instead of starting a new one.
    same turn; the user approves the spec and the plan together at the end of S0 (step 6).
    The rules for criteria are in `spec`, "Write `spec.md`". Questions about how to build it
    wait in `decisions.md` for the session that needs them (step 5).
+
+   **Hand the reading to subagents** when it spans more than a few files: this skill asks
+   you to. Split it by area (a module, a set of skills, the tests) and start one built-in
+   `Explore` agent per area, or `general-purpose` when the area needs a command run. Start
+   them in one message so they run at once. Each brief says what the effort is for, the area
+   and the questions to answer, and asks for findings with file:line references and a
+   suggested severity, not file contents. The agents only read. You write `findings.md` and
+   the plan from their reports. Re-read a file:line yourself only when the finding changes
+   the plan and you doubt it; for anything else, send that agent a follow-up question.
+   Without the Agent tool, or for a small area, read it yourself.
 3. If the effort changes code, fill in the Design section of `plan.md` before cutting sessions.
    Read the **Architecture** section of CLAUDE.md (and accepted ADRs) and the code, then write:
    the style the new parts follow, the modules touched, the existing code to reuse or extend,

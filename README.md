@@ -226,6 +226,10 @@ Docs-only branches skip it; the `Docs-only` line in `CLAUDE.md` says which files
 `CLAUDE.md` says the project works through pull requests, the session ends by pushing and
 opening one instead of merging locally.
 
+**Subagents.** A `multi-session` S0 hands its reading to built-in agents, one per area, so
+the main context keeps room for the plan. The review stays in the main context
+(`simple-session`, "Review", says why).
+
 ## Docs
 
 Four kinds, each maintained differently: reference (corrected in place), guides (corrected

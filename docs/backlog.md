@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-10
+updated: 2026-11-11
 owns: [open-work-register]
 ---
 
@@ -36,10 +36,20 @@ config) that runs the check but skips the two review skills.
 **Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a multi-session effort needs
 a `/clear` mid-session, or two of its sessions could run at once.
 
-Everything runs in the main context today. S0 analysis and the review could run in subagents,
-so the main context stays small. Independent sessions of one effort could run in parallel git
-worktrees; the main-branch hook already allows that. Superpowers and claude-flow both delegate
-this way.
+Independent sessions of one effort could run in parallel git worktrees; the main-branch hook
+already allows that. Superpowers and claude-flow both work this way. (S0 analysis already runs
+in subagents; for the review, see the next entry.)
+
+## Delegate the review's design read
+
+**Priority: Medium** · **Added:** 2026-11-11 · **Trigger to act:** the design read in
+`simple-session`, "Review", fills the main context in a real session, or
+`claude plugin eval` documents that `tool_used` graders count a subagent's calls.
+
+The review stays in the main context (`simple-session`, "Review", says why). Also, the
+review graders in eval cases 02, 13, 15 and 19 probably miss calls made inside a subagent. The
+design read against Architecture could still move to a subagent that returns conflicts only.
+If the graders do see subagent calls, the whole review could move.
 
 ## A debugging skill
 
