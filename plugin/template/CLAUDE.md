@@ -75,6 +75,9 @@ It prints one `PASS`/`FAIL` line per check. A person can skip the git hook once 
 - **Version bump:** <!-- FILL IN or delete: the command (e.g. `pnpm run version:patch`), the
   file it changes, and the rule (e.g. "code changes get a patch bump as its own commit,
   `chore(release): bump version to X.Y.Z`; docs-only branches do not"). -->
+- **Worktree setup:** <!-- FILL IN or "none": what a new `git worktree add` tree needs before
+  `scripts/check` passes (e.g. "copy `.env` from the main worktree, run `pnpm install`").
+  Parallel sessions (`yotamake:multi-session`) run it. -->
 - **Release branch / tags:** <!-- FILL IN or delete: e.g. "`production` records what is live; it is
   fast-forwarded from main after a deploy and never committed to". -->
 

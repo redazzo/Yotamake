@@ -20,6 +20,15 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.22.0 — Worktree setup line
+
+- **Check:** `CLAUDE.md`, **Branching and releases**, has a line starting
+  `**Worktree setup:**`.
+- **Apply:** add that line from the plugin's `template/CLAUDE.md` before the
+  `Release branch / tags` line, or at the end of the section if it has none, and propose its
+  value as `/yotamake:setup` does. Tell the user that parallel sessions in worktrees
+  (`multi-session`, "Running sessions in parallel") read it.
+
 ## 0.20.1 — CLAUDE.md says what to do without the plugin
 
 - **Check:** `CLAUDE.md`, "How to work here", has a paragraph starting

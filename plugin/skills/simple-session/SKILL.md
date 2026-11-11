@@ -84,7 +84,8 @@ means. If more than one might match, ask which. If the change is too big and you
 ## 2. Branch
 
 If the user or the environment names a branch to work on, and you are on it, stay there and
-skip to step 3.
+skip to step 3. The same holds in a linked git worktree made for this session (a
+`multi-session` parallel session): its branch is already cut.
 
 Otherwise cut a new branch:
 
@@ -207,7 +208,8 @@ outside this branch's concern, goes in the report with one line on why you left 
 
 ## 7. Stop and report
 
-Do not commit yet. Tell the user:
+Do not commit yet. (In a `multi-session` worktree session, its rules on commits come first:
+`multi-session`, "Running sessions in parallel".) Tell the user:
 
 - what changed, by file, in a few lines;
 - for a code change, two lines: "Reused:" the existing code it reuses or extends (or
