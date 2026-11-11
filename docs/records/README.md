@@ -22,4 +22,5 @@ _None._
 
 | Date | Record |
 |---|---|
+| 2026-11-11 | [Subagents for S0, and parallel sessions in worktrees](./2026/2026-11-11-subagents-and-worktrees.md) |
 | 2026-11-10 | [SessionStart hooks: hooks path, session context, upgrades](./2026/2026-11-10-session-start-hooks.md) |
