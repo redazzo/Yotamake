@@ -54,9 +54,9 @@ entry. Do not change the fixture or `scripts/check` to get around the sandbox.
 user says sessions are slow or expensive.
 
 `simple-session` is about 260 lines, and a one-line typo fix still runs `/simplify` and
-`/code-review`. Nothing measures that. Record turns, tokens and wall time per case next to the
-pass rate. If small changes cost too much, consider a trivial tier (comments, typos, one-line
-config) that runs the check but skips the two review skills.
+`/code-review`. Saved eval runs already hold cost, turns and wall time, and
+`scripts/eval-costs.mjs` summarises them per case (`README.md`, Evals). If small changes cost too much, consider a trivial tier (comments, typos,
+one-line config) that runs the check but skips the two review skills.
 
 ## Delegate the review's design read
 
@@ -196,7 +196,8 @@ listed somewhere public.
 
 Store each full run's per-case scores, costs, plugin version and Claude Code version as a
 record, so a drop shows up as a regression. Running each case several times would also show
-flaky skill firing more clearly.
+flaky skill firing more clearly. `node scripts/eval-costs.mjs <results folder>` prints those
+numbers for one run, ready to paste into a record.
 
 ## The `Stop` hook ignores a project's own `Docs-only` line
 
