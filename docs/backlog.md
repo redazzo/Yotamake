@@ -31,17 +31,6 @@ user says sessions are slow or expensive.
 pass rate. If small changes cost too much, consider a trivial tier (comments, typos, one-line
 config) that runs the check but skips the two review skills.
 
-## Use subagents and worktrees
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a multi-session effort needs
-a `/clear` mid-session, or two of its sessions could run at once.
-
-Independent sessions of one effort could run in parallel git worktrees; the main-branch hook
-already allows that. Superpowers and claude-flow both work this way. (S0 analysis already runs
-in subagents; for the review, see the next entry.) In progress: the rules are in
-[ADR-0005](./decisions/0005-parallel-sessions-in-worktrees.md); the hooks and skill changes
-follow in the effort `.scratchpad/2026-11-11-subagents-worktrees/`.
-
 ## Let a hook approve commits in opted-in worktrees
 
 **Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in
@@ -65,6 +54,28 @@ The review stays in the main context (`simple-session`, "Review", says why). Als
 review graders in eval cases 02, 13, 15 and 19 probably miss calls made inside a subagent. The
 design read against Architecture could still move to a subagent that returns conflicts only.
 If the graders do see subagent calls, the whole review could move.
+
+## Spawn worktree sessions from the main conversation
+
+**Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** users find opening one
+Claude Code conversation per worktree too slow, or a subagent can stop and ask the user
+before a commit.
+
+[ADR-0005](./decisions/0005-parallel-sessions-in-worktrees.md) has the user open a
+conversation in each worktree, so every session keeps its own stop before commit
+(ADR-0003). The other option: the main conversation starts one `isolation: "worktree"`
+subagent per session. Before that, the hooks would need to handle an edit made by absolute
+path in a linked worktree whose `cwd` is the main tree: today it escapes the `Stop` gate.
+It would also need a new ADR.
+
+## Plugin agent definitions
+
+**Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the agent briefs in skills
+grow long, or the same brief is repeated in two or more skills.
+
+Skills hand work to Claude Code's built-in agents, with the brief in the skill text
+(`multi-session` S0). Shipping definitions in `plugin/agents/` would let skills share a
+brief, but it changes the Architecture Style line.
 
 ## A debugging skill
 
