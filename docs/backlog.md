@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-11
+updated: 2026-11-12
 owns: [open-work-register]
 ---
 
@@ -58,6 +58,37 @@ user says sessions are slow or expensive.
 pass rate. If small changes cost too much, consider a trivial tier (comments, typos, one-line
 config) that runs the check but skips the two review skills.
 
+## Delegate the review's design read
+
+**Priority: Medium** · **Added:** 2026-11-11 · **Trigger to act:** the design read in
+`simple-session`, "Review", fills the main context in a real session, or
+`claude plugin eval` documents that `tool_used` graders count a subagent's calls.
+
+The review stays in the main context (`simple-session`, "Review", says why). Also, the
+review graders in eval cases 02, 13, 15 and 19 probably miss calls made inside a subagent. The
+design read against Architecture could still move to a subagent that returns conflicts only.
+If the graders do see subagent calls, the whole review could move.
+
+## A debugging skill
+
+**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a `fix/` session patches a
+symptom and the bug comes back, or a user asks how to debug with the harness.
+
+There is no method for "fix this bug": reproduce it, write a failing test, find the root cause,
+then fix. Superpowers' systematic-debugging skill is the model. It would run inside
+`simple-session`, not replace it.
+
+## Test-first as a project choice
+
+**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a project using the harness
+asks for test-first, or a spec's criteria ship without tests.
+
+`spec` asks for a test per criterion only "where the project has tests". A line in the
+template `CLAUDE.md` (for example under **Checks**: "Test-first: yes") could make
+`simple-session` write the failing test before the code. It changes a project-owned template
+file and a section skills read, so it needs an `upgrades.md` entry and the section-name
+updates `CLAUDE.md` lists.
+
 ## Let a hook approve commits in opted-in worktrees
 
 **Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in
@@ -70,17 +101,6 @@ template, so it works without the plugin, as in ADR-0004) that returns "ask" for
 except on an opted-in session branch in a linked worktree. Needs an `upgrades.md` entry to
 remove the rule from existing installs, test cases, a test that the hook's "ask" still
 prompts under a broad `Bash(git:*)` allow rule, and a new ADR amending ADR-0003.
-
-## Delegate the review's design read
-
-**Priority: Medium** · **Added:** 2026-11-11 · **Trigger to act:** the design read in
-`simple-session`, "Review", fills the main context in a real session, or
-`claude plugin eval` documents that `tool_used` graders count a subagent's calls.
-
-The review stays in the main context (`simple-session`, "Review", says why). Also, the
-review graders in eval cases 02, 13, 15 and 19 probably miss calls made inside a subagent. The
-design read against Architecture could still move to a subagent that returns conflicts only.
-If the graders do see subagent calls, the whole review could move.
 
 ## Spawn worktree sessions from the main conversation
 
@@ -103,27 +123,6 @@ grow long, or the same brief is repeated in two or more skills.
 Skills hand work to Claude Code's built-in agents, with the brief in the skill text
 (`multi-session` S0). Shipping definitions in `plugin/agents/` would let skills share a
 brief, but it changes the Architecture Style line.
-
-## A debugging skill
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a `fix/` session patches a
-symptom and the bug comes back, or a user asks how to debug with the harness.
-
-There is no method for "fix this bug": reproduce it, write a failing test, find the root cause,
-then fix. Superpowers' systematic-debugging skill is the model. It would run inside
-`simple-session`, not replace it.
-
-## Test-first as a project choice
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a project using the harness
-asks for test-first, or a spec's criteria ship without tests.
-
-`spec` asks for a test per criterion only "where the project has tests". A line in the
-template `CLAUDE.md` (for example under **Checks**: "Test-first: yes") could make
-`simple-session` write the failing test before the code. It changes a project-owned template
-file and a section skills read, so it needs an `upgrades.md` entry and the section-name
-updates `CLAUDE.md` lists.
-
 
 ## Re-check two fixes on the next full eval run
 
