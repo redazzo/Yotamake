@@ -23,6 +23,7 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 ## S1 — <title> (<finding IDs>, <criterion IDs if there is a spec>) — `todo`
 
 Branch: `<type>/<slug>` <!-- or "the assigned branch" in a committed setup -->
+Needs: none <!-- or the sessions this one depends on, e.g. "S1, S2" -->
 
 Ask <decision IDs> first.
 

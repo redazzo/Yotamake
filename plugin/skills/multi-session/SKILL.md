@@ -46,8 +46,10 @@ The user resumes with: **"Read <folder>/README.md and start the next session."**
    An effort started before the ledger existed has no `docs.md`: copy the template now, and
    fill it from `log.md` and the diffs of the sessions already done, before going on.
 3. Read only the parts of `findings.md` the current session names.
-4. Start the first session in `plan.md` whose status is not `done`. Ask its questions from
-   `decisions.md` before doing anything else, unless they already have answers.
+4. Start the first session in `plan.md` whose status is not `done` and whose `Needs:`
+   sessions are all `done`. Skip one marked `in progress` in another worktree (see "Running
+   sessions in parallel"). Ask its questions from `decisions.md` before doing anything else,
+   unless they already have answers.
 5. Do not redo the analysis. Do re-check any file:line or fact you are about to act on or
    copy into a durable doc. Code moves, and the log can be wrong: a stale inventory row can
    name the wrong file and slip into a permanent record.
@@ -99,7 +101,9 @@ session, offer to resume that effort instead of starting a new one.
    never lands mid-change. Order them so each makes
    the next one easier (bugs first, then deletions, then refactors, docs last so they describe
    the final state). With a spec, each session names the criteria it delivers, and every
-   criterion is in some session.
+   criterion is in some session. Give each session a `Needs:` line naming the sessions it
+   depends on (`Needs: S1, S2`, or `Needs: none`), and list the files it will change when
+   another session could run beside it.
 5. Put every question for the user in `decisions.md`, tagged with the session that needs the
    answer. Give a recommendation with each. Ask at the start of that session, not all up front:
    by then the earlier sessions may have changed the question.
@@ -115,7 +119,8 @@ session, offer to resume that effort instead of starting a new one.
 - Before proposing a commit, run `scripts/check` (see `simple-session`, "Run the checks").
   Save its output to `s<N>-checks.log` in the folder and report only the summary lines.
 - Commit, version bump, push and merge only after the user says yes. In a committed setup,
-  commit the folder's updates with the session's work.
+  commit the folder's updates with the session's work. The one exception is a worktree
+  commit in an effort that opted in (see "Running sessions in parallel").
 - Deploying is the user's decision, never part of a session.
 - A session that changes behaviour updates the reference doc that owns it (the "Owns" table in
   `docs/README.md`) in the same branch. The close-out sweep below catches what slips through; it
@@ -131,6 +136,51 @@ session, offer to resume that effort instead of starting a new one.
   done, commit hashes, what is left, anything surprising), check `docs.md` is up to date, then
   tell the user it is a good point to `/clear`. In a committed setup, commit and push those
   updates first.
+
+## Running sessions in parallel
+
+Two sessions may run at the same time, each in its own git worktree with its own Claude Code
+conversation (the harness's ADR-0005 has the reasons). Only when all of these hold:
+
+- the effort uses the local setup, not a committed folder;
+- every session each one needs (its `Needs:` line) is `done`;
+- they change different files.
+
+When the user wants a session to run beside the current one, start it like this:
+
+1. From the main worktree, on an up-to-date main branch, add the worktree as a sibling
+   folder on the session's branch: `git worktree add ../<repo>-s<N> -b <prefix>/<slug>`.
+2. Do the project's worktree setup there: the `Worktree setup` line in CLAUDE.md, **Branching
+   and releases** (copy `.env`, install dependencies). If the line is missing, say so and
+   ask the user what the checks need; do not guess.
+3. Set the session's status in `plan.md` to `in progress (worktree ../<repo>-s<N>)`.
+4. Give the user the command to open Claude Code there (`cd ../<repo>-s<N> && claude`) and a
+   resume line with the folder's absolute path: "Read <absolute path>/README.md and start
+   S<N>." The working folder stays in the main worktree; the new one has no copy, since it is
+   git-ignored.
+
+Inside a worktree session:
+
+- The branch is already cut: skip the cut (`simple-session`, "Branch").
+- Edit only your own `## S<N>` section of `plan.md`. Only append to `log.md` and `docs.md`;
+  never rewrite another session's rows. If an edit fails because the file changed, read it
+  again and redo the edit.
+- **Commits.** If the effort opted in to worktree commits (a row in `decisions.md` saying
+  so), commit on the session's branch as soon as the checks and the review pass, then report.
+  Claude Code still prompts for each commit. Without that row, stop and ask as usual.
+  Merge, push, rebase, `reset --hard`, tag and the release always keep their stop.
+
+Merging, one branch at a time:
+
+1. In the worktree, if the main branch has moved since the branch was cut, merge it into the
+   branch (`git merge <main-branch>`), fix any conflict, and run `scripts/check` again.
+2. Then do the project's release steps (CLAUDE.md, **Branching and releases**), never
+   earlier, so two branches do not claim the same version.
+3. Merge into the main branch from the main worktree, as `simple-session`, "On yes: commit,
+   bump, integrate" says (`git -C <main worktree> merge --no-ff <branch>` works from the
+   worktree).
+4. After the merge, remove the worktree: `git worktree remove ../<repo>-s<N>`. Delete the
+   branch only if the user asks.
 
 ## Closing out
 

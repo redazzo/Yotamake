@@ -37,6 +37,7 @@ npm test    # run the tests
   repository root other than `CLAUDE.md`.
 - **Version bump:** code changes get `npm version patch --no-git-tag-version` as their own
   commit, `chore(release): bump version to X.Y.Z`. Docs-only branches do not.
+- **Worktree setup:** none.
 
 ## Conventions
 

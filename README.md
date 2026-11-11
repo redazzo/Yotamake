@@ -234,6 +234,11 @@ Docs-only branches skip it; the `Docs-only` line in `CLAUDE.md` says which files
 `CLAUDE.md` says the project works through pull requests, the session ends by pushing and
 opening one instead of merging locally.
 
+**Parallel sessions.** Two sessions of one effort that need nothing from each other and
+change different files may run at once, each in a sibling `git worktree` with its own Claude
+Code conversation, and merge one at a time (ADR-0005; `multi-session`, "Running sessions in
+parallel"). The `Worktree setup` line in `CLAUDE.md` says what a new worktree needs.
+
 **Subagents.** A `multi-session` S0 hands its reading to built-in agents, one per area, so
 the main context keeps room for the plan. The review stays in the main context
 (`simple-session`, "Review", says why).

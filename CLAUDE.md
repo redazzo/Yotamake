@@ -98,6 +98,8 @@ says how). Put them in the report and ask before running them (see Commands).
   and includes what it changes, so this repository's own harness moves with the release.
   Docs-only, evals-only and `scripts/`-only branches do not bump. `scripts/check` fails when
   the two files or `.claude/yotamake/version` disagree.
+- **Worktree setup:** none. `scripts/check` needs only bash, git and Node, and the working
+  folder is reached by its absolute path.
 - **Release:** merging to main is the release. Users get it with
   `claude plugin update yotamake@yotamake`.
 
