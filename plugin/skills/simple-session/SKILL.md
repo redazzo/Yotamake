@@ -11,7 +11,8 @@ has to survive a `/clear`.
 
 Project specifics live in `CLAUDE.md`, not here. This skill reads these sections:
 
-- **Checks** — how the project's one check command works (normally `scripts/check`).
+- **Checks** — how the project's one check command works (normally `scripts/check`), and
+  the `Test-first` line (step 4, "Do the work").
 - **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
   merge or a pull request), whether code changes get a version bump, and which files count
   as docs (the `Docs-only` line).
@@ -152,6 +153,11 @@ policy (CLAUDE.md, Conventions) applies: fix a typo or stale comment you pass, a
 the report. Anything with behavioural reach that is outside the task goes in the report as a
 suggestion, not in the diff.
 
+**Test-first.** When **Checks** says `Test-first: yes`, start a change in behaviour with a
+test. Run just that test (not `scripts/check`) and see it fail for the reason you expect,
+then change the code and see it pass. Refactors, docs-only and trivial branches are exempt.
+When the line is missing or says `no`, write tests as the project already does.
+
 If the change alters how something works, update the reference doc that owns it in the same
 branch. The "Owns" table in `docs/README.md` names it. Also fix CLAUDE.md if it describes the
 thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing goes
@@ -224,6 +230,7 @@ Do not commit yet. (In a `multi-session` worktree session, its rules on commits 
 - which docs you updated, or why none needed it;
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
+- with `Test-first: yes`, the test you saw fail before the change;
 - the check results (one line each);
 - the review: which skills you ran, what they found and fixed, what you left and why, or
   that it was skipped because the branch is docs-only, or trivial (and why);

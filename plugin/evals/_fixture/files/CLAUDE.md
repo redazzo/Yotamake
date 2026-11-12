@@ -27,6 +27,8 @@ npm test    # run the tests
 
 **`scripts/check` is the one gate.** It runs the tests and the docs linter.
 
+**Test-first:** `no`.
+
 ## Branching and releases
 
 - **Main branch:** `main`. Work on branches cut from it.

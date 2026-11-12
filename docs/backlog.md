@@ -68,17 +68,6 @@ There is no method for "fix this bug": reproduce it, write a failing test, find 
 then fix. Superpowers' systematic-debugging skill is the model. It would run inside
 `simple-session`, not replace it.
 
-## Test-first as a project choice
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a project using the harness
-asks for test-first, or a spec's criteria ship without tests.
-
-`spec` asks for a test per criterion only "where the project has tests". A line in the
-template `CLAUDE.md` (for example under **Checks**: "Test-first: yes") could make
-`simple-session` write the failing test before the code. It changes a project-owned template
-file and a section skills read, so it needs an `upgrades.md` entry and the section-name
-updates `CLAUDE.md` lists.
-
 ## Let a hook approve commits in opted-in worktrees
 
 **Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in
