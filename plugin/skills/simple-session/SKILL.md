@@ -195,7 +195,7 @@ Call each one with the Skill tool. Reading the diff yourself does not replace th
 when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
 checks below are only for a skill the Skill tool says is not available. Call them from this
 context, not from a subagent you start for the review. Each already runs its own agents, so
-their reading stays out of this context.
+their reading stays out of this context. Only the design read (part 2) goes to a subagent.
 
 Both skills read the diff with `git diff HEAD`, which leaves out new files git does not track
 yet. So first run `git add -N` on each new file this branch adds (`git status --short` marks
@@ -209,9 +209,14 @@ Otherwise review the branch's diff against the main branch in three parts:
    `git checkout`, which would also drop your own uncommitted work) and list them in the
    report as suggestions. If `/simplify` is not available, check by hand: for each new
    function or block, search for code that already does the same, and reuse it.
-2. **Design.** Read the diff against **Architecture** (step 3): a broken boundary or constraint,
-   a clash with an accepted ADR, a part that does not fit the Style, a pattern the project
-   does not use, or logic copied from elsewhere.
+2. **Design.** Once part 1's fixes are in, start one built-in `general-purpose` agent in
+   the background with the Agent tool, go on to part 3, and act on its answer when it
+   comes. It did not write the change, so it reads it fresh. Its brief, self-contained: "Design read: run `git diff <main branch>`. Read the
+   **Architecture** section of CLAUDE.md, and from `docs/decisions/` the accepted ADRs on
+   what the diff touches. Find a broken boundary or constraint, a clash with an ADR, a part
+   that does not fit the Style, a pattern the project does not use, or logic copied from
+   elsewhere. Edit nothing. Return each conflict as file:line and the rule it breaks,
+   quoted, or 'none'." Without the Agent tool, read the diff yourself.
    Fix what lies inside this change. A conflict you only see now gets the same stop as in
    step 3: ask before going on.
 3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a

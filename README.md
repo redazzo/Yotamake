@@ -246,8 +246,8 @@ Code conversation, and merge one at a time (ADR-0005; `multi-session`, "Running 
 parallel"). The `Worktree setup` line in `CLAUDE.md` says what a new worktree needs.
 
 **Subagents.** A `multi-session` S0 hands its reading to built-in agents, one per area, so
-the main context keeps room for the plan. The review stays in the main context
-(`simple-session`, "Review", says why).
+the main context keeps room for the plan. The review hands its design read to one agent
+(`simple-session`, "Review").
 
 ## Docs
 
@@ -268,7 +268,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | Case | Skills | Checks that Claude… |
 |---|---|---|
 | 01-branches-first | `simple-session` | tries to branch before editing, and edits nothing on `main` |
-| 02-small-change | `simple-session` | changes code, test and the owning doc, runs `scripts/check`, `/simplify` and `/code-review`, proposes a commit and asks |
+| 02-small-change | `simple-session` | changes code, test and the owning doc, runs `scripts/check`, `/simplify` and `/code-review`, hands the design read to an agent, proposes a commit and asks |
 | 03-too-big | `simple-session`, `multi-session` | refuses to start a four-part feature and offers a multi-session plan |
 | 04-docs-only | `simple-session`, `write-doc` | fixes a guide, runs the docs check, plans no version bump |
 | 05-work-record | `simple-session`, `write-doc` | writes a valid record and regenerates the index |
