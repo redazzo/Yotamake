@@ -78,7 +78,7 @@ User involvement: approve the commit.
 
 ✂ **Clear context.**
 
-## S3 — Overview, eval and release (A1, F9, F10) — `todo`
+## S3 — Overview, eval and release (A1, F9, F10) — `done`
 
 Branch: the assigned branch.
 Needs: S2

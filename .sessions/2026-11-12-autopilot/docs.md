@@ -20,7 +20,9 @@ does it), `none` (checked; no doc needs it, and why).
 | S2 | S0's end message offers autopilot; "Resuming" and "Rules for every session" point to it; S0 leaves out `report.md` | `plugin/skills/multi-session/SKILL.md` | done |
 | S2 | Templates: autopilot setup and resume lines; `assumed` answers; new `report.md` | `plugin/skills/multi-session/templates/` | done |
 | S2 | `simple-session`, "Stop and report": autopilot rules come first | `plugin/skills/simple-session/SKILL.md` | done |
-| S2 | Overview of autopilot for users | `README.md` (Sessions) | open (S3) |
+| S2 | Overview of autopilot for users | `README.md` (Sessions) | done (S3) |
+| S3 | New eval case `20-multi-session-autopilot-offer` (A1): S0 offers autopilot and starts no session agent, though tempted | `README.md` (Evals table) | done |
+| S3 | Version 0.23.0 | `plugin/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | done (bump commit) |
 | S2 | ADR-0007 decision 1 says autopilot is turned on "at the end of S0 or when resuming"; the skill matches | `docs/decisions/0007-…` | none (already says so) |
 | S2 | The end's order changed by D8 (report and question before the folder delete and the bump): dated amendment | `docs/decisions/0007-autopilot-runs-sessions-in-subagents.md` | done |
 
@@ -44,3 +46,8 @@ Old names that docs may still use. Close-out greps `docs/` and CLAUDE.md for eac
   on a long run; trigger: a run that compacts. Option: hand review fixes to a fix agent.
 - **Backlog:** test whether a subagent's edit marks the parent session for the `Stop` gate
   (F8), in a session where the plugin's hooks run (S1 could not).
+- **Record:** S3 added the README overview, eval case 20 and released 0.23.0.
+- **Backlog:** `no-code-edits.md` (07, 16, 20) and `skill-fired.md` (multi-session in 07,
+  16, 18, 20) are hand-kept copies the consistency check does not cover; promoting them to
+  `_graders/` needs renames, since cases 03, 08, 12 and nine `simple-session` cases use the
+  same names with other content. Trigger: the next edit to either grader.

@@ -45,3 +45,22 @@
   the session pick was unclear about a cut-off `in progress` session; fixed.
 - Commits: see the S2 commit on the assigned branch.
 - Next: S3 (ask D7 first).
+
+## 2026-11-12 — S3: overview, eval and release
+
+- The user answered D7: write the eval case, then run it.
+- `README.md`: an "Autopilot" paragraph under Sessions, and the case 20 row in Evals.
+- New eval case `20-multi-session-autopilot-offer` (A1). The prompt tempts autopilot ("I'd
+  rather not babysit the later sessions") and allows `Agent`, so the gate is really tested:
+  `no-session-agent` fails on any Agent call whose brief says "under autopilot".
+- Review: `/simplify` (four reviewers) cut overlapping graders and restated README text,
+  dropped `plan-written` (case 07 covers it), and made the case test the gate rather than
+  S0's normal stop. Left: folding the check into case 16 instead of a new case (the plan
+  names case 20, and the tempting prompt gives it its own reason); promoting
+  `no-code-edits` and `skill-fired` to `_graders/` (needs renames; backlog line in
+  `docs.md`). `/code-review` low: no findings.
+- Eval: case 20, 3 runs, score 1.00, $0.62. No run called Agent at all (the fixture is small
+  enough that S0 read it itself).
+- Commits: the S3 commit, then `chore(release): bump version to 0.23.0` with
+  `./plugin/install.sh .`.
+- Next: S4, close-out.
