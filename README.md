@@ -86,6 +86,7 @@ plugin/
   skills/
     simple-session/   one change: size check, branch, work, docs, scripts/check, stop and ask
     multi-session/    work across several contexts, with a working folder that survives /clear
+    debugging/        a bug fix inside a session: reproduce, failing test, root cause, fix
     write-doc/        pick the doc kind, write it, link it, lint it
     spec/             agree scope and acceptance criteria before code  (manual: /yotamake:spec)
     release-check/    guided deploy with pre-flight and gotchas      (manual: /yotamake:release-check)
@@ -218,7 +219,8 @@ This section is an overview. Each skill's `SKILL.md` holds its rules and is the 
 A session is one branch and one merge that fits in one context
 ([`simple-session`](./plugin/skills/simple-session/SKILL.md)). It checks the size first, and
 with `Test-first: yes` in `CLAUDE.md` it writes a failing test before a change in behaviour. A
-change too big for one session becomes a
+bug fix follows [`debugging`](./plugin/skills/debugging/SKILL.md): reproduce it, write a
+failing test, find and name the root cause, then fix it. A change too big for one session becomes a
 [`multi-session`](./plugin/skills/multi-session/SKILL.md) effort, with a working folder that
 survives `/clear`: git-ignored at `.scratchpad/<date>-<slug>/`, or committed at
 `.sessions/<date>-<slug>/` in an ephemeral environment or on an assigned branch. You `/clear`
@@ -285,6 +287,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 18-multi-session-docs-ledger | `multi-session`, `simple-session` | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
 | 19-claude-md-only | `simple-session` | with no `Docs-only` line, changes only `CLAUDE.md` and treats it as code by the default rule, runs `scripts/check`, `/simplify` and `/code-review`, asks before committing |
 | 20-trivial-change | `simple-session` | fixes a typo in a code comment, runs `scripts/check` but neither `/simplify` nor `/code-review`, says the change is trivial and why, asks before committing |
+| 21-debugging | `simple-session`, `debugging` | for a crash that shows in one helper but starts in another, writes a failing test first, fixes the helper that makes the bad value rather than guarding where it throws, names the root cause, asks before committing |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
 plugin, `scripts/check` uses it to name the cases worth running: those that list a changed

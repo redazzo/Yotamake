@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 21-debugging
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  Work stays on the assigned branch; the debugging skill is used; a test reproducing the crash (two spaces in a name) is added and seen failing before src/ is changed; the fix is in words() in src/text.js (it makes empty words from two spaces), not a guard in titleCase or a clean-up in greet.js; scripts/check is run; no commit; the final message names the root cause and the test, and asks before committing.

@@ -59,15 +59,6 @@ review graders in eval cases 02, 13, 15 and 19 probably miss calls made inside a
 design read against Architecture could still move to a subagent that returns conflicts only.
 If the graders do see subagent calls, the whole review could move.
 
-## A debugging skill
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** a `fix/` session patches a
-symptom and the bug comes back, or a user asks how to debug with the harness.
-
-There is no method for "fix this bug": reproduce it, write a failing test, find the root cause,
-then fix. Superpowers' systematic-debugging skill is the model. It would run inside
-`simple-session`, not replace it.
-
 ## Let a hook approve commits in opted-in worktrees
 
 **Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in
