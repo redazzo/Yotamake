@@ -6,8 +6,7 @@ status: current
 
 # ADR-0007: Autopilot runs an approved effort's sessions in subagents on one branch
 
-- **Status:** Proposed. Becomes Accepted when the user approves it with the effort's plan,
-  after S1 records the tests below.
+- **Status:** Accepted (2026-11-12), with the effort's spec and plan. The tests are below.
 - **Date:** 2026-11-12
 - **Work record:** none yet (effort "Autopilot for multi-session efforts")
 - **Supersedes / amends:** amends [ADR-0005](./0005-parallel-sessions-in-worktrees.md),
@@ -53,7 +52,9 @@ instead of after each session.
 3. **One subagent per session.** The main conversation starts one built-in agent per
    session, in turn, with a brief written in the skill. The subagent's fresh context stands
    in for `/clear`. Each session still follows `simple-session`: design check, work, owning
-   doc, `scripts/check`, the review, the docs ledger.
+   doc, `scripts/check`, the docs ledger. The main conversation runs the review
+   (`/simplify` and `/code-review`) on each session's diff when the subagent returns, as
+   `simple-session`, "Review", already says (see Tested).
 4. **Stops kept.** Every `git commit` and `git merge` still prompts (ADR-0003). Autopilot
    never pushes, merges into the main branch, tags or deploys without a yes.
 5. **Pauses.** The run stops and asks on a design conflict (as `simple-session`, "Design and
@@ -78,8 +79,23 @@ We decided against:
 
 ## Tested
 
-<!-- S1 writes the results here: whether /simplify and /code-review run inside a session
-  subagent, and whether a subagent's edit marks this session for the Stop gate. -->
+Run on 2026-11-12, in a Claude Code 2.1.322 cloud session in this repository, on a
+throwaway branch with a one-line diff.
+
+- **Review skills in a subagent: they run, but weaker.** A built-in `general-purpose`
+  subagent had the `Skill` tool and both `simplify` and `code-review` were offered. Both
+  calls succeeded. The subagent had no `Agent` tool, so `/simplify` said so and ran as one
+  inline pass instead of its parallel reviewers. `/code-review` ran as a fork and returned
+  only its result, so whether it started reviewers of its own could not be seen. The
+  documentation's "agents up to three levels deep" did not hold for this subagent.
+  Decision (D4): the main conversation runs both on each session's diff.
+- **The `Stop` gate in a subagent: not tested.** The plugin's hooks did not run in that
+  session: its skills were not offered, and an edit by the main conversation left no
+  `yotamake-edited` marker. So a subagent's edit could not be checked either. Whether a
+  subagent's edit carries the parent's `session_id` is still the documentation's word. If it
+  does not, the gate only misses a check after a subagent's edit; it does not block wrongly.
+  The main conversation runs `scripts/check` on each session's work before its commit
+  anyway.
 
 ## Consequences
 
@@ -89,8 +105,8 @@ We decided against:
   the final report, not session by session.
 - `multi-session` gains an Autopilot section, a `report.md` template and an `assumed`
   decision state.
-- If built-in review skills do not run inside a subagent, the main conversation runs the
-  review on each session's diff, and more of each session lands in its context.
+- The main conversation runs the review on each session's diff, so the review's findings
+  and fixes land in its context, though not the session's own reading.
 
 ## References
 

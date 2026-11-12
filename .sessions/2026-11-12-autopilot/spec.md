@@ -1,6 +1,6 @@
 # Spec — Autopilot for multi-session efforts
 
-Agreed <pending approval at the end of S0>. What must be true when this work is done.
+Agreed 2026-11-12 (approved with the plan and ADR-0007 at the start of S1). What must be true when this work is done.
 
 ## Problem
 

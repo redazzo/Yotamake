@@ -112,3 +112,10 @@ new worktree may need setup, and that commits in parallel sessions still need a 
 - [ADR-0003](./0003-stop-points-enforced-by-ask-rules.md),
   [ADR-0004](./0004-project-session-start-hook-sets-hooks-path.md)
 - [Backlog](../backlog.md), "Let a hook approve commits in opted-in worktrees"
+
+## Amendment (2026-11-12): autopilot may drive session subagents
+
+[ADR-0007](./0007-autopilot-runs-sessions-in-subagents.md) allows one option this ADR
+turned down, one conversation driving session subagents, for one case only: an effort the
+user put on autopilot after approving its spec, plan and Design. Those sessions run one at a
+time on one branch, not in parallel worktrees. Everything else here stands.

@@ -40,7 +40,7 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 
 ---
 
-## S1 — ADR-0007 and the open facts (F2, F4, F8) — `todo`
+## S1 — ADR-0007 and the open facts (F2, F4, F8) — `done`
 
 Branch: the assigned branch.
 Needs: none

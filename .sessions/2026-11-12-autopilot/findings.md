@@ -29,6 +29,13 @@ subagent. The docs say subagents may call skills and start agents up to three le
 but do not say whether built-in skills such as `/simplify` and `/code-review` are reachable
 from a subagent. S1 tests this (D4).
 
+*S1 result (2026-11-12, tested):* both skills run inside a `general-purpose` subagent, but
+weaker. That subagent had no `Agent` tool, so `/simplify` ran as one inline pass, without its
+parallel reviewers; `/code-review` ran as a fork and returned only its result, so its depth
+could not be seen. D4 answered: the main conversation runs the review on each session's
+diff. Also: the docs' "agents up to three levels deep" did not hold for this subagent, so a
+session brief must not rely on the session starting agents of its own.
+
 **F5 — The committed setup already uses one branch (low, reuse).** On an assigned branch,
 every session is commits on that branch (`plugin/skills/multi-session/SKILL.md:29-35`). The
 mother branch reuses this shape: autopilot is the same, with a branch cut for the effort in
@@ -51,6 +58,12 @@ end of a turn when this session edited code after the last passing check
 inside subagents and their sample payload carries the parent's `session_id`, so a subagent's
 edits should mark the parent's session. This is an inference from an example; S1 checks it
 in a real run.
+
+*S1 result (2026-11-12): not tested.* The plugin's hooks did not run in this cloud session
+(no `yotamake:` skills offered; an edit by the main conversation left no marker), so a
+subagent's edit could not be checked. Still an inference. The risk is small: if the
+`session_id` differs, the gate misses a check after a subagent's edit; it does not block
+wrongly, and the main conversation runs `scripts/check` before each commit anyway.
 
 ## Docs and evals
 
