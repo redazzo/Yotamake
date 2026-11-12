@@ -95,7 +95,7 @@ User involvement: approve the commits; D7.
 
 ✂ **Clear context.**
 
-## S4 — Close-out — `todo`
+## S4 — Close-out — `done`
 
 Branch: the assigned branch.
 Needs: S3

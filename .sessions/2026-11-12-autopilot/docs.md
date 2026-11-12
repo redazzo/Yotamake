@@ -25,6 +25,10 @@ does it), `none` (checked; no doc needs it, and why).
 | S3 | Version 0.23.0 | `plugin/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | done (bump commit) |
 | S2 | ADR-0007 decision 1 says autopilot is turned on "at the end of S0 or when resuming"; the skill matches | `docs/decisions/0007-…` | none (already says so) |
 | S2 | The end's order changed by D8 (report and question before the folder delete and the bump): dated amendment | `docs/decisions/0007-autopilot-runs-sessions-in-subagents.md` | done |
+| S4 | Record of the effort (the Record lines below and `log.md`) | `docs/records/2026/2026-11-12-autopilot.md`, records index | done |
+| S4 | Backlog: "Spawn worktree sessions…" points at ADR-0007; three new entries (the Backlog lines below) | `docs/backlog.md` | done |
+| S4 | Re-read every `done` row against the final skill text; A1–A11 all met; ADR-0007 and README match | — | none (no change needed) |
+| S4 | ADR-0007 "Work record: none yet" left as is: ADRs are not edited, and ADR-0005 kept the same line after its record | — | none |
 
 ## Renames and removals
 

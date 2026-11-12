@@ -64,3 +64,21 @@
 - Commits: the S3 commit, then `chore(release): bump version to 0.23.0` with
   `./plugin/install.sh .`.
 - Next: S4, close-out.
+
+## 2026-11-12 — S4: close-out
+
+- Worked through `docs.md`. New record `docs/records/2026/2026-11-12-autopilot.md`; records
+  index regenerated. Backlog: "Spawn worktree sessions from the main conversation" now
+  points at ADR-0007 and names only the parallel case; new entries "Autopilot context
+  growth", "Test the `Stop` gate after a subagent's edit" (F8), "Shared copies of two eval
+  graders".
+- Re-read the `done` rows against the final skill text: ADR-0007, `README.md` and the
+  templates match. A1–A11 all met in `multi-session`, "Autopilot", and `report.md`. No
+  renames or removals to grep for.
+- Surprise: S3's note said nine `simple-session` cases share the name `skill-fired.md`; it
+  is eight identical copies plus case 05 with its own content. The backlog entry lists the
+  cases exactly.
+- Branch is docs-only for this session (files under `docs/` and `.sessions/`): no design
+  step, review or bump.
+- Left for the user: approve the S4 commit; approve deleting this folder (its own commit);
+  the push; whether to open a pull request. ADR-0007's "Tested" still lacks F8 (backlog).
