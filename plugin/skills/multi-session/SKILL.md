@@ -49,8 +49,8 @@ The user resumes with: **"Read <folder>/README.md and start the next session."**
 4. Start the first session in `plan.md` whose status is not `done` and whose `Needs:`
    sessions are all `done`. Skip one marked `in progress` in another worktree (see "Running
    sessions in parallel"). Ask its questions from `decisions.md` before doing anything else,
-   unless they already have answers. If `README.md` says autopilot is on and the user asks
-   to continue it, follow "Autopilot" instead.
+   unless they already have answers. If the user resumes autopilot, follow "Resuming
+   autopilot" instead.
 5. Do not redo the analysis. Do re-check any file:line or fact you are about to act on or
    copy into a durable doc. Code moves, and the log can be wrong: a stale inventory row can
    name the wrong file and slip into a permanent record.
@@ -198,8 +198,7 @@ report and the `/clear` between sessions. Every `git commit` and `git merge` sti
 and autopilot never pushes, merges into the main branch, tags or deploys without a yes.
 
 **Turning it on.** Only the user turns it on: when they answer the S0 message (step 6 of
-"Starting a new effort"), or later, when they say "continue autopilot" on resuming. When
-they do:
+"Starting a new effort"), or later, with the line in "Resuming autopilot". When they do:
 
 1. Write `Autopilot: on (<yyyy-mm-dd>), mother branch <branch>.` under **Setup** in the
    folder's `README.md`, and a row in `decisions.md` saying the user chose it.
@@ -209,8 +208,7 @@ they do:
    kind of change (**Branching and releases**). No session gets a branch of its own.
 
 **Each session.** Pick the first session in `plan.md` not `done` whose `Needs:` sessions are
-all `done`, including one left `in progress` by a run that was cut off. Then, in the main
-conversation:
+all `done`. Then, in the main conversation:
 
 1. **Decisions.** For each of the session's questions in `decisions.md` with no answer, take
    the recommendation and write `assumed (<yyyy-mm-dd>): <the recommendation>` as the answer.
@@ -220,13 +218,15 @@ conversation:
    the brief below. Its fresh context stands in for `/clear`, and its reading stays out of
    the main conversation.
 3. **Pause, if it says so.** If the agent returns `PAUSE`, write the reason and what is done
-   in `log.md`, and ask the user. Once it is settled, carry on from this step, or tell the
-   user to resume with "Read <folder>/README.md and continue autopilot".
-4. **Review.** Run `scripts/check`, then the review, as `simple-session`, "Review", says,
-   on this session's uncommitted diff, not the whole mother branch: the docs-only and
-   trivial tests apply to that diff, and the design read's brief uses `git diff HEAD`. A
-   conflict the design read finds pauses as above, and so does a check that still fails
-   after two fix attempts.
+   in `log.md`, and ask the user. Record the answer in `decisions.md`, then send it to the
+   paused agent so it carries on. If that agent can no longer be reached, start a new one
+   with the brief, adding one line: what was settled. If the user would rather stop the run
+   here, the session stays `in progress` for "Resuming autopilot".
+4. **Review.** Run `scripts/check`, saving its output as "Rules for every session" says.
+   Then run the review as `simple-session`, "Review", says, on this session's uncommitted
+   diff, not the whole mother branch: the docs-only and trivial tests apply to that diff,
+   and the design read's brief uses `git diff HEAD`. A conflict the design read finds pauses
+   as above, and so does a check that still fails after two fix attempts.
 5. **Commit.** Set the session's status in `plan.md` to `done` and append its `log.md`
    entry, with what the review found, fixed and left; the report is built from these
    entries. Commit on the mother branch as `simple-session`, "On yes: commit, bump,
@@ -240,16 +240,16 @@ conversation:
 > `<mother branch>`. Read the folder's `README.md`, `plan.md`, `spec.md` (if any),
 > `decisions.md`, `docs.md` and the last entry of `log.md`, then the parts of `findings.md`
 > that S<N> names. Do S<N>'s tasks by the `simple-session` skill's "Design and reuse", "Do
-> the work" and "Run the checks" (its file is `<path to simple-session/SKILL.md>`). Save
-> the check output to `<folder>/s<N>-checks.log`. Add this session's rows to `docs.md`, as
-> the `multi-session` skill's "Rules for every session" says. Treat `assumed` answers in
-> `decisions.md` as answers. Do not switch branches, commit, push, merge, run `/simplify`
-> or `/code-review`, or start agents of your own. Do not edit `plan.md` or `log.md`.
-> Stop and return `PAUSE: <reason>` instead of going on wherever a step or skill you follow
-> says to stop and ask the user; when `scripts/check` still fails after two fix attempts; or
-> when the session cannot finish within its plan. Otherwise return, in under 30 lines, what
-> `simple-session`, "Stop and report", lists, leaving out the review and the commit
-> message; then the `docs.md` rows added and anything surprising.
+> the work" and "Run the checks" (its file is `<path to simple-session/SKILL.md>`). If the
+> working tree already holds part of S<N>'s work, carry on from it. Add this session's rows
+> to `docs.md`, as the `multi-session` skill's "Rules for every session" says. Treat
+> `assumed` answers in `decisions.md` as answers. Do not switch branches, commit, push,
+> merge, run `/simplify` or `/code-review`, or start agents of your own. Do not edit
+> `plan.md` or `log.md`. Stop and return `PAUSE: <reason>` instead of going on wherever a
+> step or skill you follow says to stop and ask the user; when `scripts/check` still fails
+> after two fix attempts; or when the session cannot finish within its plan. Otherwise
+> return, in under 30 lines, what `simple-session`, "Stop and report", lists, leaving out
+> the review and the commit message; then the `docs.md` rows added and anything surprising.
 
 **The end.** After the last session:
 
@@ -271,11 +271,11 @@ On yes, in this order, each its own commit:
 
 On no, leave the branch and the folder as they are, and ask what to change.
 
-**Resuming autopilot.** "Read <folder>/README.md and continue autopilot" resumes as
-"Resuming" says, then goes on with the loop above from the first session not `done`. A
-session left `in progress` by a run that was cut off (the user stopped it, the container was
-lost) starts again. If the working tree holds its uncommitted work, stop and ask whether to
-keep it or start the session afresh. Do not stash or discard it yourself.
+**Resuming autopilot.** The user resumes with: **"Read <folder>/README.md and continue
+autopilot."** Do "Resuming" steps 1 to 3, then the loop above from the first session not
+`done`. A session left `in progress` (paused, or cut off) starts again. If the working tree
+holds its uncommitted work, ask whether to keep it or start the session afresh. Do not stash
+or discard it yourself.
 
 ## Closing out
 

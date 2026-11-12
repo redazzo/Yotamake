@@ -8,7 +8,7 @@ status: current
 
 - **Status:** Accepted (2026-11-12), with the effort's spec and plan. The tests are below.
 - **Date:** 2026-11-12
-- **Work record:** none yet (effort "Autopilot for multi-session efforts")
+- **Work record:** [Autopilot for multi-session efforts](../records/2026/2026-11-12-autopilot.md)
 - **Supersedes / amends:** amends [ADR-0005](./0005-parallel-sessions-in-worktrees.md),
   which rejected "one conversation driving worktree subagents", for autopilot only. Keeps
   [ADR-0003](./0003-stop-points-enforced-by-ask-rules.md) as it is.
