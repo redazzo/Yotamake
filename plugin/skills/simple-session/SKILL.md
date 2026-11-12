@@ -158,6 +158,9 @@ test. Run just that test (not `scripts/check`) and see it fail for the reason yo
 then change the code and see it pass. Refactors, docs-only and trivial branches are exempt.
 When the line is missing or says `no`, write tests as the project already does.
 
+**Bug fixes.** When the change fixes a bug, follow the `debugging` skill here, then come
+back for step 5.
+
 If the change alters how something works, update the reference doc that owns it in the same
 branch. The "Owns" table in `docs/README.md` names it. Also fix CLAUDE.md if it describes the
 thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing goes
@@ -231,6 +234,7 @@ Do not commit yet. (In a `multi-session` worktree session, its rules on commits 
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
 - with `Test-first: yes`, the test you saw fail before the change;
+- for a bug fix, what `debugging`, "Report", asks for;
 - the check results (one line each);
 - the review: which skills you ran, what they found and fixed, what you left and why, or
   that it was skipped because the branch is docs-only, or trivial (and why);
