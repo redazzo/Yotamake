@@ -5,8 +5,11 @@ Started <yyyy-mm-dd>. <One or two sentences: what this effort is, and its scope,
 **Setup:** <!-- one of: "Local: this folder is git-ignored; one branch per session." or
 "Committed: this folder is committed; all sessions are commits on branch `<branch>`." -->
 It carries the work across context clears. Workflow: the `multi-session` skill.
+<!-- If the user turns on autopilot, add: "Autopilot: on (<yyyy-mm-dd>), mother branch
+`<branch>`." -->
 
 The user resumes with: **"Read <folder path>/README.md and start the next session."**
+<!-- Under autopilot: **"Read <folder path>/README.md and continue autopilot."** -->
 
 ## Files
 
@@ -17,3 +20,4 @@ The user resumes with: **"Read <folder path>/README.md and start the next sessio
 - `log.md` — one entry per session: what was done, commits, what is left, surprises.
 - `docs.md` — the docs ledger: every change a durable doc must reflect, and whether it is
   done. Close-out works from it.
+- `report.md` — autopilot only: the report of the whole effort, written at the end.

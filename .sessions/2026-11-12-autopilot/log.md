@@ -26,3 +26,22 @@
 - Surprise: the docs said subagents can start agents up to three levels deep; this one could
   not. S2's brief must not rely on it.
 - Next: S2 (ask D5, D6, D8 first).
+
+## 2026-11-12 — S2: the autopilot skill text
+
+- The user answered D5 (the main conversation commits), D6 (`<prefix>/<effort-slug>`) and
+  D8 (report and question first; on yes delete the folder, bump, merge).
+- Wrote `multi-session`, "Autopilot" (turning it on, mother branch, per-session loop,
+  session brief, pauses, `assumed` answers, the end, resuming). Pointers from S0's end
+  message, "Resuming", "Rules for every session" and "Closing out". Templates: autopilot
+  lines in `README.md`, `assumed` in `decisions.md`, new `report.md`. One merged sentence in
+  `simple-session`, "Stop and report".
+- ADR-0007 got a dated amendment: D8 changed the order of the end from its decision 6.
+- Review: `/simplify` (four reviewers) found restated rules; fixed by pointers (the PAUSE
+  list now points at "Design and reuse", which also covers the dependency case it missed).
+  Left: re-running `scripts/check` in the main conversation (ADR-0007 relies on it before
+  each commit); pre-writing all `assumed` answers at turn-on (questions wait for their
+  session by design); context growth (backlog line). `/code-review` low: one finding,
+  the session pick was unclear about a cut-off `in progress` session; fixed.
+- Commits: see the S2 commit on the assigned branch.
+- Next: S3 (ask D7 first).

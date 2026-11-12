@@ -61,7 +61,7 @@ User involvement: approve the commit; answer D4 if the test fails.
 
 ✂ **Clear context.**
 
-## S2 — The autopilot skill text (A1–A11) — `todo`
+## S2 — The autopilot skill text (A1–A11) — `done`
 
 Branch: the assigned branch.
 Needs: S1

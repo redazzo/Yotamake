@@ -208,8 +208,8 @@ outside this branch's concern, goes in the report with one line on why you left 
 
 ## 7. Stop and report
 
-Do not commit yet. (In a `multi-session` worktree session, its rules on commits come first:
-`multi-session`, "Running sessions in parallel".) Tell the user:
+Do not commit yet. (Inside a `multi-session` effort, its rules come first: "Running
+sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell the user:
 
 - what changed, by file, in a few lines;
 - for a code change, two lines: "Reused:" the existing code it reuses or extends (or

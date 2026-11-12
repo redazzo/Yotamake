@@ -116,3 +116,12 @@ throwaway branch with a one-line diff.
   [ADR-0005](./0005-parallel-sessions-in-worktrees.md),
   [ADR-0006](./0006-commit-stop-by-project-hook.md)
 - [Backlog](../backlog.md), "Spawn worktree sessions from the main conversation"
+
+## Amendment (2026-11-12): the order of the end
+
+Decision 6 put the version bump before the report. Writing the skill showed the effort's
+folder holds the report, so it must last until the user answers the merge question. The
+order is now: close-out (keeping the folder), the report, the one question; then, on yes,
+each as its own commit: delete the folder, the version bump (still once, and still the last
+commit on the mother branch), and the merge or pull request. On no, nothing is deleted or
+bumped. The rest of the decision stands.
