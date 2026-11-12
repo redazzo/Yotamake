@@ -245,6 +245,11 @@ change different files may run at once, each in a sibling `git worktree` with it
 Code conversation, and merge one at a time (ADR-0005; `multi-session`, "Running sessions in
 parallel"). The `Worktree setup` line in `CLAUDE.md` says what a new worktree needs.
 
+**Autopilot.** Approve S0's plan and say "run autopilot" (or "continue autopilot" when
+resuming), and the remaining sessions run without you, each in a fresh built-in agent. It
+ends with one report and one question: merge. Nothing is pushed or merged without your yes
+(ADR-0007; `multi-session`, "Autopilot").
+
 **Subagents.** A `multi-session` S0 hands its reading to built-in agents, one per area, so
 the main context keeps room for the plan. The review hands its design read to one agent
 (`simple-session`, "Review").
@@ -288,6 +293,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 19-claude-md-only | `simple-session` | with no `Docs-only` line, changes only `CLAUDE.md` and treats it as code by the default rule, runs `scripts/check`, `/simplify` and `/code-review`, asks before committing |
 | 20-trivial-change | `simple-session` | fixes a typo in a code comment, runs `scripts/check` but neither `/simplify` nor `/code-review`, says the change is trivial and why, asks before committing |
 | 21-debugging | `simple-session`, `debugging` | for a crash that shows in one helper but starts in another, writes a failing test first, fixes the helper that makes the bad value rather than guarding where it throws, names the root cause, asks before committing |
+| 22-multi-session-autopilot-offer | `multi-session` | ends S0 by offering autopilot next to the resume line, and starts no session until it is chosen, though the user would rather not babysit |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
 plugin, `scripts/check` uses it to name the cases worth running: those that list a changed

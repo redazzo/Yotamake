@@ -67,8 +67,31 @@ before a commit.
 
 [ADR-0005](./decisions/0005-parallel-sessions-in-worktrees.md) has the user open a
 conversation in each worktree, so every session keeps its own stop before commit
-(ADR-0003). The other option: the main conversation starts one `isolation: "worktree"`
-subagent per session. That would need a new ADR.
+(ADR-0003). [ADR-0007](./decisions/0007-autopilot-runs-sessions-in-subagents.md) now lets
+the main conversation run sessions as subagents under autopilot, but one at a time on one
+branch. What is left: the main conversation starts one `isolation: "worktree"` subagent per
+parallel session. That would need a new ADR, or an amendment of ADR-0007, which rules out
+parallel sessions under autopilot.
+
+## Autopilot context growth
+
+**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** an autopilot run whose main
+conversation compacts before the end.
+
+Under autopilot the main conversation runs the review of every session, so each review's
+findings and fixes land in its context (ADR-0007). A long effort may fill it. One option:
+hand the review's fixes to a fix agent, and keep only its summary.
+
+## Test the `Stop` gate after a subagent's edit
+
+**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** the next session where the
+plugin's hooks run and a subagent edits code (an autopilot run, for example).
+
+`stop-check-ran.sh` matches on `session_id`. The Claude Code docs suggest a subagent's hook
+calls carry the parent's id, so its edits should mark the parent session. ADR-0007's test
+could not check this: the plugin's hooks did not run in that cloud session. If the id
+differs, the gate misses a check after a subagent's edit; it never blocks wrongly. Record
+the result in ADR-0007's "Tested" section with a dated amendment.
 
 ## Plugin agent definitions
 
@@ -172,6 +195,20 @@ paths count as code, so Claude runs `scripts/check` once more than it needs to. 
 a `.claude/yotamake/docs-paths.conf` of globs that the installer seeds and `setup` fills in
 from that line.
 
+## Two clashes `scripts/check` misses after a merge
+
+**Added:** 2026-11-12 · **Trigger to act:** the next branch that merges main and hits
+either clash, or any change to `scripts/consistency.mjs`.
+
+Merging main into the autopilot branch showed both; each was fixed by hand.
+
+- **Version not above main's.** `checkVersion` in `scripts/consistency.mjs` checks only that
+  the three version files agree. It could also fail when `plugin/` (evals aside) changed
+  since the merge-base but the version is not higher than the one on the main branch.
+- **Two eval cases with one number.** Cases are matched by full folder name, so
+  `20-trivial-change` and `20-multi-session-autopilot-offer` both passed. A check that the
+  `NN-` prefixes in `plugin/evals/` are unique would catch it.
+
 ## Two gaps left in the `Stop` gate
 
 **Added:** 2026-11-12 · **Trigger to act:** a session edits code in a separate repository by
@@ -201,6 +238,9 @@ side-fix policy in `CLAUDE.md`, **Conventions**.
 - `skill-fired.md` and `asks-before-commit.md` sit in many case folders with the same
   text (10 and 6 identical copies). Move them into `plugin/evals/_graders/` like the
   shared graders already there.
+- The `multi-session` `skill-fired.md` (cases 07, 16, 18, 22) and `no-code-edits.md`
+  (07, 16, 22) need new names before they can move, since other cases use those names for
+  other content.
 - The "trivial side-fix policy" in `CLAUDE.md` and the trivial review tier in
   `simple-session` use the same word for different things. Rename one.
 
