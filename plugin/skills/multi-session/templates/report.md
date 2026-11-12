@@ -37,8 +37,10 @@ Each with `git diff --stat <main-branch>...HEAD -- <paths>`.
 ## Checks and review
 
 - **`scripts/check`:** <the summary lines from the last run>
-- **Review:** <per session: what `/simplify` and `/code-review` found and fixed, and what was
-  left and why>
+- **Review:** <per session, from its `log.md` entry: what each part of `simple-session`,
+  "Review", found, fixed and left and why, or why it was skipped (docs-only, trivial)>
+- **From the sessions' reports:** <tests seen failing first (Test-first), root causes of bug
+  fixes> or "none"
 
 ## Assumed decisions
 

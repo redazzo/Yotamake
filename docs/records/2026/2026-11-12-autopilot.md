@@ -6,7 +6,7 @@ status: historical
 
 # Autopilot for multi-session efforts
 
-**Date:** 2026-11-12 · **Status:** live in 0.23.0
+**Date:** 2026-11-12 · **Status:** live in 0.27.0
 
 **Why.** A multi-session effort needed the user between every session: a `/clear`, the
 resume line, and a report to read before each commit. When the spec and plan are already
@@ -40,12 +40,12 @@ sessions run, and review the whole result at the end. It ran as a five-session e
 
 **Built.**
 
-- 0.23.0 (S2): `multi-session`, "Autopilot": turning it on, the mother branch, the
+- 0.27.0 (S2): `multi-session`, "Autopilot": turning it on, the mother branch, the
   per-session loop, the session brief, pauses, `assumed` answers, the end, resuming. S0's end
   message offers it. Templates: autopilot lines in `README.md`, `assumed` in `decisions.md`,
   a new `report.md`. `simple-session`, "Stop and report", defers to it.
-- 0.23.0 (S3): the "Autopilot" paragraph in `README.md`, and eval case
-  `20-multi-session-autopilot-offer`: S0 offers autopilot and starts no session agent, though
+- 0.27.0 (S3): the "Autopilot" paragraph in `README.md`, and eval case
+  `22-multi-session-autopilot-offer`: S0 offers autopilot and starts no session agent, though
   the prompt tempts it. 3 runs, score 1.00.
 
 **Not tested.** Whether a subagent's edit marks the parent session for the `Stop` gate: the
@@ -54,4 +54,4 @@ it would be too slow and costly. This effort itself ran without autopilot.
 
 **Left.** In [the backlog](../../backlog.md): "Spawn worktree sessions from the main
 conversation" (now only the parallel case), "Autopilot context growth", "Test the `Stop`
-gate after a subagent's edit" and "Shared copies of two eval graders".
+gate after a subagent's edit" and "Copied graders and a shared word".

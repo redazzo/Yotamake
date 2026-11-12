@@ -93,17 +93,6 @@ could not check this: the plugin's hooks did not run in that cloud session. If t
 differs, the gate misses a check after a subagent's edit; it never blocks wrongly. Record
 the result in ADR-0007's "Tested" section with a dated amendment.
 
-## Shared copies of two eval graders
-
-**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** the next edit to either
-grader.
-
-`no-code-edits.md` (cases 07, 16, 20) and `skill-fired.md` (the `multi-session` copy in
-cases 07, 16, 18, 20) are kept in step by hand; the consistency check does not cover them.
-Moving them to `plugin/evals/_graders/` needs new names first, since other cases use the same
-file names with other content: `no-code-edits.md` in 03, 08 and 12, and `skill-fired.md` in
-01 to 05, 13, 14, 17 and 19.
-
 ## Plugin agent definitions
 
 **Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the agent briefs in skills
@@ -206,6 +195,20 @@ paths count as code, so Claude runs `scripts/check` once more than it needs to. 
 a `.claude/yotamake/docs-paths.conf` of globs that the installer seeds and `setup` fills in
 from that line.
 
+## Two clashes `scripts/check` misses after a merge
+
+**Added:** 2026-11-12 · **Trigger to act:** the next branch that merges main and hits
+either clash, or any change to `scripts/consistency.mjs`.
+
+Merging main into the autopilot branch showed both; each was fixed by hand.
+
+- **Version not above main's.** `checkVersion` in `scripts/consistency.mjs` checks only that
+  the three version files agree. It could also fail when `plugin/` (evals aside) changed
+  since the merge-base but the version is not higher than the one on the main branch.
+- **Two eval cases with one number.** Cases are matched by full folder name, so
+  `20-trivial-change` and `20-multi-session-autopilot-offer` both passed. A check that the
+  `NN-` prefixes in `plugin/evals/` are unique would catch it.
+
 ## Two gaps left in the `Stop` gate
 
 **Added:** 2026-11-12 · **Trigger to act:** a session edits code in a separate repository by
@@ -235,6 +238,9 @@ side-fix policy in `CLAUDE.md`, **Conventions**.
 - `skill-fired.md` and `asks-before-commit.md` sit in many case folders with the same
   text (10 and 6 identical copies). Move them into `plugin/evals/_graders/` like the
   shared graders already there.
+- The `multi-session` `skill-fired.md` (cases 07, 16, 18, 22) and `no-code-edits.md`
+  (07, 16, 22) need new names before they can move, since other cases use those names for
+  other content.
 - The "trivial side-fix policy" in `CLAUDE.md` and the trivial review tier in
   `simple-session` use the same word for different things. Rename one.
 

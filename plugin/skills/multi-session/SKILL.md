@@ -222,11 +222,14 @@ conversation:
 3. **Pause, if it says so.** If the agent returns `PAUSE`, write the reason and what is done
    in `log.md`, and ask the user. Once it is settled, carry on from this step, or tell the
    user to resume with "Read <folder>/README.md and continue autopilot".
-4. **Review.** Run `scripts/check`, then the review, as `simple-session`, "Review", says, on
-   the session's uncommitted diff (`git add -N` on new files first). Fix what it finds and
-   run `scripts/check` again. If a check still fails after two fix attempts, pause as above.
+4. **Review.** Run `scripts/check`, then the review, as `simple-session`, "Review", says,
+   on this session's uncommitted diff, not the whole mother branch: the docs-only and
+   trivial tests apply to that diff, and the design read's brief uses `git diff HEAD`. A
+   conflict the design read finds pauses as above, and so does a check that still fails
+   after two fix attempts.
 5. **Commit.** Set the session's status in `plan.md` to `done` and append its `log.md`
-   entry. Commit on the mother branch as `simple-session`, "On yes: commit, bump,
+   entry, with what the review found, fixed and left; the report is built from these
+   entries. Commit on the mother branch as `simple-session`, "On yes: commit, bump,
    integrate", says, with the folder's updates in a committed setup and `(S<N>)` at the end
    of the summary. No version bump and no merge yet.
 6. Go on to the next session.
@@ -242,11 +245,11 @@ conversation:
 > the `multi-session` skill's "Rules for every session" says. Treat `assumed` answers in
 > `decisions.md` as answers. Do not switch branches, commit, push, merge, run `/simplify`
 > or `/code-review`, or start agents of your own. Do not edit `plan.md` or `log.md`.
-> Stop and return `PAUSE: <reason>` instead of going on wherever "Design and reuse" says to
-> stop and ask the user; when `scripts/check` still fails after two fix attempts; or when
-> the session cannot finish within its plan. Otherwise return, in under 30 lines: the files
-> changed and why; "Reused:" and "New, because:"; the docs updated; the check summary lines;
-> the `docs.md` rows added; anything surprising.
+> Stop and return `PAUSE: <reason>` instead of going on wherever a step or skill you follow
+> says to stop and ask the user; when `scripts/check` still fails after two fix attempts; or
+> when the session cannot finish within its plan. Otherwise return, in under 30 lines, what
+> `simple-session`, "Stop and report", lists, leaving out the review and the commit
+> message; then the `docs.md` rows added and anything surprising.
 
 **The end.** After the last session:
 
