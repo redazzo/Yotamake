@@ -69,7 +69,8 @@ code yet.
 
 Run `simple-session`. Its size check decides whether the work fits one session; if not, it
 offers `multi-session`, which moves the spec into its folder. In the session, write a test
-for each criterion where the project has tests.
+for each criterion where the project has tests; with `Test-first: yes`, each one comes first
+(`simple-session`, "Do the work").
 
 The spec does not outlive the work. When the work is done, behaviour that lasts goes into the
 reference doc that owns it (or CLAUDE.md or `README.md` in a lite install). Then the spec is

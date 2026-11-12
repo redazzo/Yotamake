@@ -216,7 +216,8 @@ rules are separate, and `git -C . commit` still asked in a test (one run, Claude
 This section is an overview. Each skill's `SKILL.md` holds its rules and is the one to change.
 
 A session is one branch and one merge that fits in one context
-([`simple-session`](./plugin/skills/simple-session/SKILL.md)). It checks the size first. A
+([`simple-session`](./plugin/skills/simple-session/SKILL.md)). It checks the size first, and
+with `Test-first: yes` in `CLAUDE.md` it writes a failing test before a change in behaviour. A
 change too big for one session becomes a
 [`multi-session`](./plugin/skills/multi-session/SKILL.md) effort, with a working folder that
 survives `/clear`: git-ignored at `.scratchpad/<date>-<slug>/`, or committed at
