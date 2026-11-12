@@ -62,6 +62,9 @@ Add a check by editing that script, not by listing it here.
 It prints one `PASS`/`FAIL` line per check. A person can skip the git hook once with
 `git commit --no-verify`. Claude never does unless the user asks.
 
+**Test-first:** `no`. With `yes`, `simple-session` writes a failing test before a change in
+behaviour.
+
 ## Branching and releases
 
 - **Main branch:** `main`. Feature work happens on branches cut from it, never on it directly.

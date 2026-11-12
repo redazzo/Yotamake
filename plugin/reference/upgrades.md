@@ -20,6 +20,13 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.24.0 — Test-first line
+
+- **Check:** `CLAUDE.md`, **Checks**, has a line starting `**Test-first:**`.
+- **Apply:** add that line from the plugin's `template/CLAUDE.md` at the end of the section.
+  Ask the user whether a change in behaviour should start with a failing test, and write
+  `yes` or `no` (the default). Tell the user that `simple-session` and `spec` read it.
+
 ## 0.22.0 — Worktree setup line
 
 - **Check:** `CLAUDE.md`, **Branching and releases**, has a line starting

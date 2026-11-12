@@ -11,7 +11,8 @@ has to survive a `/clear`.
 
 Project specifics live in `CLAUDE.md`, not here. This skill reads these sections:
 
-- **Checks** — how the project's one check command works (normally `scripts/check`).
+- **Checks** — how the project's one check command works (normally `scripts/check`), and
+  the `Test-first` line (step 4, "Do the work").
 - **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
   merge or a pull request), whether code changes get a version bump, and which files count
   as docs (the `Docs-only` line).
@@ -26,6 +27,12 @@ branch is docs-only when every file it changes is a doc, as the `Docs-only` line
 Without that line, the docs are the files under `docs/` and the Markdown files at the
 repository root other than `CLAUDE.md`. Everything else counts as code. When unsure, treat
 the file as code.
+
+**Trivial.** A trivial branch changes code, but every changed line is a comment or a prose
+typo fix (in a docstring, or in Markdown that counts as code). It skips the design and
+review steps; the checks and any version bump still apply. A change to a string literal,
+identifier, config value or logic is never trivial, even a one-character typo. When unsure,
+it is not trivial.
 
 ## 0. Harness upgrades — first
 
@@ -103,8 +110,8 @@ discard them yourself.
 
 ## 3. Design and reuse — before any edit
 
-Skip this step when the branch is docs-only. Otherwise read the **Architecture** section
-of CLAUDE.md and decide how the change fits before you write it.
+Skip this step when the branch is docs-only or trivial. Otherwise read the **Architecture**
+section of CLAUDE.md and decide how the change fits before you write it.
 
 1. **Reuse first.** Before you write a new function, type, component or module, search for
    code that already does the job: first in the places **Shared code** names, then in the
@@ -146,6 +153,14 @@ policy (CLAUDE.md, Conventions) applies: fix a typo or stale comment you pass, a
 the report. Anything with behavioural reach that is outside the task goes in the report as a
 suggestion, not in the diff.
 
+**Test-first.** When **Checks** says `Test-first: yes`, start a change in behaviour with a
+test. Run just that test (not `scripts/check`) and see it fail for the reason you expect,
+then change the code and see it pass. Refactors, docs-only and trivial branches are exempt.
+When the line is missing or says `no`, write tests as the project already does.
+
+**Bug fixes.** When the change fixes a bug, follow the `debugging` skill here, then come
+back for step 5.
+
 If the change alters how something works, update the reference doc that owns it in the same
 branch. The "Owns" table in `docs/README.md` names it. Also fix CLAUDE.md if it describes the
 thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing goes
@@ -172,15 +187,15 @@ The review runs once per session, here: after the work is done and the checks pa
 whole branch diff. Never after each edit. Fixing its findings does not start another review;
 re-run only `scripts/check` (below). If the user asks for more changes after the report, run
 the full review once more before the next report, on what changed since the last one: both
-skills again, however small the new change.
+skills again, however small the new change, unless that change alone is trivial.
 
-Skip this step when the branch is docs-only. A branch that changes any code gets the full
-review, however small: a one-line diff still runs both skills.
+Skip this step when the branch is docs-only or trivial. Any other branch that changes code
+gets the full review: a one-line diff still runs both skills.
 Call each one with the Skill tool. Reading the diff yourself does not replace them, even
 when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
 checks below are only for a skill the Skill tool says is not available. Call them from this
 context, not from a subagent you start for the review. Each already runs its own agents, so
-their reading stays out of this context.
+their reading stays out of this context. Only the design read (part 2) goes to a subagent.
 
 Both skills read the diff with `git diff HEAD`, which leaves out new files git does not track
 yet. So first run `git add -N` on each new file this branch adds (`git status --short` marks
@@ -194,9 +209,14 @@ Otherwise review the branch's diff against the main branch in three parts:
    `git checkout`, which would also drop your own uncommitted work) and list them in the
    report as suggestions. If `/simplify` is not available, check by hand: for each new
    function or block, search for code that already does the same, and reuse it.
-2. **Design.** Read the diff against **Architecture** (step 3): a broken boundary or constraint,
-   a clash with an accepted ADR, a part that does not fit the Style, a pattern the project
-   does not use, or logic copied from elsewhere.
+2. **Design.** Once part 1's fixes are in, start one built-in `general-purpose` agent in
+   the background with the Agent tool, go on to part 3, and act on its answer when it
+   comes. It did not write the change, so it reads it fresh. Its brief, self-contained: "Design read: run `git diff <main branch>`. Read the
+   **Architecture** section of CLAUDE.md, and from `docs/decisions/` the accepted ADRs on
+   what the diff touches. Find a broken boundary or constraint, a clash with an ADR, a part
+   that does not fit the Style, a pattern the project does not use, or logic copied from
+   elsewhere. Edit nothing. Return each conflict as file:line and the rule it breaks,
+   quoted, or 'none'." Without the Agent tool, read the diff yourself.
    Fix what lies inside this change. A conflict you only see now gets the same stop as in
    step 3: ask before going on.
 3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a
@@ -218,9 +238,11 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
 - which docs you updated, or why none needed it;
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
+- with `Test-first: yes`, the test you saw fail before the change;
+- for a bug fix, what `debugging`, "Report", asks for;
 - the check results (one line each);
 - the review: which skills you ran, what they found and fixed, what you left and why, or
-  that it was skipped because the branch is docs-only;
+  that it was skipped because the branch is docs-only, or trivial (and why);
 - any side-fixes and any suggestions you left out;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).

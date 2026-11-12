@@ -86,6 +86,7 @@ plugin/
   skills/
     simple-session/   one change: size check, branch, work, docs, scripts/check, stop and ask
     multi-session/    work across several contexts, with a working folder that survives /clear
+    debugging/        a bug fix inside a session: reproduce, failing test, root cause, fix
     write-doc/        pick the doc kind, write it, link it, lint it
     spec/             agree scope and acceptance criteria before code  (manual: /yotamake:spec)
     release-check/    guided deploy with pre-flight and gotchas      (manual: /yotamake:release-check)
@@ -216,8 +217,10 @@ rules are separate, and `git -C . commit` still asked in a test (one run, Claude
 This section is an overview. Each skill's `SKILL.md` holds its rules and is the one to change.
 
 A session is one branch and one merge that fits in one context
-([`simple-session`](./plugin/skills/simple-session/SKILL.md)). It checks the size first. A
-change too big for one session becomes a
+([`simple-session`](./plugin/skills/simple-session/SKILL.md)). It checks the size first, and
+with `Test-first: yes` in `CLAUDE.md` it writes a failing test before a change in behaviour. A
+bug fix follows [`debugging`](./plugin/skills/debugging/SKILL.md): reproduce it, write a
+failing test, find and name the root cause, then fix it. A change too big for one session becomes a
 [`multi-session`](./plugin/skills/multi-session/SKILL.md) effort, with a working folder that
 survives `/clear`: git-ignored at `.scratchpad/<date>-<slug>/`, or committed at
 `.sessions/<date>-<slug>/` in an ephemeral environment or on an assigned branch. You `/clear`
@@ -231,10 +234,11 @@ refactors skip it.
 
 **Review.** Once per session, after the checks pass, `simple-session` reviews the whole
 branch diff with the built-in `/simplify` and `/code-review`, and against Architecture.
-Docs-only branches skip it; the `Docs-only` line in `CLAUDE.md` says which files are docs
-(`simple-session` has the default). When the `Integration` line in
-`CLAUDE.md` says the project works through pull requests, the session ends by pushing and
-opening one instead of merging locally.
+Docs-only branches skip it, and so do trivial ones (every changed line a comment or a prose
+typo). The `Docs-only` line in `CLAUDE.md` says which files are docs; the top of
+`simple-session` has the default and says what counts as trivial. When the `Integration`
+line in `CLAUDE.md` says the project works through pull requests, the session ends by
+pushing and opening one instead of merging locally.
 
 **Parallel sessions.** Two sessions of one effort that need nothing from each other and
 change different files may run at once, each in a sibling `git worktree` with its own Claude
@@ -247,8 +251,8 @@ ends with one report and one question: merge. Nothing is pushed or merged withou
 (ADR-0007; `multi-session`, "Autopilot").
 
 **Subagents.** A `multi-session` S0 hands its reading to built-in agents, one per area, so
-the main context keeps room for the plan. The review stays in the main context
-(`simple-session`, "Review", says why).
+the main context keeps room for the plan. The review hands its design read to one agent
+(`simple-session`, "Review").
 
 ## Docs
 
@@ -269,7 +273,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | Case | Skills | Checks that Claude… |
 |---|---|---|
 | 01-branches-first | `simple-session` | tries to branch before editing, and edits nothing on `main` |
-| 02-small-change | `simple-session` | changes code, test and the owning doc, runs `scripts/check`, `/simplify` and `/code-review`, proposes a commit and asks |
+| 02-small-change | `simple-session` | changes code, test and the owning doc, runs `scripts/check`, `/simplify` and `/code-review`, hands the design read to an agent, proposes a commit and asks |
 | 03-too-big | `simple-session`, `multi-session` | refuses to start a four-part feature and offers a multi-session plan |
 | 04-docs-only | `simple-session`, `write-doc` | fixes a guide, runs the docs check, plans no version bump |
 | 05-work-record | `simple-session`, `write-doc` | writes a valid record and regenerates the index |
@@ -287,6 +291,8 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 17-upgrade-offer | `simple-session`, `multi-session` | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
 | 18-multi-session-docs-ledger | `multi-session`, `simple-session` | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
 | 19-claude-md-only | `simple-session` | with no `Docs-only` line, changes only `CLAUDE.md` and treats it as code by the default rule, runs `scripts/check`, `/simplify` and `/code-review`, asks before committing |
+| 20-trivial-change | `simple-session` | fixes a typo in a code comment, runs `scripts/check` but neither `/simplify` nor `/code-review`, says the change is trivial and why, asks before committing |
+| 21-debugging | `simple-session`, `debugging` | for a crash that shows in one helper but starts in another, writes a failing test first, fixes the helper that makes the bad value rather than guarding where it throws, names the root cause, asks before committing |
 | 20-multi-session-autopilot-offer | `multi-session` | ends S0 by offering autopilot next to the resume line, and starts no session until it is chosen, though the user would rather not babysit |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
@@ -307,6 +313,12 @@ account, about $7 for the full suite with the baseline arm):
 cd plugin
 claude plugin eval . --scaffold --allow-tools Bash Write Edit --ablation with-without
 ```
+
+Each run is saved as `plugin/evals/results/<timestamp>/aggregate-result.json` (git-ignored),
+with every run's pass, cost, turns and seconds, and the Claude Code and plugin versions. To
+see what the cases cost, run `node scripts/eval-costs.mjs` from the repository root. It
+prints one row per case: runs, pass rate, and mean cost, turns and seconds. Name one results
+folder to cover only that run. The results hold no token counts.
 
 The headline number is Δ: the score with the plugin minus the score without it. The eval
 sandbox does not let Claude write inside `.git`, so cases that need work done start on a

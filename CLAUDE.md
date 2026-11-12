@@ -72,6 +72,9 @@ Add a check by editing that script, not by listing it here.
 It prints one `PASS`/`FAIL` line per check. A person can skip the git hook once with
 `git commit --no-verify`. Claude never does unless the user asks.
 
+**Test-first:** `no`. With `yes`, `simple-session` writes a failing test before a change in
+behaviour.
+
 For a hook change, add its case to `scripts/test-hooks.sh`. For an installer change, add one
 to `scripts/test-install.sh`.
 
