@@ -231,10 +231,11 @@ refactors skip it.
 
 **Review.** Once per session, after the checks pass, `simple-session` reviews the whole
 branch diff with the built-in `/simplify` and `/code-review`, and against Architecture.
-Docs-only branches skip it; the `Docs-only` line in `CLAUDE.md` says which files are docs
-(`simple-session` has the default). When the `Integration` line in
-`CLAUDE.md` says the project works through pull requests, the session ends by pushing and
-opening one instead of merging locally.
+Docs-only branches skip it, and so do trivial ones (every changed line a comment or a prose
+typo). The `Docs-only` line in `CLAUDE.md` says which files are docs; the top of
+`simple-session` has the default and says what counts as trivial. When the `Integration`
+line in `CLAUDE.md` says the project works through pull requests, the session ends by
+pushing and opening one instead of merging locally.
 
 **Parallel sessions.** Two sessions of one effort that need nothing from each other and
 change different files may run at once, each in a sibling `git worktree` with its own Claude
@@ -282,6 +283,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 17-upgrade-offer | `simple-session`, `multi-session` | in a repo set up before 0.11.0, names the missing Style line and asks whether to apply it before editing anything |
 | 18-multi-session-docs-ledger | `multi-session`, `simple-session` | resumes an effort at S2, changes code, test and the owning doc, adds an S2 row to the docs ledger, asks before committing |
 | 19-claude-md-only | `simple-session` | with no `Docs-only` line, changes only `CLAUDE.md` and treats it as code by the default rule, runs `scripts/check`, `/simplify` and `/code-review`, asks before committing |
+| 20-trivial-change | `simple-session` | fixes a typo in a code comment, runs `scripts/check` but neither `/simplify` nor `/code-review`, says the change is trivial and why, asks before committing |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
 plugin, `scripts/check` uses it to name the cases worth running: those that list a changed

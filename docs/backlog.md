@@ -48,16 +48,6 @@ To recheck on a new release: run `claude plugin eval . --case 06-question --runs
 `config/settings.json`. When it is gone, re-run the cases that need git and delete this
 entry. Do not change the fixture or `scripts/check` to get around the sandbox.
 
-## Measure what a session costs
-
-**Priority: Medium** · **Added:** 2026-11-10 · **Trigger to act:** the next full eval run, or a
-user says sessions are slow or expensive.
-
-`simple-session` is about 260 lines, and a one-line typo fix still runs `/simplify` and
-`/code-review`. Saved eval runs already hold cost, turns and wall time, and
-`scripts/eval-costs.mjs` summarises them per case (`README.md`, Evals). If small changes cost too much, consider a trivial tier (comments, typos,
-one-line config) that runs the check but skips the two review skills.
-
 ## Delegate the review's design read
 
 **Priority: Medium** · **Added:** 2026-11-11 · **Trigger to act:** the design read in

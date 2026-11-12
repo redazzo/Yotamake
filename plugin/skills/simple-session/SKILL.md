@@ -27,6 +27,12 @@ Without that line, the docs are the files under `docs/` and the Markdown files a
 repository root other than `CLAUDE.md`. Everything else counts as code. When unsure, treat
 the file as code.
 
+**Trivial.** A trivial branch changes code, but every changed line is a comment or a prose
+typo fix (in a docstring, or in Markdown that counts as code). It skips the design and
+review steps; the checks and any version bump still apply. A change to a string literal,
+identifier, config value or logic is never trivial, even a one-character typo. When unsure,
+it is not trivial.
+
 ## 0. Harness upgrades — first
 
 Do this once per conversation, before step 1. When the repository's harness is older than
@@ -103,8 +109,8 @@ discard them yourself.
 
 ## 3. Design and reuse — before any edit
 
-Skip this step when the branch is docs-only. Otherwise read the **Architecture** section
-of CLAUDE.md and decide how the change fits before you write it.
+Skip this step when the branch is docs-only or trivial. Otherwise read the **Architecture**
+section of CLAUDE.md and decide how the change fits before you write it.
 
 1. **Reuse first.** Before you write a new function, type, component or module, search for
    code that already does the job: first in the places **Shared code** names, then in the
@@ -172,10 +178,10 @@ The review runs once per session, here: after the work is done and the checks pa
 whole branch diff. Never after each edit. Fixing its findings does not start another review;
 re-run only `scripts/check` (below). If the user asks for more changes after the report, run
 the full review once more before the next report, on what changed since the last one: both
-skills again, however small the new change.
+skills again, however small the new change, unless that change alone is trivial.
 
-Skip this step when the branch is docs-only. A branch that changes any code gets the full
-review, however small: a one-line diff still runs both skills.
+Skip this step when the branch is docs-only or trivial. Any other branch that changes code
+gets the full review: a one-line diff still runs both skills.
 Call each one with the Skill tool. Reading the diff yourself does not replace them, even
 when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
 checks below are only for a skill the Skill tool says is not available. Call them from this
@@ -220,7 +226,7 @@ Do not commit yet. (In a `multi-session` worktree session, its rules on commits 
   whether to delete the spec file once this is merged;
 - the check results (one line each);
 - the review: which skills you ran, what they found and fixed, what you left and why, or
-  that it was skipped because the branch is docs-only;
+  that it was skipped because the branch is docs-only, or trivial (and why);
 - any side-fixes and any suggestions you left out;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).
