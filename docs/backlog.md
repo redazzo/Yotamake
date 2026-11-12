@@ -48,17 +48,6 @@ To recheck on a new release: run `claude plugin eval . --case 06-question --runs
 `config/settings.json`. When it is gone, re-run the cases that need git and delete this
 entry. Do not change the fixture or `scripts/check` to get around the sandbox.
 
-## Delegate the review's design read
-
-**Priority: Medium** · **Added:** 2026-11-11 · **Trigger to act:** the design read in
-`simple-session`, "Review", fills the main context in a real session, or
-`claude plugin eval` documents that `tool_used` graders count a subagent's calls.
-
-The review stays in the main context (`simple-session`, "Review", says why). Also, the
-review graders in eval cases 02, 13, 15 and 19 probably miss calls made inside a subagent. The
-design read against Architecture could still move to a subagent that returns conflicts only.
-If the graders do see subagent calls, the whole review could move.
-
 ## Let a hook approve commits in opted-in worktrees
 
 **Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in
@@ -119,6 +108,9 @@ Both look fixed. Delete this entry if the full run agrees.
   `CLAUDE.md` could check that it names both and edits nothing.
 - `setup`'s install step has no eval case (the eval sandbox keeps `.claude/` read-only).
   `scripts/test-install.sh` covers `install.sh` itself.
+- A Skill call made inside a subagent. A probe (2026-11-12) showed that `tool_used` graders
+  count a subagent's Bash call, but not whether a subagent can call `/simplify` or
+  `/code-review`. Test it before moving those two out of the main context.
 
 ## No plugin icon
 
@@ -200,6 +192,17 @@ session's turn ends unchecked. Both gaps were there before the fix.
 `install.sh`'s `managed` list and `scripts/consistency.mjs` name each harness-owned script in
 `.claude/yotamake/`. Matching `.claude/yotamake/*.sh` by pattern would save an edit in both
 for each new script.
+
+## Copied graders and a shared word
+
+**Added:** 2026-11-12 · **Trigger to act:** the next change to an eval grader, or to the
+side-fix policy in `CLAUDE.md`, **Conventions**.
+
+- `skill-fired.md` and `asks-before-commit.md` sit in many case folders with the same
+  text (10 and 6 identical copies). Move them into `plugin/evals/_graders/` like the
+  shared graders already there.
+- The "trivial side-fix policy" in `CLAUDE.md` and the trivial review tier in
+  `simple-session` use the same word for different things. Rename one.
 
 ## Small harness ideas
 
