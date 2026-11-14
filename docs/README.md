@@ -36,6 +36,10 @@ harness: install, how it is split, the hooks, the docs system and the evals. Eac
 rules are owned by its own `plugin/skills/<name>/SKILL.md`. The README sums up a skill and
 links to it, rather than restating its rules.
 
+The website in [`site/`](../site/index.html) is an introduction for new users. It owns no
+subject: it sums up the README and the skills and links to them. The README's "Developing
+Yotamake" section says how it is published and kept in step.
+
 | Document | Owns |
 |---|---|
 | _None yet._ | |

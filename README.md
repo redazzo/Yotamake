@@ -7,6 +7,9 @@ true.
 
 It started as the `.claude/` setup and docs rules of a single application project.
 
+The website, [redazzo.github.io/Yotamake](https://redazzo.github.io/Yotamake/), introduces
+the harness and walks through getting started. This README holds the detail.
+
 ## Install
 
 **1. Add the plugin** (once per machine), in Claude Code:
@@ -351,6 +354,14 @@ repository's own copies match; the check fails until they do. Releases re-run it
 Version bump). The docs baseline
 (`scripts/docs/docs-lint-baseline.txt`) holds one entry on purpose: the template `CLAUDE.md`
 links `./README.md`, which exists only once the template is installed.
+
+**The website.** `site/` is the landing site: plain HTML and CSS, no build step.
+`.github/workflows/pages.yml` publishes it to GitHub Pages each time CI passes on main, and
+fills in the version from `plugin.json`. The pages sum up the harness and link here and to
+each `SKILL.md` for the rules. So a change to what a page says, such as the install command or
+a skill's purpose, updates that page on the same branch. `scripts/check` checks the site's
+links, and that `site/skills.html` has a card for every skill. To view it locally, open
+`site/index.html` in a browser; the version shows as `__VERSION__` until it is published.
 
 ## Requirements
 

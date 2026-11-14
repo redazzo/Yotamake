@@ -143,11 +143,15 @@ not list stops before any edit and is raised with the user, whoever asked for it
   template installed by `install.sh`, whose files are either harness-owned (refreshed) or
   project-owned (copied once). Besides the plugin's hooks, the template's
   `.claude/settings.json` has project `SessionStart` hooks, one per harness-owned script in
-  `.claude/yotamake/` (ADR-0004), so they work without the plugin.
+  `.claude/yotamake/` (ADR-0004), so they work without the plugin. Beside the plugin, a
+  static landing site (hand-written HTML and CSS, no build step) that a GitHub Pages workflow
+  publishes after CI passes.
 - **Modules:** `plugin/skills/` the method, one folder per skill; `plugin/hooks/` edit-time
   enforcement; `plugin/install.sh` and `plugin/template/` the per-repository files;
   `plugin/reference/` material skills read on demand (style catalogue, upgrades);
-  `plugin/evals/` the eval suite and its fixture; `scripts/` this repository's own checks.
+  `plugin/evals/` the eval suite and its fixture; `scripts/` this repository's own checks;
+  `site/` the landing site (static HTML, published to GitHub Pages; it sums up and links
+  out, and owns no rules).
 - **Boundaries:** the plugin stays generic: anything specific to one stack or project goes in
   the target's `CLAUDE.md` or `scripts/check` as a `FILL IN` placeholder, never in a skill or
   hook. Skills read project facts only from named `CLAUDE.md` sections. The installer never

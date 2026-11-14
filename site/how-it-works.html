@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How it works · Yotamake</title>
+  <meta name="description" content="How the Yotamake harness works: sessions, the design check, the one gate, stop points, hooks and the docs system.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">Y</span><span class="brand-name">Yotamake</span></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="get-started.html">Get started</a>
+      <a href="how-it-works.html" aria-current="page">How it works</a>
+      <a href="skills.html">Skills</a>
+      <a href="https://github.com/redazzo/Yotamake">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap doc">
+  <aside class="toc">
+    <p>On this page</p>
+    <ol>
+      <li><a href="#split">Plugin and repo</a></li>
+      <li><a href="#session">A session</a></li>
+      <li><a href="#multi">Bigger work</a></li>
+      <li><a href="#design">Design and reuse</a></li>
+      <li><a href="#gate">The one gate</a></li>
+      <li><a href="#stops">Stop points</a></li>
+      <li><a href="#hooks">The hooks</a></li>
+      <li><a href="#limits">What hooks miss</a></li>
+      <li><a href="#docs">The docs system</a></li>
+      <li><a href="#evals">Evals</a></li>
+    </ol>
+  </aside>
+
+  <article class="prose">
+    <h1>How it works</h1>
+    <p class="lede">An overview of the method and what enforces it. Each skill's <code>SKILL.md</code> holds its exact rules, and the <a href="https://github.com/redazzo/Yotamake/blob/main/README.md">README</a> holds the full detail.</p>
+
+    <h2 id="split">The plugin and the repository</h2>
+    <p>Yotamake is split in two. The plugin holds the method and is the same for every project. Each repository holds the facts that are specific to it.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Lives in</th><th>What</th><th>Who changes it</th></tr></thead>
+        <tbody>
+          <tr><td>The plugin</td><td>Skills, hooks, output style, the installer and its template</td><td>Yotamake; reaches every project on update</td></tr>
+          <tr><td>Each repository</td><td><code>CLAUDE.md</code> facts, <code>scripts/check</code>, <code>docs/</code>, hook config, CI</td><td>The project</td></tr>
+          <tr><td>Each repository, harness-owned</td><td>The docs scripts, the pre-commit hook, the session scripts, the version file</td><td>Refreshed by the installer</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Skills read project facts only from named <code>CLAUDE.md</code> sections, such as <strong>Checks</strong> or <strong>Deploying</strong>. When a section is missing, the skill says so and uses a stated default, or stops and asks.</p>
+
+    <h2 id="session">A session, step by step</h2>
+    <p>A session is one branch and one merge that fits in one context. It is what <a href="skills.html#simple-session"><code>simple-session</code></a> runs for every change to code, tests or docs, however small.</p>
+    <ol class="flow">
+      <li><strong>Check the size</strong><p>Before branching. A change that adds a migration and other code, adds more than one interface, touches more than one package, needs an ADR, or would need a <code>/clear</code> is too big. Claude offers a multi-session plan instead.</p></li>
+      <li><strong>Branch</strong><p>Cut a branch from main with a prefix such as <code>feat/</code> or <code>fix/</code>. Never edit on main.</p></li>
+      <li><strong>Design and reuse</strong><p>Look for code to reuse, and check the change against Architecture. Stop and ask on a conflict.</p></li>
+      <li><strong>Do the work</strong><p>Keep to one concern. Update the doc that owns what changed. With <code>Test-first: yes</code>, start with a failing test. A bug fix follows the <a href="skills.html#debugging"><code>debugging</code></a> skill.</p></li>
+      <li><strong>Run the checks</strong><p>Run <code>scripts/check</code>. Never skip or weaken a check to get a pass.</p></li>
+      <li><strong>Review</strong><p>Once, on the whole branch: the built-in <code>/simplify</code>, a design read by a fresh agent, and <code>/code-review</code>. Docs-only and trivial branches skip it.</p></li>
+      <li class="stop"><strong>Stop and report</strong><p>What changed, what was reused, which docs were updated, the check and review results, and a proposed commit message. Then ask: commit and merge?</p></li>
+    </ol>
+    <p>On a yes, Claude commits, bumps the version if the project uses bumps, and merges locally, or pushes and opens a pull request if the project works that way. It never deploys.</p>
+
+    <h2 id="multi">Bigger work</h2>
+    <p>Work that will not fit one context runs as <a href="skills.html#multi-session"><code>multi-session</code></a>: numbered sessions with a working folder that survives <code>/clear</code>. The folder is git-ignored at <code>.scratchpad/&lt;date&gt;-&lt;slug&gt;/</code>, or committed under <code>.sessions/</code> in a cloud session. It holds the plan, findings and a log.</p>
+    <ul>
+      <li><strong>S0 plans.</strong> It hands its reading to agents, one per area, so the main context keeps room for the plan. You approve the plan before S1.</li>
+      <li><strong>Resume after <code>/clear</code></strong> with "Read .scratchpad/&lt;folder&gt;/README.md and start the next session."</li>
+      <li><strong>Parallel sessions.</strong> Two sessions that change different files and need nothing from each other can run at once, each in its own git worktree, and merge one at a time.</li>
+      <li><strong>Autopilot.</strong> Say "run autopilot" and the remaining sessions each run in a fresh agent. It ends with one report and one question: merge? Nothing is pushed or merged without your yes.</li>
+    </ul>
+
+    <h2 id="design">Design and reuse</h2>
+    <p>The <strong>Architecture</strong> section of <code>CLAUDE.md</code> has six lines the skills read:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Line</th><th>Says</th></tr></thead>
+        <tbody>
+          <tr><td>Style</td><td>The overall shape, for example layered, hexagonal, or a plugin.</td></tr>
+          <tr><td>Modules</td><td>Which folder owns what.</td></tr>
+          <tr><td>Boundaries</td><td>What may not import or call what.</td></tr>
+          <tr><td>Shared code</td><td>Where to look before writing something new.</td></tr>
+          <tr><td>Patterns</td><td>How recurring things are done: errors, config, data access.</td></tr>
+          <tr><td>Constraints</td><td>Hard limits: runtime versions, budgets, licences, security rules.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>A full install adds the accepted ADRs in <code>docs/decisions/</code>. <code>/yotamake:setup</code> proposes the six lines from the repository, using a <a href="https://github.com/redazzo/Yotamake/blob/main/plugin/reference/architecture-styles.md">catalogue of styles</a>.</p>
+    <p>Before any edit, Claude searches for code to reuse. It stops and asks when a change would break a boundary or a constraint, go against an ADR, or bring in a pattern or a dependency the project does not use. It does this even when told not to ask, because changing the rule is a separate decision.</p>
+
+    <h2 id="gate">The one gate</h2>
+    <p><code>scripts/check</code> is the only list of checks. It belongs to your project. Add a check by editing the script.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Command</th><th>Runs</th><th>Used by</th></tr></thead>
+        <tbody>
+          <tr><td><code>scripts/check</code></td><td>Every check for what changed since main, plus uncommitted work</td><td>Claude, before proposing a commit</td></tr>
+          <tr><td><code>scripts/check --staged</code></td><td>Fast checks on staged files</td><td>The pre-commit hook</td></tr>
+          <tr><td><code>scripts/check --all</code></td><td>Every check</td><td>CI</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>It prints one <code>PASS</code> or <code>FAIL</code> line per check. A person's commit passes the same gate as Claude's. One catch: <code>core.hooksPath</code> is a local git setting and is not cloned. A SessionStart hook sets it at a teammate's first Claude Code session in the clone. Someone who never opens Claude Code there runs <code>git config core.hooksPath .githooks</code> once. CI covers everyone.</p>
+
+    <h2 id="stops">Stop points</h2>
+    <p>The skills stop before commit, version bump, merge and deploy. The repository's settings back this up: <code>git commit</code>, <code>merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> are under <code>ask</code>, so Claude Code asks every time. An <code>ask</code> rule wins over a matching <code>allow</code> rule, even a broad one. Add your deploy command to the list too.</p>
+    <p>Cutting a branch, staging files and a fast-forward pull are allowed, so they do not prompt.</p>
+
+    <h2 id="hooks">The hooks</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Hook</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>pre-edit-protect</code></td><td>Blocks edits to the files listed in <code>protected-paths.conf</code>. By default that is <code>.env</code> files, keys and certificates.</td></tr>
+          <tr><td><code>pre-edit-main-branch</code></td><td>Blocks Edit and Write while the repository is on its main branch.</td></tr>
+          <tr><td><code>pre-bash-git</code></td><td>Blocks <code>--no-verify</code>, and <code>git commit</code> on the main branch.</td></tr>
+          <tr><td><code>post-edit-check</code></td><td>Runs a fast per-file check after each edit, from <code>post-edit-checks.conf</code>.</td></tr>
+          <tr><td><code>post-edit-mark</code></td><td>Notes that this session edited a code file.</td></tr>
+          <tr><td><code>stop-check-ran</code></td><td>Blocks the end of a turn once when code changed and <code>scripts/check</code> has not passed since. A second stop goes through, so Claude can still stop to ask a question.</td></tr>
+          <tr><td><code>session-upgrades</code></td><td>At session start, says when the repository's harness is older than the plugin.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The repository also has two SessionStart hooks of its own, which work without the plugin. One sets <code>core.hooksPath</code>. The other tells Claude the branch, any active multi-session effort, and that every change runs as a session.</p>
+    <p>A repository that works on main on purpose can opt out with an empty file at <code>.claude/yotamake/allow-edits-on-main</code>. A person creates it; Claude cannot.</p>
+
+    <h2 id="limits">What the hooks do not cover</h2>
+    <p>The edit hooks watch the Edit and Write tools only. The Bash hook watches git commands only. So a shell command gets past them: <code>sed -i</code>, <code>echo &gt; .env</code>, or a code change made from the shell, which the Stop hook never sees. Claude Code's own permission prompt for Bash is the guard there.</p>
+
+    <h2 id="docs">The docs system</h2>
+    <p>A full install adds four kinds of doc under <code>docs/</code>, each with its own update rule:</p>
+    <ul>
+      <li><strong>Reference</strong>: how the system works now. Corrected in place.</li>
+      <li><strong>Guides</strong>: how to do a thing. Corrected in place.</li>
+      <li><strong>Decisions</strong>: why it is built this way. Never edited, only superseded.</li>
+      <li><strong>Records</strong>: what was done, and when. Written once.</li>
+    </ul>
+    <p>Plus <code>docs/backlog.md</code> for open work, each item with the trigger that should make someone pick it up.</p>
+    <p>When two docs disagree: code beats decisions, decisions beat reference, reference beats records. Each subject has one owning doc, named in the "Owns" table in <code>docs/README.md</code>. A change in behaviour updates that doc on the same branch.</p>
+    <p>The linter fails on broken links, docs nothing links to, bad front-matter and a stale records index. For a repository with existing link debt, <code>node scripts/docs/lint-docs.mjs --update-baseline</code> records it once, and after that only new problems fail.</p>
+
+    <h2 id="evals">Evals</h2>
+    <p>The plugin has an eval suite: over twenty cases, each run against a small project built fresh with the harness installed. They check behaviour such as "branches before editing", "refuses a change that is too big", "reuses the shared helper", and "stops at a boundary even when told not to ask". The headline number is the score with the plugin minus the score without it. The <a href="https://github.com/redazzo/Yotamake/blob/main/README.md#evals">README's eval table</a> lists every case.</p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Yotamake v__VERSION__ · MIT licence</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/redazzo/Yotamake">GitHub</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/README.md">README</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/docs/backlog.md">Open work</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/LICENSE">Licence</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>
