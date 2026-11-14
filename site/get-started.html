@@ -41,7 +41,7 @@
 
   <article class="prose">
     <h1>Get started</h1>
-    <p class="lede">Install the plugin once, set up each repository, then ask Claude for a change as you normally would.</p>
+    <p class="lede">Installing the plugin, setting up a repository, and what a first session looks like.</p>
 
     <h2 id="requirements">Requirements</h2>
     <ul>
@@ -66,7 +66,7 @@ claude plugin install yotamake@yotamake</code></pre></div>
     <p>The repository's <code>.claude/settings.json</code> then names the Yotamake marketplace and enables the plugin. Teammates who open the repository in Claude Code are prompted to install it.</p>
 
     <div class="note">
-      <p><strong>Already using another hook tool?</strong> If the repository has a <code>.pre-commit-config.yaml</code>, a lefthook config or a hook in <code>.git/hooks/</code>, the installer leaves <code>core.hooksPath</code> alone, so that tool keeps working. It prints the lines that call <code>.githooks/pre-commit</code> from your tool instead.</p>
+      <p><strong>Other hook tools.</strong> If the repository has a <code>.pre-commit-config.yaml</code>, a lefthook config or a hook in <code>.git/hooks/</code>, the installer leaves <code>core.hooksPath</code> alone, so that tool keeps working. It prints the lines that call <code>.githooks/pre-commit</code> from your tool instead.</p>
     </div>
 
     <p>If the repository already has its own version of a template file, such as a docs linter, list the path in <code>.claude/yotamake/skip</code>, one per line. The installer never writes a listed path.</p>
@@ -106,7 +106,7 @@ claude plugin install yotamake@yotamake</code></pre></div>
     <p>Or ask <code>/yotamake:setup</code> for lite mode. You get <code>CLAUDE.md</code>, <code>scripts/check</code>, the pre-commit hook, the hook config and the settings, but nothing under <code>docs/</code>. You can add the docs system later. The <a href="https://github.com/redazzo/Yotamake/blob/main/README.md#install">README</a> says how.</p>
 
     <h2 id="first-session">4. Your first session</h2>
-    <p>Ask for a change in plain words. You do not need to name a skill. Claude picks <code>simple-session</code> for any edit to code, tests or docs, and works through it:</p>
+    <p>Ask for a change as usual. There is no need to name a skill. Claude picks <code>simple-session</code> for any edit to code, tests or docs, and works through it:</p>
     <div class="code"><pre><code><span class="p">&gt; </span>Rename the --out flag to --output and keep --out as an alias</code></pre></div>
     <p>It cuts a branch, makes the change, updates the doc that owns it, runs <code>scripts/check</code> and a review, and then asks whether to commit and merge. See <a href="how-it-works.html#session">a session, step by step</a>.</p>
     <p>For a new feature where "done" is unclear, agree the scope first:</p>
@@ -123,7 +123,7 @@ claude plugin install yotamake@yotamake</code></pre></div>
     <div class="code"><pre><code>claude plugin update yotamake@yotamake</code></pre></div>
     <p>This updates the method for every repository at once. To refresh a repository's harness-owned scripts, re-run <code>/yotamake:setup</code> in it.</p>
     <p>When a new version needs a line added to a project-owned file, such as <code>CLAUDE.md</code>, Claude tells you at the start of the next session and offers to apply it.</p>
-    <p><strong>Optional:</strong> the plugin ships a <code>plain-english</code> output style, with short sentences and plain words. Pick it with <code>/output-style</code>.</p>
+    <p>The plugin also includes a <code>plain-english</code> output style, which keeps Claude's replies short and plain. Select it with <code>/output-style</code>.</p>
   </article>
 </main>
 
