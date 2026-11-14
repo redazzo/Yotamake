@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-12
+updated: 2026-11-14
 owns: [open-work-register]
 ---
 
@@ -47,6 +47,32 @@ To recheck on a new release: run `claude plugin eval . --case 06-question --runs
 --keep-temp` (about $0.10), then look for `/usr/bin/git` in the kept run's
 `config/settings.json`. When it is gone, re-run the cases that need git and delete this
 entry. Do not change the fixture or `scripts/check` to get around the sandbox.
+
+## Show that the harness helps: Δ and cost against the baseline
+
+**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** "Eval sandbox denies
+`git`" is closed.
+
+From a review of Yotamake against other harnesses (2026-11-14). No Δ (score with the plugin
+minus score without) has been published, though `README.md`, Evals, calls it the headline
+number. The pass rates on record are small samples ("3 of 3", "10 of 10") on one model and
+one Claude Code version, and most code-change graders have failed since 2026-10-29 because of
+the sandbox, not the harness. Run the full suite with `--ablation with-without`, at least 5
+runs per case and on two models, and write a record with Δ and mean cost per case for both
+arms. This is the first run for "Keep eval results over time" and "Re-check two fixes on the
+next full eval run".
+
+## Session overhead on small changes
+
+**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** the Δ run above gives
+cost per case, or a user reports that small fixes cost too much time or money.
+
+From the same review. Any change that is not docs-only or trivial runs `scripts/check`,
+`/simplify`, `/code-review` and a design-read agent, and stops to ask. Nobody has measured
+what that costs over the baseline. First compare cost, turns and seconds for cases 02, 13 and
+20 in both arms. If the overhead is large, consider a tier between trivial and full, for
+example a small diff inside one module that skips `/simplify` and the design read. That
+changes `simple-session`, "Review", and cases 02, 13, 15 and 20 cover it.
 
 ## Let a hook approve commits in opted-in worktrees
 
@@ -102,6 +128,30 @@ Skills hand work to Claude Code's built-in agents, with the brief in the skill t
 (`multi-session` S0). Shipping definitions in `plugin/agents/` would let skills share a
 brief, but it changes the Architecture Style line.
 
+## Shell commands get past the edit hooks
+
+**Priority: Low** · **Added:** 2026-11-14 · **Trigger to act:** a session changes a
+protected file, edits on the main branch, or edits code without the `Stop` gate noticing, by
+running a shell command instead of Edit or Write.
+
+From the same review. `README.md`, "What the hooks do not cover", lists the gap: `sed -i`,
+`echo > .env`, `tee` or any code change made from Bash gets past the main-branch,
+protected-paths and edit-marking hooks. `pre-bash-git.sh` already parses commands with a
+quote-aware reader; a sibling hook could refuse redirections and in-place edits aimed at
+protected paths or made on the main branch. It must still let a command through when it
+cannot read it (Architecture, Boundaries). See also "Two gaps left in the `Stop` gate".
+
+## Keep skills short
+
+**Priority: Low** · **Added:** 2026-11-14 · **Trigger to act:** a fix for a step Claude
+skipped adds more wording to a skill, or a `SKILL.md` passes 350 lines.
+
+From the same review. `simple-session` and `multi-session` are each about 300 lines, and this
+repository's `CLAUDE.md` is about 10 KB, all in context. Past misses (the review skipped, the
+skill not firing on a named branch) were fixed by adding text, which makes the next miss more
+likely. Options: move edge cases into `plugin/reference/` files that skills read on demand,
+and have `scripts/check` warn when a skill passes a line limit.
+
 ## Re-check two fixes on the next full eval run
 
 **Added:** 2026-10-29 · **Trigger to act:** the next full suite run
@@ -155,7 +205,9 @@ Cursor, Gemini CLI or Copilot.
 
 Those tools read `AGENTS.md`, not `CLAUDE.md`. The installer could offer an `AGENTS.md` that
 points at `CLAUDE.md`, so other agents and people follow the same facts. Skills keep reading
-`CLAUDE.md` sections.
+`CLAUDE.md` sections. The skills, hooks and `ask` rules work only in Claude Code, so other
+agents would get the facts and `scripts/check` but none of the enforcement (review of
+2026-11-14).
 
 ## `scripts/check` recipes per stack
 
@@ -252,3 +304,12 @@ side-fix policy in `CLAUDE.md`, **Conventions**.
 - A `PreCompact` hook that writes the multi-session `log.md` entry before the context is
   compacted.
 - `simple-session` suggests `/security-review` when a diff touches auth or secrets.
+
+## The size check can misjudge a change
+
+**Added:** 2026-11-14 · **Trigger to act:** a user or an eval run reports a change wrongly
+called too big for one session, or one that should have been.
+
+From the same review. `simple-session`, "Check the size", uses fixed tests (more than one new
+interface, a schema change plus other code, and so on). They are easy to apply but blunt.
+Collect the misjudged cases before changing the tests; case 03 covers the too-big path.
