@@ -29,31 +29,34 @@
   <div class="wrap">
     <div>
       <span class="version-tag">Claude Code plugin <b>v__VERSION__</b></span>
-      <h1>A working method for Claude Code, in every repo.</h1>
-      <p class="lede">Yotamake is a harness. It makes Claude work in small sessions on branches, check the design before writing code, run one check command, and stop to ask before anything is committed.</p>
+      <h1>Yotamake</h1>
+      <p class="lede">A Claude Code plugin that sets up a repository so Claude works on a branch, runs the project's checks before it proposes a commit, and asks before committing, merging or pushing.</p>
       <div class="actions">
         <a class="btn primary" href="get-started.html">Get started</a>
         <a class="btn" href="how-it-works.html">How it works</a>
       </div>
     </div>
-    <div class="terminal" role="img" aria-label="An example session: Claude cuts a branch, checks the design, makes the change, runs the checks and the review, then asks before committing.">
+    <div class="terminal" role="img" aria-label="An example session: Claude cuts a branch, edits the code, a lint check fails and is fixed, the review finds one issue, then Claude asks before committing.">
       <div class="terminal-bar"><span></span><span></span><span></span></div>
       <div class="terminal-body"><span class="u">&gt; Add a --json flag to the export command</span>
 
-<span class="d">Size check: one interface, one package. Fits a session.</span>
 git switch -c feat/export-json
-<span class="d">Reused: formatRows() in src/shared/format.ts</span>
-<span class="d">Edited src/cli/export.ts, its test, docs/reference/cli.md</span>
+<span class="d">Reusing formatRows() from src/shared/format.ts.
+Edited src/cli/export.ts, export.test.ts, docs/reference/cli.md</span>
 
+scripts/check
+<span class="ok">PASS</span>  types
+<span class="fail">FAIL</span>  lint   <span class="d">unused import in export.ts</span>
+<span class="d">Removed the import.</span>
 scripts/check
 <span class="ok">PASS</span>  types
 <span class="ok">PASS</span>  lint
 <span class="ok">PASS</span>  tests
 <span class="ok">PASS</span>  docs
 
-<span class="d">Review: /simplify, design read, /code-review. No findings.</span>
+<span class="d">/code-review: --json ignores --limit. Fixed, test added.</span>
 
-<span class="q">feat(cli): add --json to export
+<span class="q">Proposed: feat(cli): add --json to export
 Commit and merge into main?</span></div>
     </div>
   </div>
@@ -62,83 +65,81 @@ Commit and merge into main?</span></div>
 <section>
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">The idea</span>
-      <h2>Skills hold the method. Your repo holds the facts.</h2>
-      <p>The plugin is the same everywhere. Each repository says what is specific to it in named sections of its <code>CLAUDE.md</code>, and the skills read them. Update the plugin once, and every repo gets the new method.</p>
-    </div>
-    <div class="grid three">
-      <div class="card">
-        <span class="num">01</span>
-        <h3>One session, one branch</h3>
-        <p>A change runs as a session: check the size, cut a branch, do the work, update the doc that owns it, check, review, then stop. Work too big for one context becomes a planned series of sessions.</p>
-      </div>
-      <div class="card">
-        <span class="num">02</span>
-        <h3>Design before code</h3>
-        <p>Before any edit, Claude looks for code to reuse and reads your Architecture section. If a change would break a boundary or an accepted decision, it stops and asks, even when told not to.</p>
-      </div>
-      <div class="card">
-        <span class="num">03</span>
-        <h3>One gate for everyone</h3>
-        <p><code>scripts/check</code> is the only list of checks. Claude runs it before proposing a commit, the pre-commit hook runs its fast part, and CI runs all of it.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Enforced</span>
-      <h2>Not just asked for.</h2>
-      <p>Instructions in a prompt get skipped. Yotamake backs the important ones with hooks and permission rules, so they hold even when a skill does not fire.</p>
+      <h2>What it does</h2>
+      <p>The plugin holds the skills and hooks, and is the same for every repository. Each repository gets its own <code>CLAUDE.md</code> with the facts the skills need: check commands, branch rules and the architecture. Updating the plugin updates every repository that uses it.</p>
     </div>
     <div class="grid two">
       <div class="card">
-        <h3>No edits on main</h3>
-        <p>A hook refuses Edit and Write while the repository is on its main branch. Claude has to cut a branch first.</p>
+        <h3>Changes run as sessions</h3>
+        <p>A session is one branch and one merge. Claude checks the change fits, cuts a branch, makes the change and updates the doc that describes it, runs the checks and a review, then stops for approval. Larger work is split into planned sessions that survive <code>/clear</code>.</p>
       </div>
       <div class="card">
-        <h3>No unchecked code at the end of a turn</h3>
-        <p>If Claude edited code and <code>scripts/check</code> has not passed since, a Stop hook sends it back to run the check.</p>
+        <h3>The architecture is checked first</h3>
+        <p>Before editing, Claude looks for existing code to reuse and reads the Architecture section of <code>CLAUDE.md</code>. A change that would break a boundary or an accepted ADR stops for a decision.</p>
       </div>
       <div class="card">
-        <h3>A yes before commit, merge and push</h3>
-        <p><code>git commit</code>, <code>merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> sit under <code>ask</code> rules. Claude Code asks every time, whatever a skill says.</p>
+        <h3>One check script</h3>
+        <p><code>scripts/check</code> lists every check. Claude runs it before proposing a commit, the pre-commit hook runs the fast checks, and CI runs all of them.</p>
       </div>
       <div class="card">
-        <h3>No skipped hooks</h3>
-        <p>A Bash hook refuses <code>--no-verify</code> and <code>git commit</code> on the main branch. Protected files such as <code>.env</code> and keys cannot be edited.</p>
+        <h3>Optional docs system</h3>
+        <p>Reference docs, guides, ADRs and dated records, each with its own update rule, plus a linter for broken links and missing front-matter. Small repositories can leave it out.</p>
       </div>
     </div>
-    <p class="muted after-grid">The hooks have known gaps, for example a shell command that writes a file. <a href="how-it-works.html#limits">What the hooks do not cover</a>.</p>
   </div>
 </section>
 
 <section>
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Install</span>
-      <h2>Two steps.</h2>
-      <p>Add the plugin once per machine. Then set up each repository you want it in.</p>
+      <h2>What the hooks block</h2>
+      <p>The important rules are enforced by hooks and permission settings, so they apply even when a skill is not used.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3>Edits on the main branch</h3>
+        <p>Edit and Write are refused while the repository is on its main branch.</p>
+      </div>
+      <div class="card">
+        <h3>Ending a turn with unchecked code</h3>
+        <p>If code was edited and <code>scripts/check</code> has not passed since, the Stop hook sends Claude back to run it once.</p>
+      </div>
+      <div class="card">
+        <h3>Commit, merge or push without asking</h3>
+        <p><code>git commit</code>, <code>merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> are under <code>ask</code> rules, so Claude Code prompts for each one.</p>
+      </div>
+      <div class="card">
+        <h3>Skipping hooks and editing secrets</h3>
+        <p><code>--no-verify</code> and <code>git commit</code> on main are refused. Files such as <code>.env</code> and private keys cannot be edited.</p>
+      </div>
+    </div>
+    <p class="muted after-grid">The hooks only see the Edit, Write and git commands, so a file written from the shell gets past them. <a href="how-it-works.html#limits">Limits of the hooks</a>.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Install</h2>
+      <p>Install the plugin once per machine, then set up each repository.</p>
     </div>
     <div class="grid two">
       <div>
-        <h3>1. Add the plugin</h3>
+        <h3>Install the plugin</h3>
         <div class="code"><pre><code><span class="c"># in a shell</span>
 claude plugin marketplace add redazzo/Yotamake
 claude plugin install yotamake@yotamake</code></pre></div>
       </div>
       <div>
-        <h3>2. Set up a repo</h3>
-        <div class="code"><pre><code><span class="c"># in Claude Code, inside the repo</span>
+        <h3>Set up a repository</h3>
+        <div class="code"><pre><code><span class="c"># in Claude Code, inside the repository</span>
 /yotamake:setup</code></pre></div>
-        <p class="muted">It installs the per-repo files, then fills in <code>CLAUDE.md</code> and <code>scripts/check</code> from what it finds in the repo. Teammates who open the repo are prompted to install the plugin.</p>
+        <p class="muted">This installs the repository files and fills in <code>CLAUDE.md</code> and <code>scripts/check</code> from the code. Anyone who opens the repository afterwards is prompted to install the plugin.</p>
       </div>
     </div>
     <div class="actions">
-      <a class="btn primary" href="get-started.html">Full walkthrough</a>
-      <a class="btn" href="skills.html">See the skills</a>
+      <a class="btn primary" href="get-started.html">Installation guide</a>
+      <a class="btn" href="skills.html">Skills reference</a>
     </div>
   </div>
 </section>
@@ -146,22 +147,21 @@ claude plugin install yotamake@yotamake</code></pre></div>
 <section>
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Docs that stay true</span>
-      <h2>Four kinds of doc, one owner per subject.</h2>
-      <p>A full install adds a small docs system. Each kind has its own update rule, and a linter fails on broken links, orphaned pages and bad front-matter.</p>
+      <h2>Docs</h2>
+      <p>A full install adds a <code>docs/</code> folder with four kinds of document. Each subject has one owning document, and the linter fails on broken links, unlinked pages and bad front-matter.</p>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Kind</th><th>What it is</th><th>How it changes</th></tr></thead>
+        <thead><tr><th>Kind</th><th>Contents</th><th>Updated by</th></tr></thead>
         <tbody>
-          <tr><td>Reference</td><td>How the system works now</td><td>Corrected in place</td></tr>
-          <tr><td>Guides</td><td>How to do a thing</td><td>Corrected in place</td></tr>
-          <tr><td>Decisions (ADRs)</td><td>Why it is built this way</td><td>Never edited, only superseded</td></tr>
-          <tr><td>Records</td><td>What was done, and when</td><td>Written once</td></tr>
+          <tr><td>Reference</td><td>How the system works now</td><td>Correcting it in place</td></tr>
+          <tr><td>Guides</td><td>How to do a task</td><td>Correcting it in place</td></tr>
+          <tr><td>Decisions (ADRs)</td><td>Why it is built this way</td><td>A new ADR that supersedes it</td></tr>
+          <tr><td>Records</td><td>What was done, and when</td><td>Nothing; written once</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="muted">Small repos can skip it with <a href="get-started.html#lite">lite mode</a>.</p>
+    <p class="muted"><a href="get-started.html#lite">Lite mode</a> installs everything except the docs system.</p>
   </div>
 </section>
 

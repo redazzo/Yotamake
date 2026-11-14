@@ -120,14 +120,6 @@ h2 { font-size: clamp(26px, 3.5vw, 34px); margin: 0 0 12px; }
 h3 { font-size: 20px; margin: 0 0 8px; }
 p { margin: 0 0 16px; }
 .lede { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 46ch; }
-.eyebrow {
-  display: inline-block;
-  margin-bottom: 14px;
-  color: var(--accent);
-  font: 600 13px/1 var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 .muted { color: var(--muted); }
 
 code {
@@ -248,15 +240,14 @@ section + section { border-top: 1px solid var(--line); }
 .terminal .u { color: #fb923c; }
 .terminal .d { color: var(--code-muted); }
 .terminal .ok { color: #4ade80; }
+.terminal .fail { color: #f87171; }
 .terminal .q { color: #fde68a; }
 
 /* ---- Cards ----------------------------------------------------------- */
 
 .grid { display: grid; gap: 16px; }
-.grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (max-width: 900px) { .grid.three { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 640px) { .grid.three, .grid.two { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .grid.two { grid-template-columns: 1fr; } }
 
 .card {
   padding: 22px;
@@ -265,12 +256,6 @@ section + section { border-top: 1px solid var(--line); }
   background: var(--surface);
 }
 .card p:last-child { margin-bottom: 0; }
-.card .num {
-  display: block;
-  margin-bottom: 10px;
-  color: var(--accent);
-  font: 600 13px var(--mono);
-}
 .card h3 code { font-size: 0.9em; }
 
 /* Skills reference cards. */
@@ -365,5 +350,5 @@ td code { white-space: nowrap; }
 
 section.intro { padding-bottom: 40px; }
 section.after-intro { padding-top: 40px; }
-.group-lead { margin-bottom: 24px; }
+.group-title { margin-bottom: 24px; }
 .after-grid { margin-top: 20px; }
