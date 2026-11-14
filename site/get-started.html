@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Get started · Yotamake</title>
+  <meta name="description" content="Install the Yotamake plugin, set up a repository, and run your first session.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">Y</span><span class="brand-name">Yotamake</span></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="get-started.html" aria-current="page">Get started</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="skills.html">Skills</a>
+      <a href="https://github.com/redazzo/Yotamake">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap doc">
+  <aside class="toc">
+    <p>On this page</p>
+    <ol>
+      <li><a href="#requirements">Requirements</a></li>
+      <li><a href="#install">Install the plugin</a></li>
+      <li><a href="#setup">Set up a repository</a></li>
+      <li><a href="#files">What gets installed</a></li>
+      <li><a href="#facts">Fill in the facts</a></li>
+      <li><a href="#lite">Lite mode</a></li>
+      <li><a href="#first-session">Your first session</a></li>
+      <li><a href="#doctor">Check the setup</a></li>
+      <li><a href="#updating">Updating</a></li>
+    </ol>
+  </aside>
+
+  <article class="prose">
+    <h1>Get started</h1>
+    <p class="lede">Install the plugin once, set up each repository, then ask Claude for a change as you normally would.</p>
+
+    <h2 id="requirements">Requirements</h2>
+    <ul>
+      <li><a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a>.</li>
+      <li><code>bash</code>, <code>git</code> and Node 18 or later. The hooks and the installer use Node to read JSON.</li>
+      <li>Linux or macOS.</li>
+    </ul>
+    <p>Nothing has npm dependencies.</p>
+
+    <h2 id="install">1. Install the plugin</h2>
+    <p>Do this once per machine. From a shell:</p>
+    <div class="code"><pre><code>claude plugin marketplace add redazzo/Yotamake
+claude plugin install yotamake@yotamake</code></pre></div>
+    <p>Start a new Claude Code session afterwards. The skills show up as <code>yotamake:simple-session</code>, <code>yotamake:multi-session</code> and so on.</p>
+
+    <h2 id="setup">2. Set up a repository</h2>
+    <p>Open Claude Code inside the repository and run:</p>
+    <div class="code"><pre><code>/yotamake:setup</code></pre></div>
+    <p>It runs the plugin's installer, then reads the repository and proposes the project facts: the check commands, the branching rules and the Architecture lines. It asks before it commits anything.</p>
+    <p>You can also run the installer by hand from a clone of the Yotamake repository:</p>
+    <div class="code"><pre><code>./plugin/install.sh /path/to/your/repo</code></pre></div>
+    <p>The repository's <code>.claude/settings.json</code> then names the Yotamake marketplace and enables the plugin. Teammates who open the repository in Claude Code are prompted to install it.</p>
+
+    <div class="note">
+      <p><strong>Already using another hook tool?</strong> If the repository has a <code>.pre-commit-config.yaml</code>, a lefthook config or a hook in <code>.git/hooks/</code>, the installer leaves <code>core.hooksPath</code> alone, so that tool keeps working. It prints the lines that call <code>.githooks/pre-commit</code> from your tool instead.</p>
+    </div>
+
+    <p>If the repository already has its own version of a template file, such as a docs linter, list the path in <code>.claude/yotamake/skip</code>, one per line. The installer never writes a listed path.</p>
+
+    <h2 id="files">What gets installed</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>File</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>CLAUDE.md</code></td><td>The project facts the skills read, in named sections.</td></tr>
+          <tr><td><code>scripts/check</code></td><td>The one gate. Skills, the pre-commit hook and CI all run it.</td></tr>
+          <tr><td><code>.githooks/pre-commit</code></td><td>Runs <code>scripts/check --staged</code>, the fast checks only.</td></tr>
+          <tr><td><code>.github/workflows/check.yml</code></td><td>CI runs <code>scripts/check --all</code>.</td></tr>
+          <tr><td><code>.claude/settings.json</code></td><td>Enables the plugin, adds the <code>ask</code> rules for commit, merge and push, and two SessionStart hooks.</td></tr>
+          <tr><td><code>.claude/yotamake/</code></td><td>Protected paths, per-file checks, the skip list, the installed version, and the two session scripts.</td></tr>
+          <tr><td><code>docs/</code>, <code>scripts/docs/</code></td><td>The docs system and its linter. Left out in lite mode.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Some of these files belong to your project and are copied only when missing. Others belong to the harness and are refreshed on every run. The installer never overwrites a project-owned file. <a href="https://github.com/redazzo/Yotamake/blob/main/README.md#how-it-is-split">How it is split</a> lists which is which.</p>
+
+    <h2 id="facts">3. Fill in the facts</h2>
+    <p><code>/yotamake:setup</code> does most of this for you. Whatever it cannot work out is left as a <code>FILL IN</code> placeholder in <code>CLAUDE.md</code>. The sections the skills read are:</p>
+    <ul>
+      <li><strong>Checks</strong>: how <code>scripts/check</code> works, and whether to write tests first.</li>
+      <li><strong>Branching and releases</strong>: the main branch, branch prefixes, merge or pull request, version bumps, and which files count as docs.</li>
+      <li><strong>Architecture</strong>: Style, Modules, Boundaries, Shared code, Patterns and Constraints.</li>
+      <li><strong>Migrations</strong> and <strong>Deploying</strong>: only if the project has them.</li>
+      <li><strong>Conventions</strong>: anything else Claude should follow.</li>
+    </ul>
+    <p>A skill that finds a section missing says so and uses a stated default, or stops and asks. It never guesses a deploy or migration command.</p>
+    <p>Then open <code>scripts/check</code> and add your project's checks: type-check, lint, tests. Put slow ones behind <code>full</code> so the pre-commit hook stays fast.</p>
+
+    <h2 id="lite">Lite mode</h2>
+    <p>For a small repository that does not want ADRs, records and a backlog:</p>
+    <div class="code"><pre><code>./plugin/install.sh /path/to/repo --lite</code></pre></div>
+    <p>Or ask <code>/yotamake:setup</code> for lite mode. You get <code>CLAUDE.md</code>, <code>scripts/check</code>, the pre-commit hook, the hook config and the settings, but nothing under <code>docs/</code>. You can add the docs system later. The <a href="https://github.com/redazzo/Yotamake/blob/main/README.md#install">README</a> says how.</p>
+
+    <h2 id="first-session">4. Your first session</h2>
+    <p>Ask for a change in plain words. You do not need to name a skill. Claude picks <code>simple-session</code> for any edit to code, tests or docs, and works through it:</p>
+    <div class="code"><pre><code><span class="p">&gt; </span>Rename the --out flag to --output and keep --out as an alias</code></pre></div>
+    <p>It cuts a branch, makes the change, updates the doc that owns it, runs <code>scripts/check</code> and a review, and then asks whether to commit and merge. See <a href="how-it-works.html#session">a session, step by step</a>.</p>
+    <p>For a new feature where "done" is unclear, agree the scope first:</p>
+    <div class="code"><pre><code>/yotamake:spec</code></pre></div>
+    <p>For work too big for one context, Claude offers a <code>multi-session</code> plan. It writes the plan to a working folder that survives <code>/clear</code>. Between sessions you clear the context and resume with:</p>
+    <div class="code"><pre><code><span class="p">&gt; </span>Read .scratchpad/&lt;folder&gt;/README.md and start the next session.</code></pre></div>
+    <p>Or say "run autopilot" once the plan is approved, and the remaining sessions run on their own. It ends with one report and asks once before merging.</p>
+
+    <h2 id="doctor">Check the setup</h2>
+    <div class="code"><pre><code>/yotamake:doctor</code></pre></div>
+    <p>A read-only check: the pre-commit hook, the harness version and pending upgrades, <code>FILL IN</code> placeholders left in <code>CLAUDE.md</code>, whether <code>scripts/check</code> runs any project checks, and whether CI runs it. It prints one screen with a fix for each problem.</p>
+
+    <h2 id="updating">Updating</h2>
+    <div class="code"><pre><code>claude plugin update yotamake@yotamake</code></pre></div>
+    <p>This updates the method for every repository at once. To refresh a repository's harness-owned scripts, re-run <code>/yotamake:setup</code> in it.</p>
+    <p>When a new version needs a line added to a project-owned file, such as <code>CLAUDE.md</code>, Claude tells you at the start of the next session and offers to apply it.</p>
+    <p><strong>Optional:</strong> the plugin ships a <code>plain-english</code> output style, with short sentences and plain words. Pick it with <code>/output-style</code>.</p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Yotamake v__VERSION__ · MIT licence</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/redazzo/Yotamake">GitHub</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/README.md">README</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/docs/backlog.md">Open work</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/LICENSE">Licence</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

@@ -80,6 +80,9 @@ run consistency node scripts/consistency.mjs
 
 run docs node scripts/docs/lint-docs.mjs
 
+# The landing site's links (its skills cards are a consistency rule).
+run site node scripts/check-site.mjs
+
 touches '^plugin/hooks/|^plugin/template/\.claude/yotamake/|^scripts/test-hooks' &&
     run hooks bash scripts/test-hooks.sh
 

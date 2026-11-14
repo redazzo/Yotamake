@@ -1,0 +1,52 @@
+# Publishes site/ to GitHub Pages after CI passes on main. CI runs scripts/check --all, the
+# one gate, which checks the site's links and its skills cards, so a failing check never
+# publishes. Pages must use "GitHub Actions" as its source (Settings → Pages).
+# The pages carry __VERSION__ where the plugin version goes; this fills it in from
+# plugin.json, so the site always names the version users get.
+name: pages
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The commit CI checked, not whatever main is now.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fill in the version
+        run: |
+          version=$(node -p "require('./plugin/.claude-plugin/plugin.json').version")
+          cp -r site _site
+          find _site -name '*.html' -exec sed -i "s/__VERSION__/$version/g" {} +
+          ! grep -rl '__VERSION__' _site
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

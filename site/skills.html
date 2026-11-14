@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skills · Yotamake</title>
+  <meta name="description" content="Every skill in the Yotamake plugin: what it does, when it runs, and the CLAUDE.md sections it reads.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark">Y</span><span class="brand-name">Yotamake</span></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="get-started.html">Get started</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="skills.html" aria-current="page">Skills</a>
+      <a href="https://github.com/redazzo/Yotamake">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="intro">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Reference</span>
+      <h1>Skills</h1>
+      <p class="lede">The method lives in these skills. Each card sums one up and links to its <code>SKILL.md</code>, which holds the exact rules.</p>
+    </div>
+    <div class="grid two">
+      <div class="card">
+        <h3><span class="badge auto">automatic</span></h3>
+        <p>Claude uses these on its own when the request fits. You never need to name them.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge manual">manual</span></h3>
+        <p>You start these with a slash command, such as <code>/yotamake:setup</code>. Claude does not run them unprompted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="after-intro">
+  <div class="wrap">
+    <h2>Working</h2>
+    <p class="muted group-lead">How changes get made.</p>
+    <div class="grid two">
+
+      <div class="card skill" id="simple-session">
+        <div class="skill-head"><h3>simple-session</h3><span class="badge auto">automatic</span></div>
+        <p>Runs any change to code, tests or docs as one session: size check, branch, design and reuse, the work and its doc, <code>scripts/check</code>, review, then stop and ask before commit. Used for every change, even a one-line fix.</p>
+        <p class="muted">Reads: Checks, Branching and releases, Architecture.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/simple-session/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+      <div class="card skill" id="multi-session">
+        <div class="skill-head"><h3>multi-session</h3><span class="badge auto">automatic</span></div>
+        <p>Plans and runs work that will not fit one context as numbered sessions, with a working folder that survives <code>/clear</code>. Covers parallel sessions in worktrees and autopilot.</p>
+        <p class="muted">Starts when a change is too big for one session, or when you say "start the next session".</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/multi-session/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+      <div class="card skill" id="debugging">
+        <div class="skill-head"><h3>debugging</h3><span class="badge auto">automatic</span></div>
+        <p>A bug fix inside a session. Reproduce the bug, write a failing test, find and name the root cause rather than patching the symptom, then fix it and see the test pass.</p>
+        <p class="muted">Does not branch, commit or review. The session around it does.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/debugging/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+      <div class="card skill" id="spec">
+        <div class="skill-head"><h3>spec</h3><span class="badge manual">/yotamake:spec</span></div>
+        <p>Agrees what a new feature must do before any code: scope, non-goals and numbered acceptance criteria in one short <code>spec.md</code>. Asks one question at a time, then hands over to a session.</p>
+        <p class="muted">Fixes, renames and refactors skip it.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/spec/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Docs and diagrams</h2>
+    <p class="muted group-lead">Keeping the written record true.</p>
+    <div class="grid two">
+
+      <div class="card skill" id="write-doc">
+        <div class="skill-head"><h3>write-doc</h3><span class="badge auto">automatic</span></div>
+        <p>Adds or changes a doc under <code>docs/</code>. Picks the kind (reference, guide, decision or record, or a backlog entry), names and places the file, writes its front-matter, links it, and runs the docs linter.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/write-doc/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+      <div class="card skill" id="drawio">
+        <div class="skill-head"><h3>drawio</h3><span class="badge auto">automatic</span></div>
+        <p>Generates draw.io diagrams as <code>.drawio</code> files, and can export them to PNG, SVG or PDF with the diagram XML embedded, so they stay editable.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/drawio/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Setup and operations</h2>
+    <p class="muted group-lead">Installing the harness, and the jobs that touch production.</p>
+    <div class="grid two">
+
+      <div class="card skill" id="setup">
+        <div class="skill-head"><h3>setup</h3><span class="badge manual">/yotamake:setup</span></div>
+        <p>Installs the per-repository files, or refreshes them after a plugin update. Then helps fill in <code>CLAUDE.md</code> and <code>scripts/check</code> from the repository itself, and applies any pending upgrades.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/setup/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+      <div class="card skill" id="doctor">
+        <div class="skill-head"><h3>doctor</h3><span class="badge manual">/yotamake:doctor</span></div>
+        <p>Checks the harness works in this repository: the pre-commit hook, the version and pending upgrades, <code>FILL IN</code> placeholders, whether <code>scripts/check</code> runs real checks, and whether CI runs it. Read-only.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/doctor/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+      <div class="card skill" id="release-check">
+        <div class="skill-head"><h3>release-check</h3><span class="badge manual">/yotamake:release-check</span></div>
+        <p>Guides a deployment to the right target and component, with a pre-flight checklist and the project's known gotchas. Refuses to guess a command when <code>CLAUDE.md</code> has no Deploying section.</p>
+        <p class="muted">Reads: Deploying.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/release-check/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+      <div class="card skill" id="new-migration">
+        <div class="skill-head"><h3>new-migration</h3><span class="badge manual">/yotamake:new-migration</span></div>
+        <p>Scaffolds a database migration file with the right timestamp and sequence number, and reminds you how to apply it locally and remotely.</p>
+        <p class="muted">Reads: Migrations.</p>
+        <a class="more" href="https://github.com/redazzo/Yotamake/blob/main/plugin/skills/new-migration/SKILL.md">Read SKILL.md →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Yotamake v__VERSION__ · MIT licence</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/redazzo/Yotamake">GitHub</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/README.md">README</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/docs/backlog.md">Open work</a>
+      <a href="https://github.com/redazzo/Yotamake/blob/main/LICENSE">Licence</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

@@ -21,6 +21,8 @@
  *     and in this repository's own.
  *   - evals: README.md's eval table has one row per folder in plugin/evals/, and no other,
  *     and each row's Skills cell names one or more skills that exist.
+ *   - site skills: site/skills.html has a card for every folder in plugin/skills/, and no
+ *     card for a skill that does not exist.
  *   - step refs: a pointer to another skill's step names its heading, as
  *     `simple-session`, "Design and reuse", and that heading exists. No pointer uses a
  *     step number, which would break silently when the skill is renumbered.
@@ -159,6 +161,16 @@ function checkEvals() {
       if (!skills.has(s)) fail('evals', `README.md's eval table row ${r} names ${s}, not in plugin/skills/`);
     }
   }
+}
+
+/** site/skills.html has one card (class="card skill" id="<name>") per skill, and no other. */
+function checkSiteSkills() {
+  const skills = new Set(skillFiles().map(([name]) => name));
+  const cards = new Set(
+    [...read('site/skills.html').matchAll(/class="card skill" id="([^"]+)"/g)].map((m) => m[1])
+  );
+  for (const s of skills) if (!cards.has(s)) fail('site skills', `site/skills.html has no card for plugin/skills/${s}`);
+  for (const c of cards) if (!skills.has(c)) fail('site skills', `site/skills.html has a card for "${c}", not in plugin/skills/`);
 }
 
 /**
@@ -323,6 +335,7 @@ if (process.argv[2] === 'upgrades') {
   checkSections();
   checkLabels();
   checkEvals();
+  checkSiteSkills();
   checkStepRefs();
   checkSharedGraders();
   checkPortableSed();
