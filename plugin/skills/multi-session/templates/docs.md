@@ -22,6 +22,7 @@ Old names that docs may still use. Close-out greps `docs/` and CLAUDE.md for eac
 
 ## For close-out
 
-- **Record:** <what was built and why, in a line per session, for the record in `docs/records/`>
+- **Record:** <what was built and why, in a line per session, for the record in `docs/records/`,
+  written from `write-doc`'s record template>
 - **Backlog:** <follow-ups found along the way, each with its trigger>
 - **ADR candidates:** <decisions that may meet the ADR bar, with the session and the D-ID>

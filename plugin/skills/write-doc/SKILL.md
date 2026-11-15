@@ -36,9 +36,9 @@ detail doc (`docs/backlog/<slug>.md`), which has none: its entry in `docs/backlo
 the dates.
 
 Start from the template for the kind, in `templates/` in this skill's directory:
-`reference.md`, `guide.md`, `record.md`, and `backlog-detail.md` for `docs/backlog/<slug>.md`.
-Each holds the front-matter, the sections that usually fit, and a comment under each heading
-saying what goes there. Copy what is inside its `~~~markdown` fence (the fence keeps the
+`reference.md`, `guide.md`, `record.md`, `decision.md`, and `backlog-detail.md` for
+`docs/backlog/<slug>.md`. Each holds the front-matter, the sections that usually fit, and a
+comment under each heading saying what goes there. Copy what is inside its `~~~markdown` fence (the fence keeps the
 placeholder links out of the docs linter). Drop the sections that do not fit, and delete
 every comment before you save.
 
@@ -51,8 +51,7 @@ spans several documents. `status: current` while open, `historical` when complet
 `node scripts/docs/generate-records-index.mjs`. Never edit `docs/records/README.md` by hand.
 
 **Decision (ADR).** Ask the user before writing one. Number it one above the highest in
-`docs/decisions/`. Use the template in `docs/decisions/README.md`, and add a row to that
-file's index.
+`docs/decisions/`, and add a row to the index in `docs/decisions/README.md`.
 
 **Avoid**, in every kind:
 

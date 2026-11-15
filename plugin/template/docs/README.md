@@ -7,7 +7,7 @@ Everything is one of four kinds, and the kind decides how it is maintained. Ever
 |---|---|---|---|
 | **Reference** | [`reference/`](#reference) | How the system works **now** | Corrected in place; must be true at HEAD |
 | **Guides** | [`guides/`](#guides) | How to do a thing | Corrected in place |
-| **Decisions** | [`decisions/`](./decisions/README.md) | Why the system is built this way | Never edited — superseded by a later ADR |
+| **Decisions** | [`decisions/`](./decisions/README.md) | Why the system is built this way | Never edited — superseded by a later ADR, or given a dated amendment |
 | **Records** | [`records/`](./records/README.md) | What was done, and when | Written once, never revised |
 
 Plus [`backlog.md`](./backlog.md) for open work.

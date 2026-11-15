@@ -37,7 +37,7 @@ then `claude plugin install yotamake@yotamake`.
 <!-- yotamake:docs begin -->
 **Docs:** [docs/README.md](./docs/README.md) (index — start here; explains the four kinds of
 doc and which doc owns what) · [README.md](./README.md) (setup) ·
-[docs/decisions/](./docs/decisions/README.md) (ADRs — never edited, only superseded) ·
+[docs/decisions/](./docs/decisions/README.md) (ADRs — never edited, only superseded or amended) ·
 [docs/records/](./docs/records/README.md) (history) · [docs/backlog.md](./docs/backlog.md)
 (open work)
 <!-- yotamake:docs end -->

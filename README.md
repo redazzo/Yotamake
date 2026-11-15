@@ -260,7 +260,7 @@ the main context keeps room for the plan. The review hands its design read to on
 ## Docs
 
 Four kinds, each maintained differently: reference (corrected in place), guides (corrected
-in place), decisions (never edited, only superseded) and records (written once). When they
+in place), decisions (never edited, only superseded or amended) and records (written once). When they
 disagree: code > decisions > reference > records. Each subject has one owning doc, named in
 the "Owns" table in `docs/README.md`. The linter fails on broken links, docs nothing links to,
 bad front-matter and a stale records index.
