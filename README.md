@@ -90,7 +90,7 @@ plugin/
     simple-session/   one change: size check, branch, work, docs, scripts/check, stop and ask
     multi-session/    work across several contexts, with a working folder that survives /clear
     debugging/        a bug fix inside a session: reproduce, failing test, root cause, fix
-    write-doc/        pick the doc kind, write it, link it, lint it
+    write-doc/        pick the doc kind, write it from its template, link it, lint it
     spec/             agree scope and acceptance criteria before code  (manual: /yotamake:spec)
     release-check/    guided deploy with pre-flight and gotchas      (manual: /yotamake:release-check)
     new-migration/    scaffold a timestamped migration file         (manual: /yotamake:new-migration)
