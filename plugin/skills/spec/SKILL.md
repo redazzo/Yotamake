@@ -27,12 +27,20 @@ question in step 2.
 Read CLAUDE.md, the code the request touches, and the reference doc that owns the subject
 (the "Owns" table in `docs/README.md`, if there is one). Do not ask what these already answer.
 
+Read the glossary the **Domain language** line of the **Architecture** section names, if
+it names one.
+
 ## 2. Ask, one question at a time
 
 Ask only what changes what you build: who it is for, what is in and out, what happens on bad
 input or failure. One question per message, each with your recommendation. Stop asking when
 the answers would not change a criterion. If the user says to go ahead, record the rest as
 open questions with your recommendation.
+
+When the user uses a glossary word in another sense, or a vague word where a criterion
+needs an exact one, make it the next question, by the rules in
+`<this skill's directory>/../../reference/domain-language.md`. The criteria use the
+glossary's words.
 
 ## 3. Write `spec.md`
 
@@ -59,6 +67,8 @@ Rules for the criteria:
 - Each one can be checked by a test or by one manual step.
 - Cover the failure cases the user named, not every failure you can imagine.
 - More than about ten criteria means the work is probably several sessions. Say so.
+- A term settled in step 2 that the glossary lacks goes under **Terms**, with its
+  definition. Leave the section out when there are none.
 
 ## 4. Stop and ask
 
@@ -73,5 +83,5 @@ for each criterion where the project has tests; with `Test-first: yes`, each one
 (`simple-session`, "Do the work").
 
 The spec does not outlive the work. When the work is done, behaviour that lasts goes into the
-reference doc that owns it (or CLAUDE.md or `README.md` in a lite install). Then the spec is
-deleted; ask before deleting it.
+reference doc that owns it (or CLAUDE.md or `README.md` in a lite install), and its
+**Terms** go into the glossary. Then the spec is deleted; ask before deleting it.

@@ -42,7 +42,10 @@ comment under each heading saying what goes there. Copy what is inside its `~~~m
 placeholder links out of the docs linter). Drop the sections that do not fit, and delete
 every comment before you save.
 
-**Reference.** Add a row to the "Owns" table in `docs/README.md`.
+**Reference.** Add a row to the "Owns" table in `docs/README.md`. The glossary
+(where the **Domain language** line of `CLAUDE.md` points; `docs/reference/glossary.md` by
+default) has a format of its own: follow
+`<this skill's directory>/../../reference/domain-language.md`.
 
 **Guide.** Add it to the guides list in `docs/README.md`.
 
@@ -50,8 +53,14 @@ every comment before you save.
 spans several documents. `status: current` while open, `historical` when complete. Then run
 `node scripts/docs/generate-records-index.mjs`. Never edit `docs/records/README.md` by hand.
 
-**Decision (ADR).** Ask the user before writing one. Number it one above the highest in
-`docs/decisions/`, and add a row to the index in `docs/decisions/README.md`.
+**Decision (ADR).** Offer one only when all three hold:
+
+1. **Hard to reverse:** changing it later costs real work.
+2. **Surprising without context:** a future reader would ask why it was done this way.
+3. **A real trade-off:** there were real alternatives, and one was chosen for a reason.
+
+Ask the user before writing one. Number it one above the highest in `docs/decisions/`, and
+add a row to the index in `docs/decisions/README.md`.
 
 **Avoid**, in every kind:
 

@@ -148,8 +148,8 @@ to reuse or extend. A change that would cross a **Boundary**, break a **Constrai
 against an accepted ADR, or bring in a way of doing things that **Style** or **Patterns** does
 not list stops before any edit and is raised with the user, whoever asked for it.
 
-<!-- FILL IN each line. Keep the six labels: the skills read them. Link to detailed docs
-  rather than repeating them here. -->
+<!-- FILL IN each line but Domain language. Keep the labels: the skills read them. Link
+  to detailed docs rather than repeating them here. -->
 
 - **Style:** <!-- FILL IN: the architecture style or styles, and where each applies, e.g.
   "modular monolith; hexagonal inside `core/`"; "layered: `api/` → `core/` → `db/`". -->
@@ -164,6 +164,8 @@ not list stops before any edit and is raised with the user, whoever asked for it
 - **Constraints:** <!-- FILL IN: limits from outside the code that a change must stay within,
   e.g. "runs on Node 20 and later"; "the bundle stays under 200 KB"; "no GPL dependencies";
   "personal data stays in the EU". -->
+- **Domain language:** none yet. <!-- Not a FILL IN: skills link the glossary here once a
+  term is settled, or list terms here when there is no docs/ folder. -->
 <!-- yotamake:docs begin -->
 - **Decisions:** accepted ADRs in [docs/decisions/](./docs/decisions/README.md) are part of
   the design. A change that needs a different one gets a new ADR first.
