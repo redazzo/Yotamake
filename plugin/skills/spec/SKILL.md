@@ -66,6 +66,9 @@ Rules for the criteria:
   <does what>." No implementation detail.
 - Each one can be checked by a test or by one manual step.
 - Cover the failure cases the user named, not every failure you can imagine.
+- If something in the feature moves through states (an order, a job, an account), list the
+  states and the allowed moves, each with its trigger. Write a criterion for each allowed
+  move and for at least one move that is not allowed: "When <trigger> in <state>, …".
 - More than about ten criteria means the work is probably several sessions. Say so.
 - A term settled in step 2 that the glossary lacks goes under **Terms**, with its
   definition. Leave the section out when there are none.

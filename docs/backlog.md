@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-15
+updated: 2026-11-16
 owns: [open-work-register]
 ---
 
@@ -151,6 +151,22 @@ repository's `CLAUDE.md` is about 10 KB, all in context. Past misses (the review
 skill not firing on a named branch) were fixed by adding text, which makes the next miss more
 likely. Options: move edge cases into `plugin/reference/` files that skills read on demand,
 and have `scripts/check` warn when a skill passes a line limit.
+
+## Enforce the session steps in order with hooks
+
+**Priority: Low** · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders
+a step that a hook could have caught, or "Keep skills short" fires.
+
+Past misses were fixed by adding wording to skills (see "Keep skills short"). Hooks could
+enforce the order instead. A per-session state file would hold the session's step (branched,
+edited, checked, reviewed, reported), and hooks would refuse a step that comes too early: for
+example, the commit stop would refuse while no review has run since the last edit.
+`stop-check-ran.sh` already does this for one step, the check. It needs an ADR first, since it
+adds per-session state and builds on the proposed
+[ADR-0006](./decisions/0006-commit-stop-by-project-hook.md). That ADR must also square
+refusing a step with the Boundary that hooks let the edit through when they cannot decide,
+as ADR-0006 does under "Failing open". Open question: how a hook can tell
+that `/simplify` and `/code-review` ran, from what it sees. Find that out before the ADR.
 
 ## Re-check two fixes on the next full eval run
 
