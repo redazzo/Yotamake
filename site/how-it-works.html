@@ -97,6 +97,7 @@
     </div>
     <p>A full install adds the accepted ADRs in <code>docs/decisions/</code>. <code>/yotamake:setup</code> proposes the six lines from the repository, using a <a href="https://github.com/redazzo/Yotamake/blob/main/plugin/reference/architecture-styles.md">catalogue of styles</a>.</p>
     <p>Before any edit, Claude searches for code to reuse. It stops and asks when a change would break a boundary or a constraint, go against an ADR, or bring in a pattern or a dependency the project does not use. It does this even when told not to ask, because changing the rule is a separate decision.</p>
+    <p>Those checks ask whether a change fits the design. To ask whether the design itself is good, run <a href="skills.html#improve-architecture"><code>/yotamake:improve-architecture</code></a>. It reports what to improve and edits nothing.</p>
 
     <h2 id="gate">The one gate</h2>
     <p><code>scripts/check</code> is the only list of checks. It belongs to your project. Add a check by editing the script.</p>
