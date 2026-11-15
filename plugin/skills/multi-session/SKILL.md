@@ -98,6 +98,12 @@ session, offer to resume that effort instead of starting a new one.
    boundary or a constraint, step outside the Style, or go against an ADR, is raised as a
    question now, as in `simple-session`, "Design and reuse". Agree the Design section with
    the user before S1 (step 6). Each session's design step then checks its work against it.
+
+   **When the effort changes the architecture itself** (a new style, a boundary moved or
+   dropped, a new kind of part), read "Choosing a style" and "Changing the style" in
+   `<this skill's directory>/../../reference/architecture-styles.md`. Put the options and
+   the recommendation in the Design section, and order the sessions as "Changing the style"
+   says.
 4. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
    (or, on an assigned branch, one set of commits) that fits in one context**, so a `/clear`
    never lands mid-change. Order them so each makes

@@ -146,7 +146,9 @@ guesses a deploy or migration command.
 skills read: **Style**, **Modules**, **Boundaries**, **Shared code**, **Patterns** and
 **Constraints**, plus the accepted ADRs in a full install. The template explains each line.
 `/yotamake:setup` proposes them from the repo, naming the style from
-`plugin/reference/architecture-styles.md`. Before any edit, `simple-session` looks for code to
+`plugin/reference/architecture-styles.md`. With no code yet, setup helps the user choose a style
+instead. The catalogue also says how to choose one and in what order to change it. Before
+any edit, `simple-session` looks for code to
 reuse, and stops and asks when a change would break the design, even when told not to ask.
 The rules are in `simple-session`, "Design and reuse". `scripts/check` has commented examples
 for a boundary check and a duplicate-code check; the project picks the tool.
