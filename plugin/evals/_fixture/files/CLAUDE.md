@@ -64,4 +64,5 @@ not list stops before any edit and is raised with the user, whoever asked for it
 - **Patterns:** named exports only; each function takes its inputs as arguments and returns a
   string; each `src/` file has a test file of the same name in `test/`.
 - **Constraints:** runs on Node 20 and later as plain ES modules, with no build step.
+- **Domain language:** none yet.
 - **Decisions:** accepted ADRs in `docs/decisions/` are part of the design.

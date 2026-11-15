@@ -76,7 +76,8 @@ from guesses:
   for rules the style implies that the code keeps but the lines leave out. Show the proposal
   and ask the user to confirm it: these lines become rules the sessions stop on, so a wrong
   boundary blocks real work. A boundary the code already breaks goes in the report, not in the
-  line.
+  line. For **Domain language**, follow "Where the glossary lives" in
+  `<this skill's directory>/../../reference/domain-language.md`.
 
   **No code yet** (a new project): choose the design with the user. Ask what the project is
   for, unless they have said, then follow "Choosing a style" in the catalogue. Once the user

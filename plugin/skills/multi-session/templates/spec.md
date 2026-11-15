@@ -22,6 +22,13 @@ cite the IDs.
 - **A1** — When <trigger or state>, <the system> <does what>.
 - **A2** — If <bad input or failure>, <the system> <does what>.
 
+## Terms
+
+<!-- Only when the talk settled a domain word the glossary lacks. Otherwise delete this
+section. -->
+
+- **<Term>:** <what it is, in one or two sentences>. _Avoid:_ <other words for it>.
+
 ## Open questions
 
 <!-- In a multi-session folder, these live in decisions.md instead. Delete this section. -->

@@ -111,6 +111,7 @@ plugin/
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
   reference/module-design.md       deep and shallow modules, seams, the deletion test
+  reference/domain-language.md     the glossary: its rules, its format, naming drift
   reference/upgrades.md            per version: what to add to a repo's own files, and how
   install.sh                       installs template/ into a repo
   template/                        the per-repo files
@@ -144,9 +145,11 @@ scripts/docs/                   docs linter and records index generator
 missing or unfilled, the skill says so and uses a stated default, or stops and asks. It never
 guesses a deploy or migration command.
 
-**Design comes before code.** The `Architecture` section of `CLAUDE.md` has six lines the
-skills read: **Style**, **Modules**, **Boundaries**, **Shared code**, **Patterns** and
-**Constraints**, plus the accepted ADRs in a full install. The template explains each line.
+**Design comes before code.** The `Architecture` section of `CLAUDE.md` has seven lines the
+skills read: **Style**, **Modules**, **Boundaries**, **Shared code**, **Patterns**,
+**Constraints** and **Domain language**, plus the accepted ADRs in a full install. The
+template explains each line. **Domain language** points to the project's glossary; see
+`plugin/reference/domain-language.md`.
 `/yotamake:setup` proposes them from the repo, naming the style from
 `plugin/reference/architecture-styles.md`. With no code yet, setup helps the user choose a style
 instead. The catalogue also says how to choose one and in what order to change it. Before

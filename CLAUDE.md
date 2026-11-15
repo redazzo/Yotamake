@@ -175,5 +175,6 @@ not list stops before any edit and is raised with the user, whoever asked for it
 - **Constraints:** needs only `bash`, `git` and Node 18+; no npm dependencies. Runs on Linux
   and macOS (BSD `sed`: use `sed -i.bak`, not `sed -i`). `claude plugin validate --strict`
   passes for the plugin and the marketplace.
+- **Domain language:** [docs/reference/glossary.md](./docs/reference/glossary.md).
 - **Decisions:** accepted ADRs in [docs/decisions/](./docs/decisions/README.md) are part of
   the design. A change that needs a different one gets a new ADR first.

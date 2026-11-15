@@ -20,6 +20,14 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.32.0 — Domain language line
+
+- **Check:** the Architecture section of `CLAUDE.md` has a `**Domain language:**` line.
+- **Apply:** add a `**Domain language:**` line after Constraints, filled in as "Where the
+  glossary lives" in `domain-language.md` (this folder) says. In the section's comment,
+  change "FILL IN each line. Keep the six labels" to "FILL IN each line but Domain language.
+  Keep the labels".
+
 ## 0.29.0 — ADRs may be amended
 
 - **Check:** `CLAUDE.md`'s **Docs** line says "only superseded or amended", and the

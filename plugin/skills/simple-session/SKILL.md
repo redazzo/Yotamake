@@ -17,7 +17,8 @@ Project specifics live in `CLAUDE.md`, not here. This skill reads these sections
   merge or a pull request), whether code changes get a version bump, and which files count
   as docs (the `Docs-only` line).
 - **Architecture** — the design a change follows: its `Style`, `Modules`, `Boundaries`,
-  `Shared code`, `Patterns` and `Constraints` lines, and the accepted ADRs (step 3).
+  `Shared code`, `Patterns`, `Constraints` and `Domain language` lines, and the accepted
+  ADRs (step 3).
 
 If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
 report and use the defaults given below.
@@ -121,6 +122,8 @@ section of CLAUDE.md and decide how the change fits before you write it.
 2. **Fit the design.** Put the change in the module that owns it (**Modules**). Shape a new
    part the way **Style** says, e.g. a new adapter rather than database code in a hexagonal
    core. Do recurring things the way **Patterns** and the nearby code already do them.
+   Name domain ideas with the glossary's words (the **Domain language** line), and follow
+   `<this skill's directory>/../../reference/domain-language.md` for a new term.
 3. **Stop on a design conflict.** Stop before any edit and ask the user when the change
    would:
    - break a rule in **Boundaries**;

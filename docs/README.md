@@ -42,7 +42,7 @@ Yotamake" section says how it is published and kept in step.
 
 | Document | Owns |
 |---|---|
-| _None yet._ | |
+| [reference/glossary.md](./reference/glossary.md) | Domain language: the harness's own words and what each means |
 
 ## Guides
 
