@@ -370,10 +370,11 @@ links `./README.md`, which exists only once the template is installed.
 **The website.** `site/` is the landing site: plain HTML and CSS, no build step.
 `.github/workflows/pages.yml` publishes it to GitHub Pages each time CI passes on main, and
 fills in the version from `plugin.json`. The pages sum up the harness and link here and to
-each `SKILL.md` for the rules. So a change to what a page says, such as the install command or
-a skill's purpose, updates that page on the same branch. `scripts/check` checks the site's
-links, and that `site/skills.html` has a card for every skill. To view it locally, open
-`site/index.html` in a browser; the version shows as `__VERSION__` until it is published.
+each `SKILL.md` for the rules. Keeping them in step is a rule in CLAUDE.md, "Site pages".
+`scripts/check` checks the site's links, and that `site/skills.html` has a card for every
+skill. On a branch that changes a skill, a hook or the installer, it also names the pages
+that mention it, as a note. To view it locally, open `site/index.html` in a browser; the
+version shows as `__VERSION__` until it is published.
 
 ## Requirements
 

@@ -102,6 +102,10 @@ full && touches '^plugin/(install\.sh|template/|evals/_fixture/|\.claude-plugin/
 full && [[ "$mode" == changed ]] && touches '^plugin/' &&
     node scripts/consistency.mjs evals-for <<<"$changed"
 
+# Not a check: names site pages that may need updating (CLAUDE.md, "Site pages").
+full && [[ "$mode" == changed ]] && touches '^plugin/(skills/|hooks/|install\.sh|template/)' &&
+    node scripts/consistency.mjs pages-for <<<"$changed"
+
 [[ $ran -gt 0 ]] || echo "note: no checks configured; add them to scripts/check." >&2
 # A passing run outside the pre-commit hook leaves a stamp in the git directory. The
 # plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
