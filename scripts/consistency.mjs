@@ -11,6 +11,8 @@
  *                                           the case graders of the same name
  *   node scripts/consistency.mjs evals-for  reads changed paths on stdin; prints the eval
  *                                           cases that cover them (a note: always exit 0)
+ *   node scripts/consistency.mjs pages-for  reads changed paths on stdin; prints the site
+ *                                           pages that mention them (a note: always exit 0)
  *
  * Rules:
  *   - version: plugin.json, marketplace.json and .claude/yotamake/version name the same
@@ -163,12 +165,14 @@ function checkEvals() {
   }
 }
 
-/** site/skills.html has one card (class="card skill" id="<name>") per skill, and no other. */
+/** The skills that have a card (class="card skill" id="<name>") in site/skills.html. */
+const siteCards = () =>
+  new Set([...read('site/skills.html').matchAll(/class="card skill" id="([^"]+)"/g)].map((m) => m[1]));
+
+/** site/skills.html has one card per skill, and no other. */
 function checkSiteSkills() {
   const skills = new Set(skillFiles().map(([name]) => name));
-  const cards = new Set(
-    [...read('site/skills.html').matchAll(/class="card skill" id="([^"]+)"/g)].map((m) => m[1])
-  );
+  const cards = siteCards();
   for (const s of skills) if (!cards.has(s)) fail('site skills', `site/skills.html has no card for plugin/skills/${s}`);
   for (const c of cards) if (!skills.has(c)) fail('site skills', `site/skills.html has a card for "${c}", not in plugin/skills/`);
 }
@@ -214,6 +218,35 @@ function evalsFor(changed) {
       [...cases].sort().join(', '));
   }
   if (uncovered.size) console.error(`note: no eval case covers ${[...uncovered].sort().join(', ')}`);
+}
+
+/**
+ * Prints, as a note, the site pages that mention a changed skill, hook or the installer
+ * (CLAUDE.md, "Site pages"). Prints nothing when no page does.
+ */
+function pagesFor(changed) {
+  const wanted = new Map(); // what to report -> the strings that show a page mentions it
+  for (const p of changed) {
+    let m;
+    if ((m = p.match(/^plugin\/skills\/([^/]+)\//))) {
+      const s = m[1];
+      wanted.set(s, [`skills.html#${s}"`, `/yotamake:${s}`, `<code>${s}</code>`]);
+    } else if (p.startsWith('plugin/hooks/')) {
+      wanted.set('hooks', [...(wanted.get('hooks') ?? ['id="hooks"']), path.basename(p)]);
+    } else if (p === 'plugin/install.sh' || p.startsWith('plugin/template/')) {
+      wanted.set('install', ['install.sh']);
+    }
+  }
+  const cards = siteCards();
+  const mentions = [];
+  for (const page of readdirSync(path.join(ROOT, 'site')).filter((f) => f.endsWith('.html')).sort()) {
+    const source = read(`site/${page}`);
+    const what = [...wanted]
+      .filter(([name, signs]) => signs.some((x) => source.includes(x)) || (page === 'skills.html' && cards.has(name)))
+      .map(([name]) => name);
+    if (what.length) mentions.push(`site/${page} (${what.sort().join(', ')})`);
+  }
+  if (mentions.length) console.error(`note: site pages that mention this change; check they still match: ${mentions.join(', ')}`);
 }
 
 /** "## 3. Design and reuse — before any edit" -> "Design and reuse". */
@@ -330,6 +363,8 @@ if (process.argv[2] === 'upgrades') {
   syncGraders();
 } else if (process.argv[2] === 'evals-for') {
   evalsFor(readFileSync(0, 'utf8').split('\n').filter(Boolean));
+} else if (process.argv[2] === 'pages-for') {
+  pagesFor(readFileSync(0, 'utf8').split('\n').filter(Boolean));
 } else {
   checkVersion();
   checkSections();
