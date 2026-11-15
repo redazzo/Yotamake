@@ -37,7 +37,7 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 
 ---
 
-## S1 — Acceptance tests (F1–F6, F16) — `todo`
+## S1 — Acceptance tests (F1–F6, F16) — `in progress`
 
 Branch: the assigned branch.
 Needs: none
