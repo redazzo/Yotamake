@@ -31,47 +31,37 @@ rather than adding a second one. Two docs explaining the same thing is a bug.
 ## 3. Write it
 
 Names are kebab-case. Every doc carries `kind:` front-matter, plus `updated:` (reference,
-guides) or `date:` (decisions, records), as `YYYY-MM-DD`.
+guides) or `date:` (decisions, records), as `YYYY-MM-DD`. The one exception is a backlog
+detail doc (`docs/backlog/<slug>.md`), which has none: its entry in `docs/backlog.md` carries
+the dates.
 
-**Reference or guide**
+Start from the template for the kind, in `templates/` in this skill's directory:
+`reference.md`, `guide.md`, `record.md`, and `backlog-detail.md` for `docs/backlog/<slug>.md`.
+Each holds the front-matter, the sections that usually fit, and a comment under each heading
+saying what goes there. Copy what is inside its `~~~markdown` fence (the fence keeps the
+placeholder links out of the docs linter). Drop the sections that do not fit, and delete
+every comment before you save.
 
-```markdown
----
-kind: reference            # or: guide
-status: current
-updated: YYYY-MM-DD
-owns: [subject-one, subject-two]
----
+**Reference.** Add a row to the "Owns" table in `docs/README.md`.
 
-# <Title>
-```
-
-Add a row for it to the "Owns" table (reference) or the guides list in `docs/README.md`.
+**Guide.** Add it to the guides list in `docs/README.md`.
 
 **Record.** Date it when the work started. Use a directory with a `README.md` when the work
-spans several documents. `status: current` while open, `historical` when complete.
-
-```markdown
----
-kind: record
-date: YYYY-MM-DD
-status: current
----
-
-# <What was done>
-
-**Date:** YYYY-MM-DD · **Status:** <open / live in <version or tag>>
-
-<Why the work happened. What was built or fixed. What was decided and what was rejected.
-What is left, with links to backlog entries.>
-```
-
-Then run `node scripts/docs/generate-records-index.mjs`. Never edit `docs/records/README.md`
-by hand.
+spans several documents. `status: current` while open, `historical` when complete. Then run
+`node scripts/docs/generate-records-index.mjs`. Never edit `docs/records/README.md` by hand.
 
 **Decision (ADR).** Ask the user before writing one. Number it one above the highest in
 `docs/decisions/`. Use the template in `docs/decisions/README.md`, and add a row to that
 file's index.
+
+**Avoid**, in every kind:
+
+- plans, roadmaps or "future enhancements" in a reference doc or a guide (they go in
+  `docs/backlog.md`);
+- a table of contents, emoji in headings, or "(added YYYY-MM-DD)" in a heading (Git
+  holds the dates);
+- a reference doc that tells the story of how the system got this way (that goes in a
+  record).
 
 **Backlog entry.** One `##` heading per item in `docs/backlog.md`:
 
@@ -85,7 +75,9 @@ someone pick this up>
 from here.>
 ```
 
-An item with no trigger is a wish, not a backlog entry.
+An item with no trigger is a wish, not a backlog entry. The entry must say enough on its
+own to decide whether to read the detail doc. Delete the detail doc with the entry when the
+work lands.
 
 ## 4. Lint
 
