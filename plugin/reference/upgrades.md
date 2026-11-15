@@ -20,6 +20,29 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.29.0 — ADRs may be amended
+
+- **Check:** `CLAUDE.md`'s **Docs** line says "only superseded or amended", and the
+  **Decisions** row of the first table in `docs/README.md` mentions a dated amendment. A
+  missing file, or a `CLAUDE.md` with no **Docs** line (a lite install), passes.
+- **Apply:** in `CLAUDE.md`, change "(ADRs — never edited, only superseded)" to "(ADRs —
+  never edited, only superseded or amended)". In `docs/README.md`, change the **Decisions**
+  row's update rule to "Never edited — superseded by a later ADR, or given a dated amendment".
+  Where the project has reworded either line, make the same change in its words.
+
+## 0.29.0 — ADR template moves into write-doc
+
+- **Check:** the `## Template` section of `docs/decisions/README.md` names `write-doc`'s
+  `templates/decision.md`, or the repository has no `docs/decisions/README.md` (a lite
+  install).
+- **Apply:** replace everything from the `## Template` heading to the end of
+  `docs/decisions/README.md` with the same part of the plugin's
+  `template/docs/decisions/README.md`. Keep the index and anything above that heading. If
+  there is no `## Template` heading, or the project changed its template, show the user the
+  difference and ask before replacing it. Do not edit existing ADRs. Tell the user the ADR
+  template now lives in the `write-doc` skill, so later changes to it arrive with plugin
+  updates.
+
 ## 0.24.0 — Test-first line
 
 - **Check:** `CLAUDE.md`, **Checks**, has a line starting `**Test-first:**`.

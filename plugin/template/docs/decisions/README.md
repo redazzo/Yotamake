@@ -27,38 +27,8 @@ dated amendment section at the end.
 ## Template
 
 File: `docs/decisions/NNNN-<kebab-slug>.md`, numbered one above the highest here. Add a row
-to the index above.
+to the index above. Start from the decision template of the `write-doc` skill
+(`templates/decision.md` in the skill). It says how to supersede or amend an ADR later.
 
-```markdown
----
-kind: decision
-date: YYYY-MM-DD
-status: current
----
-
-# ADR-NNNN: <Decision as a short statement>
-
-- **Status:** Accepted
-- **Date:** YYYY-MM-DD
-- **Work record:** <link, if any>
-- **Supersedes / amends:** <links, if any>
-
-## Context
-
-<What forced a choice. The constraints. Say so if the rationale is inferred from the code.>
-
-## Decision
-
-In the context of <use case or component>, facing <concern>, we decided for <option> (and
-against <alternatives>) to achieve <quality>, accepting that <downside>.
-
-## Consequences
-
-<What becomes easier, what becomes harder, what is now forbidden.>
-
-## References
-
-<Files, records, issues.>
-```
-
-Use `status: superseded` in the front-matter when a later ADR replaces this one.
+Older ADRs may have one `**Supersedes / amends:**` line. It means the same as the template's
+separate **Supersedes** and **Amends** lines.
