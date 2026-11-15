@@ -308,7 +308,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 20-trivial-change | `simple-session` | fixes a typo in a code comment, runs `scripts/check` but neither `/simplify` nor `/code-review`, says the change is trivial and why, asks before committing |
 | 21-debugging | `simple-session`, `debugging` | for a crash that shows in one helper but starts in another, writes a failing test first, fixes the helper that makes the bad value rather than guarding where it throws, names the root cause, asks before committing |
 | 22-multi-session-autopilot-offer | `multi-session` | ends S0 by offering autopilot next to the resume line, and starts no session until it is chosen, though the user would rather not babysit |
-| 23-improve-architecture | `improve-architecture` | names a pass-through module as a deepening candidate and notes the Modules line does not list it, edits nothing, names a top pick and asks which to take on |
+| 23-improve-architecture | `improve-architecture` | proposes deleting or merging a pass-through module and rates it, notes the Modules line does not list it, edits nothing, names a top pick and asks which to take on |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
 plugin, `scripts/check` uses it to name the cases worth running: those that list a changed

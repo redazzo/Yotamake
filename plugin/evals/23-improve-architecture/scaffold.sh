@@ -34,6 +34,6 @@ export function greet(name) {
 JS
 commit "feat: format the name in the greeting"
 
-echo '// Callers pass the raw name; this module owns the display format.' >> src/name.js
+echo '// Used by greet.' >> src/name.js
 echo '// The name is title-cased by formatName.' >> src/greet.js
 commit "docs: say what the greeting does to the name"
