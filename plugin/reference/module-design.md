@@ -53,6 +53,8 @@ for the other.
 - A pure helper was pulled out to make it testable, but the bugs are in how it is called.
 - Two modules always change together, or one reaches into the other's internals.
 - Code that is untested, or that can only be tested by reaching past its interface.
+- A hidden state machine: the states live in loose flags or a status field, and each caller
+  checks and sets them itself. One module should own the states and the moves between them.
 
 ## Dependencies, and how to test a deepened module
 
