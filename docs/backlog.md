@@ -219,6 +219,13 @@ Design is spread across `setup`, `simple-session`, `multi-session` S0, `write-do
 `plugin/reference/architecture-styles.md`. Until design is its own activity, a separate skill
 would only repeat these.
 
+Reviewing the design of code that already exists is now its own skill, `improve-architecture`
+(0.31.0), with its vocabulary in `plugin/reference/module-design.md`. What is left is
+designing new architecture: quality-attribute scenarios, comparing options, and diagrams as
+deliverables. Two ideas from the same source wait here too: asking several design questions
+per round in `spec`, and having several agents each design a different interface for a
+chosen candidate before picking one.
+
 ## `scripts/check` recipes per stack
 
 **Added:** 2026-11-10 · **Trigger to act:** `setup` fills in `scripts/check` badly or slowly for

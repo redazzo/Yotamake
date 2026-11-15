@@ -92,6 +92,7 @@ plugin/
     debugging/        a bug fix inside a session: reproduce, failing test, root cause, fix
     write-doc/        pick the doc kind, write it from its template, link it, lint it
     spec/             agree scope and acceptance criteria before code  (manual: /yotamake:spec)
+    improve-architecture/  review the code's design, read-only (manual: /yotamake:improve-architecture)
     release-check/    guided deploy with pre-flight and gotchas      (manual: /yotamake:release-check)
     new-migration/    scaffold a timestamped migration file         (manual: /yotamake:new-migration)
     setup/            install or refresh the per-repo files         (manual: /yotamake:setup)
@@ -109,6 +110,7 @@ plugin/
     lib.sh                         shared by the hooks: reads the hook input, finds the gate files
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
+  reference/module-design.md       deep and shallow modules, seams, the deletion test
   reference/upgrades.md            per version: what to add to a repo's own files, and how
   install.sh                       installs template/ into a repo
   template/                        the per-repo files
@@ -237,6 +239,13 @@ first ([`spec`](./plugin/skills/spec/SKILL.md)). It agrees the scope and numbere
 criteria in one short file before any code, then hands over to a session. Fixes, renames and
 refactors skip it.
 
+**Architecture review.** The checks above ask whether a change fits the design. To ask
+whether the design itself is good, run `/yotamake:improve-architecture`
+([`improve-architecture`](./plugin/skills/improve-architecture/SKILL.md)). It reads, starting
+where git history shows the code changes most, and reports shallow modules worth deepening
+and places where the code and the Architecture section disagree. It names the one to do
+first, then hands what you choose to a session, the backlog or an ADR. It edits nothing.
+
 **Review.** Once per session, after the checks pass, `simple-session` reviews the whole
 branch diff with the built-in `/simplify` and `/code-review`, and against Architecture.
 Docs-only branches skip it, and so do trivial ones (every changed line a comment or a prose
@@ -299,6 +308,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 20-trivial-change | `simple-session` | fixes a typo in a code comment, runs `scripts/check` but neither `/simplify` nor `/code-review`, says the change is trivial and why, asks before committing |
 | 21-debugging | `simple-session`, `debugging` | for a crash that shows in one helper but starts in another, writes a failing test first, fixes the helper that makes the bad value rather than guarding where it throws, names the root cause, asks before committing |
 | 22-multi-session-autopilot-offer | `multi-session` | ends S0 by offering autopilot next to the resume line, and starts no session until it is chosen, though the user would rather not babysit |
+| 23-improve-architecture | `improve-architecture` | names a pass-through module as a deepening candidate and notes the Modules line does not list it, edits nothing, names a top pick and asks which to take on |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
 plugin, `scripts/check` uses it to name the cases worth running: those that list a changed
@@ -332,7 +342,7 @@ read-only, so `install.sh` cannot run inside a case; case 11's scaffold runs it 
 Until a Claude Code bug is fixed, the sandbox also denies the agent `git` itself, so graders
 that need `scripts/check` or the review fail for that reason (backlog, "Eval sandbox denies
 `git`").
-Cases 09–12 start with a slash command, since those skills are not model-invoked.
+Cases 09–12 and 23 start with a slash command, since those skills are not model-invoked.
 Case 15 resumes a recorded first turn (`history.jsonl`, a run of case 13) and its prompt is
 the next message. The history holds the `simple-session` text, the system prompt and the
 Claude Code version from when it was recorded. So after changing that skill or upgrading

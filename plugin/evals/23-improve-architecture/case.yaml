@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 23-improve-architecture
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  The run reviews the design without changing anything: no branch, no edits, no commit. Its report names src/name.js as a shallow module that only forwards to titleCase (deleting it would not move any complexity into its callers), and notes that the Architecture section's Modules line does not list it. It names one candidate to do first and asks the user which candidate to take on.
