@@ -170,6 +170,18 @@ and have `scripts/check` warn when a skill passes a line limit.
 
 Both look fixed. Delete this entry if the full run agrees.
 
+## LLM judges fail case 23 on text that meets them
+
+**Added:** 2026-11-15 · **Trigger to act:** case 23 scores below 1.00 on a run whose final
+messages a person reads as passing, or another case shows the same split votes.
+
+In six runs of `23-improve-architecture` (2026-11-15, 0.31.0), every final message did what
+the case asks, yet the judges split or failed. `rating` voted FAIL three times on a message
+with "**Rating:** Strong", and `drift` did the same on one saying `src/name.js` "is
+not in Architecture → Modules". Splitting each grader into one short claim fixed
+`shallow-module` (3 of 3) but not the rest. Next step: one run with `--keep-temp`, to see
+exactly what the judge is given as the final message.
+
 ## Untested paths
 
 **Added:** 2026-10-29 · **Trigger to act:** the next change to one of these paths.
