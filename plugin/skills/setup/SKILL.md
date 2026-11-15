@@ -77,6 +77,13 @@ from guesses:
   and ask the user to confirm it: these lines become rules the sessions stop on, so a wrong
   boundary blocks real work. A boundary the code already breaks goes in the report, not in the
   line.
+
+  **No code yet** (a new project): choose the design with the user. Ask what the project is
+  for, unless they have said, then follow "Choosing a style" in the catalogue. Once the user
+  picks, fill in Style, Modules (the parts planned so far), Boundaries and Patterns from that
+  style's entry, using the paths the user plans, and any Constraints they state. Leave Shared
+  code as a placeholder until there is code. When the catalogue says the choice gets an ADR
+  and the install has a `docs/` folder, offer to write it with the `write-doc` skill.
 - **`scripts/check`, design gates** — if the repository already has a boundary or
   duplicate-code tool configured, add it as a `run` line. Otherwise leave the placeholders and
   mention them in the report, with the rules the style's "Gate" entry says a tool would

@@ -138,7 +138,9 @@ section of CLAUDE.md and decide how the change fits before you write it.
 
    Say what conflicts and quote the rule. Give options with a recommendation, for example: a
    way that keeps the rule; changing the rule first (edit Architecture, or write a new ADR,
-   which makes the work too big for one session, step 1); or dropping that part. Do this
+   which makes the work too big for one session, step 1; the order is in "Changing the style"
+   in `<this skill's directory>/../../reference/architecture-styles.md`); or dropping that
+   part. Do this
    every time, even when the user asked for exactly that change or said not to ask. The rule
    is the project's, and changing it is a separate decision. Wait for the answer.
 

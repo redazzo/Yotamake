@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-14
+updated: 2026-11-15
 owns: [open-work-register]
 ---
 
@@ -208,6 +208,16 @@ points at `CLAUDE.md`, so other agents and people follow the same facts. Skills 
 `CLAUDE.md` sections. The skills, hooks and `ask` rules work only in Claude Code, so other
 agents would get the facts and `scripts/check` but none of the enforcement (review of
 2026-11-14).
+
+## A dedicated architecture design skill
+
+**Added:** 2026-11-15 · **Trigger to act:** users ask for quality-attribute scenarios, a
+deeper comparison of options, or C4 or draw.io diagrams as deliverables. Or the design text
+in `setup` and `multi-session` grows past a short paragraph each.
+
+Design is spread across `setup`, `simple-session`, `multi-session` S0, `write-doc` and
+`plugin/reference/architecture-styles.md`. Until design is its own activity, a separate skill
+would only repeat these.
 
 ## `scripts/check` recipes per stack
 

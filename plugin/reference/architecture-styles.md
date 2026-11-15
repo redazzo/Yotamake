@@ -186,3 +186,14 @@ testability, and the constraints. Name two or three candidate styles, give each 
 and cost against those needs, and recommend one. Prefer the simplest style that meets them;
 a modular monolith can split into services later, but merging services back is costly. A
 choice that is costly to reverse gets an ADR.
+
+## Changing the style
+
+Change the rule before the code, in this order:
+
+1. The ADR, and the Architecture lines in `CLAUDE.md`.
+2. The boundary gate in the check command. Turn it on only for code already moved, or add
+   it in the last step.
+3. The code, moved in steps that each pass the gate.
+
+This is more than one session's work, so it runs as a `multi-session` effort.
