@@ -65,27 +65,28 @@ Commit and merge into main?</span></div>
 <section>
   <div class="wrap">
     <div class="section-head">
-      <h2>What it does</h2>
-      <p>The plugin holds the skills and hooks, and is the same for every repository. Each repository gets its own <code>CLAUDE.md</code> with the facts the skills need: check commands, branch rules and the architecture. Updating the plugin updates every repository that uses it.</p>
+      <h2>What it does differently</h2>
+      <p>Many coding-agent harnesses are prompts and conventions alone, which work only while the model follows them. Yotamake has those too, plus the four things below. The plugin is the same for every repository, and each repository's <code>CLAUDE.md</code> holds the facts it needs: check commands, branch rules and the architecture.</p>
     </div>
     <div class="grid two">
       <div class="card">
-        <h3>Changes run as sessions</h3>
-        <p>A session is one branch and one merge. Claude checks the change fits, cuts a branch, makes the change and updates the doc that describes it, runs the checks and a review, then stops for approval. Larger work is split into planned sessions that survive <code>/clear</code>.</p>
+        <h3>Enforced, not only asked</h3>
+        <p>The stop points and branch rules are hooks and permission rules, so they do not depend on a skill firing or on what is still in context.</p>
       </div>
       <div class="card">
-        <h3>The architecture is checked first</h3>
-        <p>Before editing, Claude looks for existing code to reuse and reads the Architecture section of <code>CLAUDE.md</code>. A change that would break a boundary or an accepted ADR stops for a decision.</p>
+        <h3>Small steps, and a person decides</h3>
+        <p>A session is one branch: Claude checks the change fits, makes it, updates its doc, runs the checks and a review, then stops for approval. Larger work becomes planned sessions that survive <code>/clear</code>. Nothing reaches the main branch without your yes.</p>
       </div>
       <div class="card">
-        <h3>One check script</h3>
-        <p><code>scripts/check</code> lists every check. Claude runs it before proposing a commit, the pre-commit hook runs the fast checks, and CI runs all of them.</p>
+        <h3>Your architecture, checked first</h3>
+        <p>Before editing, Claude looks for code to reuse and reads your Architecture section and ADRs, not a generic process. A change that would break a boundary or an accepted ADR stops for a decision.</p>
       </div>
       <div class="card">
-        <h3>Optional docs system</h3>
-        <p>Reference docs, guides, ADRs and dated records, each with its own update rule, plus a linter for broken links and missing front-matter. Small repositories can leave it out.</p>
+        <h3>One gate for people, Claude and CI</h3>
+        <p><code>scripts/check</code> lists every check. Claude runs it before proposing a commit, the pre-commit hook runs the fast checks, and CI runs all of them, so a pass means the same everywhere.</p>
       </div>
     </div>
+    <p class="muted after-grid">Skills also cover specs, bug fixes, design reviews, deploy checklists and migrations. <a href="skills.html">All the skills</a>.</p>
   </div>
 </section>
 
@@ -93,7 +94,7 @@ Commit and merge into main?</span></div>
   <div class="wrap">
     <div class="section-head">
       <h2>What the hooks block</h2>
-      <p>The important rules are enforced by hooks and permission settings, so they apply even when a skill is not used.</p>
+      <p>What the hooks block and the permission rules stop to ask about, even when no skill runs.</p>
     </div>
     <div class="grid two">
       <div class="card">
