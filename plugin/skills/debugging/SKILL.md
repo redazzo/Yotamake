@@ -44,6 +44,12 @@ error shows.
 - For a regression, `git log` and `git blame` on the lines involved show when it started and
   why.
 - A fix where the error shows rarely stops the bug on other paths to the same code.
+- A guard at the error is a fix only when the state it handles is allowed to happen. If
+  that state should never exist, find what makes it.
+
+If two fixes in a row fail on the same idea of the cause, write that idea down in one
+sentence. Then test it directly, before another fix: find an observation that would come out
+differently if the idea were false, and make it.
 
 If three fixes in a row fail, stop. Your idea of the cause is probably wrong. Say what you
 tried and what you saw, and ask the user before trying more.
