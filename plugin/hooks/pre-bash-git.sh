@@ -7,7 +7,9 @@
 #     (MERGE_HEAD exists) is allowed, and so is a repository with
 #     .claude/yotamake/allow-edits-on-main.
 # The command is split into simple commands with a small quote-aware parser; `cd <dir>` and
-# `git -C <dir>` move the directory the next git command runs in. When the command cannot
+# `git -C <dir>` move the directory the next git command runs in. Shell keywords and
+# wrappers in front of git (`{`, `then`, `do`, `time`, `env`, `nohup`, …) are skipped, and
+# the script given to `bash -c` or `sh -c` is read the same way. When the command cannot
 # be read (an unclosed quote, say), the hook lets it through. Exit 2 blocks the call and
 # sends stderr back to Claude.
 
@@ -25,7 +27,9 @@ input=$(cat)
 calls=$(node -e '
 let d;
 try { d = JSON.parse(require("fs").readFileSync(0, "utf8")); } catch { process.exit(0); }
-const src = String(d?.tool_input?.command ?? "");
+// split(src): the simple commands in src, each a list of words, or null when it cannot be
+// read (an unclosed quote).
+const split = (src) => {
 const cmds = [[]];
 let word = null, quote = null;
 const end = () => { if (word !== null) cmds[cmds.length - 1].push(word); word = null; };
@@ -46,16 +50,47 @@ for (let i = 0; i < src.length; i++) {
     }
     word = (word ?? "") + c;
 }
-if (quote) process.exit(0);
+if (quote) return null;
 end();
+return cmds;
+};
+const cmds = split(String(d?.tool_input?.command ?? ""));
+if (!cmds) process.exit(0);
 const commitValueFlags = "mFcCt";
 const valueLong = /^--(message|file|reuse-message|reedit-message|template|author|date|cleanup|trailer|fixup|squash)$/;
-let dir = ".";
 const join = (a, b) => (b.startsWith("/") ? b : a + "/" + b);
 const out = [];
+// Words that can stand before the command itself, and how many words each option of theirs
+// takes: a shell keyword, a `{` group, `!`, or a wrapper that runs the rest of the line.
+// Best effort: other wrappers (sudo, xargs, eval, $(…)) still hide git. The `ask` rules stay
+// the guard for the commit itself.
+const assign = /^[A-Za-z_][A-Za-z0-9_]*=/;
+const lead = new Set(["{", "!", "if", "then", "elif", "else", "do", "while", "until", "time",
+    "command", "exec", "nohup", "env"]);
+const leadValueOpts = { env: ["-u", "-C", "-S"], exec: ["-a"] };
+const shell = /(^|\/)(ba|da|z|k)?sh$/;
+// walk(cmds, dir): add each git call in cmds to out. A `bash -c` script is walked with a
+// copy of dir, so a `cd` inside it does not move the commands after it.
+const walk = (cmds, dir) => {
 for (let words of cmds) {
-    while (words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(words[0])) words = words.slice(1);
-    if (words[0] === "command" || words[0] === "exec") words = words.slice(1);
+    while (words.length) {
+        while (words.length && assign.test(words[0])) words = words.slice(1);
+        const w = words[0];
+        if (!lead.has(w)) break;
+        let i = 1;
+        while (i < words.length && (words[i].startsWith("-") || (w === "env" && assign.test(words[i])))) {
+            i += (leadValueOpts[w] || []).includes(words[i]) ? 2 : 1;
+        }
+        // `command -v git` only looks git up.
+        words = w === "command" && words.slice(1, i).some((o) => /^-[A-Za-z]*[vV]/.test(o)) ? [] : words.slice(i);
+    }
+    // bash -c "<script>": read the script as commands of its own.
+    if (words.length && shell.test(words[0])) {
+        const c = words.findIndex((w, k) => k > 0 && /^-[A-Za-z]*c[A-Za-z]*$/.test(w));
+        const inner = c > 0 && words[c + 1] !== undefined ? split(words[c + 1]) : null;
+        if (inner) walk(inner, dir);
+        continue;
+    }
     if (words[0] === "cd" && words[1]) { dir = join(dir, words[1]); continue; }
     if (!words.length || !/(^|\/)git$/.test(words[0])) continue;
     let i = 1, gdir = dir;
@@ -82,6 +117,8 @@ for (let words of cmds) {
     }
     out.push([gdir, sub, skip].join("\t"));
 }
+};
+walk(cmds, ".");
 if (out.length) process.stdout.write([d.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd(), ...out].join("\n"));
 ' <<<"$input" 2>/dev/null)
 [[ -n "$calls" ]] || exit 0

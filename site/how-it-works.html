@@ -116,14 +116,14 @@
 
     <h2 id="stops">Stop points</h2>
     <p>The skills stop before commit, version bump, merge and deploy. The repository's settings back this up: <code>git commit</code>, <code>merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> are under <code>ask</code>, so Claude Code asks every time. An <code>ask</code> rule wins over a matching <code>allow</code> rule, even a broad one. Add your deploy command to the list too.</p>
-    <p>Cutting a branch, staging files and a fast-forward pull are allowed, so they do not prompt.</p>
+    <p>Cutting a branch, staging files and a fast-forward pull are allowed, so they do not prompt. Deleting, moving or overwriting a branch (<code>git branch -D</code>, <code>-f</code>, <code>-M</code> and the like) asks.</p>
 
     <h2 id="hooks">The hooks</h2>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Hook</th><th>What it does</th></tr></thead>
         <tbody>
-          <tr><td><code>pre-edit-protect</code></td><td>Blocks edits to the files listed in <code>protected-paths.conf</code>. By default that is <code>.env</code> files, keys and certificates.</td></tr>
+          <tr><td><code>pre-edit-protect</code></td><td>Blocks edits to the files listed in <code>protected-paths.conf</code>, and reads of them, so secrets stay out of Claude's context. By default that is <code>.env</code> files, keys and certificates.</td></tr>
           <tr><td><code>pre-edit-main-branch</code></td><td>Blocks Edit and Write while the repository is on its main branch.</td></tr>
           <tr><td><code>pre-bash-git</code></td><td>Blocks <code>--no-verify</code>, and <code>git commit</code> on the main branch.</td></tr>
           <tr><td><code>post-edit-check</code></td><td>Runs a fast per-file check after each edit, from <code>post-edit-checks.conf</code>.</td></tr>
@@ -137,7 +137,7 @@
     <p>A repository that works on main on purpose can opt out with an empty file at <code>.claude/yotamake/allow-edits-on-main</code>. A person creates it; Claude cannot.</p>
 
     <h2 id="limits">What the hooks do not cover</h2>
-    <p>The edit hooks watch the Edit and Write tools only. The Bash hook watches git commands only. So a shell command gets past them: <code>sed -i</code>, <code>echo &gt; .env</code>, or a code change made from the shell, which the Stop hook never sees. Claude Code's own permission prompt for Bash is the guard there.</p>
+    <p>The edit hooks watch the Edit, Write and NotebookEdit tools only, and the protected-paths hook Read too, but not Grep. The Bash hook watches git commands only. So a shell command gets past them: <code>sed -i</code>, <code>echo &gt; .env</code>, or a code change made from the shell, which the Stop hook never sees. Claude Code's own permission prompt for Bash is the guard there.</p>
 
     <h2 id="docs">The docs system</h2>
     <p>A full install adds four kinds of doc under <code>docs/</code>, each with its own update rule:</p>

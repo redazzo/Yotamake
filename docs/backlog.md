@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-16
+updated: 2026-11-17
 owns: [open-work-register]
 ---
 
@@ -48,6 +48,18 @@ To recheck on a new release: run `claude plugin eval . --case 06-question --runs
 --keep-temp` (about $0.10), then look for `/usr/bin/git` in the kept run's
 `config/settings.json`. When it is gone, re-run the cases that need git and delete this
 entry. Do not change the fixture or `scripts/check` to get around the sandbox.
+
+Rechecked 2026-11-16 on Claude Code 2.1.325: `/usr/bin/git` is still on the deny list.
+
+**A second cause, found the same day.** With the three helpers replaced by copies of git
+(`cp --remove-destination /usr/bin/git` over each; `sudo pacman -S git` restores the
+links), git is no longer denied, but the sandbox mounts the eval repository's `.git`
+read-only: `git switch -c` fails with `Unable to create '.git/index.lock': Read-only file
+system`. The settings file does not list it, so Claude Code adds it at run time. Saved runs
+from 2026-10-29 on show these errors beside the git denials, and none shows a branch
+created. `claude plugin eval` has no option to make the repository writable, and an Ubuntu
+machine would not help. So this entry closes only when a release fixes both causes; check
+that a git case (`01-branches-first`, about $0.20) creates its branch.
 
 ## Show that the harness helps: Δ and cost against the baseline
 
@@ -116,43 +128,6 @@ Review of 2026-11-16: a one-line code fix runs the check, `/simplify`, `/code-re
 design-read agent and two or three permission prompts. A middle tier to try first: a small
 diff inside one module runs the check and `/code-review` only. Take the threshold from the
 cost numbers, not from a guess.
-
-## Permission holes in the template settings
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** the next change to
-`plugin/template/.claude/settings.json` or `plugin/hooks/hooks.json`, or a session deletes or
-moves a branch, or reads a secret, without a prompt.
-
-From a review of the harness (2026-11-16). Three small holes:
-
-- `Bash(git branch:*)` is under `allow`, so `git branch -D`, `git branch -f main` and
-  `git branch -M` run without a prompt. Put those forms under `ask`, as the forced forms of
-  `git switch` already are.
-- The protected-paths list stops edits only. Nothing stops Claude reading `.env` or a key.
-  Add `Read` deny rules for the same patterns to the template settings, or a `PreToolUse`
-  hook on Read that uses `protected-paths.conf`.
-- `post-edit-mark.sh` and `post-edit-check.sh` are registered for `Edit|Write|MultiEdit`,
-  not `NotebookEdit`, so a notebook edit never marks the session and the `Stop` gate misses
-  it. The pre-edit hooks already match it.
-
-The settings file is merged on every install, so new rules reach older repositories on a
-refresh. Add cases to `scripts/test-hooks.sh` and `scripts/test-install.sh`.
-
-## The git guard misses wrapped commands
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** the next change to
-`plugin/hooks/pre-bash-git.sh`, or a session commits on the main branch or passes `--no-verify`
-through one of these forms.
-
-From the same review. Probes of `pre-bash-git.sh` (2026-11-16) showed it lets these through:
-`{ git commit …; }`, `if …; then git commit …`, `time git commit …`,
-`env git commit --no-verify` and `bash -c "git commit --no-verify"`. The parser reads the
-first word of each simple command, so a leading `{`, `then`, `do`, `time` or `env` hides
-the `git`, and it does not look inside a `bash -c` or `sh -c` string. The `ask` rule
-still prompts for the commit itself, but `--no-verify` in the last two forms has no second
-guard. Fix: skip those leading words, and parse the string given to `bash -c` the same way.
-Add each form to `scripts/test-hooks.sh`. See also "Shell commands get past the edit
-hooks".
 
 ## An empty gate still writes the pass stamp
 
@@ -226,6 +201,18 @@ that `/simplify` and `/code-review` ran, from what it sees. Find that out before
 Review of 2026-11-16: do this after "A facts file that hooks can read", so the hooks have
 facts they can rely on.
 
+## Gaps left in the git and protected-paths guards
+
+**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** a session deletes or moves a
+branch, commits on the main branch, skips the pre-commit hook or reads a secret through one of
+these forms.
+
+From the review of the 0.34.1 hook fixes. `ask` rules match from the start of a command, so
+`git branch foo -D` still runs without a prompt. `pre-bash-git.sh` could refuse those flags
+anywhere, since it already reads flag clusters. The wrapper list in `pre-bash-git.sh` is best
+effort: `sudo`, `xargs`, `eval` and `$(…)` still hide git. And the protected-paths hook runs
+on Read but not Grep, so a Grep on a folder can still show a secret.
+
 ## Shell commands get past the edit hooks
 
 **Priority: Low** · **Added:** 2026-11-14 · **Trigger to act:** a session changes a protected
@@ -238,9 +225,6 @@ protected-paths and edit-marking hooks. `pre-bash-git.sh` already parses command
 quote-aware reader; a sibling hook could refuse redirections and in-place edits aimed at
 protected paths or made on the main branch. It must still let a command through when it
 cannot read it (Architecture, Boundaries). See also "Two gaps left in the `Stop` gate".
-
-"The git guard misses wrapped commands" covers the same kind of gap in `pre-bash-git.sh`
-itself, and is the cheaper one to close first.
 
 ## Two gaps left in the `Stop` gate
 
