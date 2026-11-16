@@ -450,7 +450,60 @@ Reviewing the design of code that already exists is now its own skill, `improve-
 designing new architecture: quality-attribute scenarios, comparing options, and diagrams as
 deliverables. Two ideas from the same source wait here too: asking several design questions
 per round in `spec`, and having several agents each design a different interface for a
-chosen candidate before picking one.
+chosen candidate before picking one. pstack's `architect` ("design it twice": two
+structurally different designs before choosing, compared on how much each hides behind a
+small interface) is a second source for the same idea.
+
+## Ideas from the pstack review
+
+**Priority: Low** · **Added:** 2026-11-16 · **Trigger to act:** each item names its own. Do not take them
+together: "Keep skills short" and "Session overhead on small changes" say new text has a
+cost.
+
+From a review of [pstack](https://github.com/cursor/plugins/tree/main/pstack) (Cursor's
+agent plugin: playbooks and principles, with no hooks or check command). It is strong at
+evidence and weak at enforcement, the opposite of this harness. The review read about a
+dozen of its skills; none of its text was run here. pstack is MIT-licensed. Rewrite what we
+take in our own plain words.
+
+- **A rule table with its enforcer.** Keep a table in `CLAUDE.md` pairing each rule with
+  what enforces it (hook, check, type, or nothing). A rule with no enforcer is a repeat
+  waiting to happen. Trigger: a Claude mistake is corrected twice, or "Enforce the session
+  steps in order with hooks" is picked up. From pstack's `correct`.
+- **A `/yotamake:correct` skill for target repos.** Find the mistakes agents keep making
+  there, fix each at the highest level that works (design, then types, then a lint whose
+  error names the fix, then a test, then docs), and prove each new check fails on a real
+  past mistake. Trigger: the rule table above proves useful, or a user asks. Needs its own
+  `multi-session` effort.
+- **Label claims in the report.** Mark each claim in a session report as measured, inferred
+  or guess, and never hand the user a check Claude could run itself. Proof by running a
+  command for each review finding is too costly for every session; offer it as an opt-in
+  step. Trigger: the Δ run gives cost per case. From `interrogate` and `blast-radius`.
+- **Prove it on the running app.** Claude Code lists a built-in `run` skill that launches
+  and drives an app. Check what it covers first. If it does not cover a repo's real use, a
+  skill that generates a project-local verify skill (pstack's `create-verification-skill`)
+  could. Trigger: a user reports a change that passed `scripts/check` but did not work.
+- **Learn from a finished effort.** At `multi-session` close-out, sort what was learned with
+  pstack's `reflect` questions: will it still be true in six months, would it change what a
+  future agent does, and could a check enforce it instead of text. Skip its four-agent
+  transcript review. Trigger: close-out entries keep repeating the same lessons.
+- **State "done" as a test that can fail.** In `spec` and the first session of a
+  `multi-session` effort, write the done condition so a command can fail it, and capture the
+  value before the change, so the check reads old against new. From `figure-it-out`.
+  Trigger: a spec's criteria turn out untestable.
+- **Eval fixture leaks.** What is still open: the sandbox path `/tmp/claude-eval-*` that the
+  agent can see (outside our control); the author and branch literals repeated in each
+  `scaffold.sh` (one shared `_fixture/env.sh` would hold them); and case 15's
+  `history.jsonl`, hand-edited for the rename, which `record.sh` should regenerate. It also
+  still holds an older `simple-session` text (findings "in the report as suggestions", no
+  trivial tier), so case 15 does not test the skill as shipped. Trigger: the Δ run, or the
+  next re-record of case 15.
+- **Watch the backlog rule's cost.** 0.34.0 writes each finding a branch does not fix into
+  `docs/backlog.md` (`simple-session`, "Findings not acted on"). Two risks: parallel
+  branches that each add an entry conflict in that file at merge (this rule's own branch
+  did), and undone `/simplify` cleanups fill the backlog with small items whose line numbers
+  go stale. Trigger: a merge conflict in `docs/backlog.md` between two session branches, or
+  more than a few cleanup entries from one branch.
 
 ## Small harness ideas
 

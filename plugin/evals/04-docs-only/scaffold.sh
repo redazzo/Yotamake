@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-exec bash "$(dirname "$0")/../_fixture/setup.sh" docs/eval-work
+exec bash "$(dirname "$0")/../_fixture/setup.sh" docs/work

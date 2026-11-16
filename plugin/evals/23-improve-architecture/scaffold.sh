@@ -5,7 +5,7 @@
 set -euo pipefail
 bash "$(dirname "$0")/../_fixture/setup.sh"
 
-commit() { git add -A && git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "$1"; }
+commit() { git add -A && git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "$1"; }
 
 cat > src/name.js <<'JS'
 import { titleCase } from './text.js';

@@ -8,5 +8,5 @@ if grep -q '\*\*Docs-only:\*\*' CLAUDE.md || ! grep -q '^## Conventions' CLAUDE.
   echo "scaffold: could not remove the Docs-only line cleanly" >&2; exit 1
 fi
 git add -A
-git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Drop the Docs-only line"
-git checkout -q -b chore/eval-work
+git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "Drop the Docs-only line"
+git checkout -q -b chore/work

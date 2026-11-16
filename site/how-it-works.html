@@ -66,7 +66,7 @@
       <li><strong>Design and reuse</strong><p>Look for code to reuse, and check the change against Architecture. Stop and ask on a conflict.</p></li>
       <li><strong>Do the work</strong><p>Keep to one concern. Update the doc that owns what changed. With <code>Test-first: yes</code>, start with a failing test. A bug fix follows the <a href="skills.html#debugging"><code>debugging</code></a> skill.</p></li>
       <li><strong>Run the checks</strong><p>Run <code>scripts/check</code>. Never skip or weaken a check to get a pass.</p></li>
-      <li><strong>Review</strong><p>Once, on the whole branch: the built-in <code>/simplify</code>, a design read by a fresh agent, and <code>/code-review</code>. Docs-only and trivial branches skip it.</p></li>
+      <li><strong>Review</strong><p>Once, on the whole branch: the built-in <code>/simplify</code>, a design read by a fresh agent, and <code>/code-review</code>. Docs-only and trivial branches skip it. A real finding the branch does not fix goes into the backlog with a trigger to act.</p></li>
       <li class="stop"><strong>Stop and report</strong><p>What changed, what was reused, which docs were updated, the check and review results, and a proposed commit message. Then ask: commit and merge?</p></li>
     </ol>
     <p>On a yes, Claude commits, bumps the version if the project uses bumps, and merges locally, or pushes and opens a pull request if the project works that way. It never deploys.</p>

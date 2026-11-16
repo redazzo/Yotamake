@@ -8,5 +8,5 @@ if ! grep -q '^// Shraed text helpers\.' src/text.js; then
   echo "scaffold: could not add the comment typo" >&2; exit 1
 fi
 git add -A
-git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Add a comment typo"
-git checkout -q -b fix/eval-work
+git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "Add a comment typo"
+git checkout -q -b fix/work

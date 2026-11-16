@@ -253,9 +253,10 @@ first, then hands what you choose to a session, the backlog or an ADR. It edits 
 branch diff with the built-in `/simplify` and `/code-review`, and against Architecture.
 Docs-only branches skip it, and so do trivial ones (every changed line a comment or a prose
 typo). The `Docs-only` line in `CLAUDE.md` says which files are docs; the top of
-`simple-session` has the default and says what counts as trivial. When the `Integration`
-line in `CLAUDE.md` says the project works through pull requests, the session ends by
-pushing and opening one instead of merging locally.
+`simple-session` has the default, says what counts as trivial, and says where findings the
+branch does not fix go. When the `Integration` line in `CLAUDE.md` says the project works
+through pull requests, the session ends by pushing and opening one instead of merging
+locally.
 
 **Parallel sessions.** Two sessions of one effort that need nothing from each other and
 change different files may run at once, each in a sibling `git worktree` with its own Claude

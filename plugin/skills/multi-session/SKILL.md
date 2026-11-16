@@ -141,7 +141,8 @@ Under autopilot, "Autopilot" overrides these where it says so.
 - Keep the docs ledger, `docs.md`, as you go, not from memory at the end. Before the report
   (`simple-session`, "Stop and report"), add a row for every behaviour, rule, interface,
   config or command this session changed: the doc that owns it, and `done`, `open` or `none`.
-  Also add every name this session renamed or removed, any follow-up for the backlog, any
+  Also add every name this session renamed or removed, any follow-up for the backlog (this
+  includes each one in `simple-session`, "Findings not acted on"), any
   decision that may need an ADR, and a line for the record. A doc update you put off is an
   `open` row, never just a line in `log.md`. The report's docs line names the rows this
   session added.

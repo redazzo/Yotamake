@@ -6,7 +6,7 @@ description: Use before editing code, tests or docs in a repository set up with 
 # Simple session
 
 A session is one branch and one merge that fits in one context. This skill is the
-`multi-session` rules without the working folder: no plan, findings or log, because nothing
+`multi-session` rules without the working folder: no plan, findings file or log, because nothing
 has to survive a `/clear`.
 
 Project specifics live in `CLAUDE.md`, not here. This skill reads these sections:
@@ -34,6 +34,22 @@ typo fix (in a docstring, or in Markdown that counts as code). It skips the desi
 review steps; the checks and any version bump still apply. A change to a string literal,
 identifier, config value or logic is never trivial, even a one-character typo. When unsure,
 it is not trivial.
+
+## Findings not acted on
+
+A finding not acted on is a real problem you see, at any step, that this branch does not
+fix: work outside the task, a `/simplify` fix you undid, a review finding outside the
+branch's concern. This holds on every branch, and a backlog entry does not stop a branch
+being docs-only or trivial.
+
+Drop a finding you judge wrong, and say why in one line in the report. Write every other
+one into `docs/backlog.md` as part of this branch's changes, as the `write-doc` skill says,
+with the file and line. Add to an entry that already covers it rather than a duplicate, and
+put one branch's small cleanups in a single entry. List the findings in the report instead
+when there is no `docs/backlog.md`, or when the user has limited which files may change.
+Inside a `multi-session` effort, add them to the ledger's Backlog line instead; close-out
+writes the entry. Write the ones you know before a `scripts/check` run, so that run covers
+them; one written after the last run means running it again before the report.
 
 ## 0. Harness upgrades — first
 
@@ -155,8 +171,8 @@ that `/yotamake:setup` can fill it in.
 
 Follow CLAUDE.md. Keep to the one concern the branch is named for. The trivial side-fix
 policy (CLAUDE.md, Conventions) applies: fix a typo or stale comment you pass, and note it in
-the report. Anything with behavioural reach that is outside the task goes in the report as a
-suggestion, not in the diff.
+the report. Anything with behavioural reach that is outside the task is a finding not acted
+on (above), not part of the diff.
 
 **Test-first.** When **Checks** says `Test-first: yes`, start a change in behaviour with a
 test. Run just that test (not `scripts/check`) and see it fail for the reason you expect,
@@ -168,11 +184,11 @@ back for step 5.
 
 If the change alters how something works, update the reference doc that owns it in the same
 branch. The "Owns" table in `docs/README.md` names it. Also fix CLAUDE.md if it describes the
-thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing goes
-in `docs/backlog.md` with a trigger to act. An architecturally significant decision needs an
+thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing is a
+finding not acted on. An architecturally significant decision needs an
 ADR in `docs/decisions/`; ask before writing one. The `write-doc` skill covers the formats.
 If the repository has no `docs/README.md` (a lite install), there is no docs system: fix
-CLAUDE.md or `README.md` where they describe the change, and put follow-ups in the report.
+CLAUDE.md or `README.md` where they describe the change.
 
 ## 5. Run the checks
 
@@ -211,9 +227,9 @@ Otherwise review the branch's diff against the main branch in three parts:
 
 1. **Reuse.** Run the built-in `/simplify` skill. It applies its fixes itself. Keep the
    fixes to code this branch added or changed. Undo the others by hand (not with
-   `git checkout`, which would also drop your own uncommitted work) and list them in the
-   report as suggestions. If `/simplify` is not available, check by hand: for each new
-   function or block, search for code that already does the same, and reuse it.
+   `git checkout`, which would also drop your own uncommitted work) and treat them as
+   findings not acted on (above). If `/simplify` is not available, check by hand: for each
+   new function or block, search for code that already does the same, and reuse it.
 2. **Design.** Once part 1's fixes are in, start one built-in `general-purpose` agent in
    the background with the Agent tool, go on to part 3, and act on its answer when it
    comes. It did not write the change, so it reads it fresh. Its brief, self-contained: "Design read: run `git diff <main branch>`. Read the
@@ -227,9 +243,8 @@ Otherwise review the branch's diff against the main branch in three parts:
 3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a
    real defect in this branch's change.
 
-If any part changed code, run `scripts/check` again. A finding you judge wrong, or one
-outside this branch's concern, goes in the report with one line on why you left it. If
-`/code-review` is not available, say so in the report and carry on.
+If any part changed a file, run `scripts/check` again. If `/code-review` is not
+available, say so in the report and carry on.
 
 ## 7. Stop and report
 
@@ -246,9 +261,10 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
 - with `Test-first: yes`, the test you saw fail before the change;
 - for a bug fix, what `debugging`, "Report", asks for;
 - the check results (one line each);
-- the review: which skills you ran, what they found and fixed, what you left and why, or
+- the review: which skills you ran, what they found and fixed, or
   that it was skipped because the branch is docs-only, or trivial (and why);
-- any side-fixes and any suggestions you left out;
+- any side-fixes, each finding not acted on and where it went (a backlog entry, the ledger,
+  or this report), and the findings you dropped as wrong, one line each;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).
 

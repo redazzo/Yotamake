@@ -43,5 +43,5 @@ if node -e "import('./src/greet.js').then(m => m.greet('Ada  Lovelace'))" 2>/dev
   echo "scaffold: the planted bug does not crash" >&2; exit 1
 fi
 git add -A
-git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Title-case names in greetings"
-git checkout -q -b fix/eval-work
+git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "Title-case names in greetings"
+git checkout -q -b fix/work
