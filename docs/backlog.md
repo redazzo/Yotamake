@@ -175,11 +175,10 @@ One case is already felt: `post-edit-mark.sh` counts an edit as docs with the de
 only (files under `docs/`, and Markdown at the root other than `CLAUDE.md`). Other doc
 paths count as code, so Claude runs `scripts/check` once more than it needs to.
 
-A fix: a `.claude/yotamake/project.conf` (main branch, docs globs, integration mode) that
-the installer seeds and `setup` fills in. `CLAUDE.md` keeps the prose for skills, and
-`doctor` or `scripts/check` fails when the two disagree. It needs an ADR first, since
-ADR-0002 puts project facts in named `CLAUDE.md` sections. A smaller first step is a
-`docs-paths.conf` of globs for the `Docs-only` case alone.
+The design is [ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)
+(Proposed): a `.claude/yotamake/project.conf` with `main-branch` and `docs` globs, which the
+installer seeds and `setup` fills in. `CLAUDE.md` stays the source, and `doctor` fails when
+the two disagree. Next step: the user accepts the ADR, then it is built.
 
 ## Tag releases, keep a changelog, and test on the latest Claude Code
 
