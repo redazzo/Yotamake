@@ -1,5 +1,5 @@
 ---
-type: llm
+type: regex
+flags: "i"
 ---
-
-The final message recommends one candidate to do first and ends with a question to the user about what to do next, without starting that work.
+^(?=[\s\S]*\b(do|start with|recommend)\b[^.?\n]{0,60}\bfirst\b)[\s\S]*\?[^?]{0,600}$

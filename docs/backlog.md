@@ -85,14 +85,23 @@ In six runs of `23-improve-architecture` (2026-11-15, 0.31.0), every final messa
 the case asks, yet the judges split or failed. `rating` voted FAIL three times on a message
 with "**Rating:** Strong", and `drift` did the same on one saying `src/name.js` "is
 not in Architecture → Modules". Splitting each grader into one short claim fixed
-`shallow-module` (3 of 3) but not the rest. Next step: one run with `--keep-temp`, to see
-exactly what the judge is given as the final message.
+`shallow-module` (3 of 3) but not the rest.
 
-Review of 2026-11-16: more cases could use graders that need no judge. Find out whether the
-eval runner has a grader type that runs a command on the final repository (which files
-changed, no new commit, the stamp is there). Where it does, replace `llm` graders that only
-check file state. This does not get round "Eval sandbox denies `git`": `scripts/check`
-itself needs git.
+2026-11-17: `rating` is now a regex on the final message, so no judge reads it and the skill
+text Claude read cannot match it. A paid run (`--runs 3`, $0.90) passed it 3 of 3, but the
+judges still split on `drift` and `asks-which` although every message met them. Both are now
+regexes too, checked against the six saved final messages (all match) and against messages
+that should fail. Starting work is still caught by `no-file-changes`. Why the judges failed
+is not known: they may be given the wrong text, which would touch every `llm` grader. Next
+step: one run of case 23 with `--keep-temp`, to see what the judges of `no-file-changes` and
+`shallow-module` are given; delete this entry if it scores 1.00 and the judge input is right.
+
+Review of 2026-11-16: more cases could use graders that need no judge. The eval runner has
+no grader type that runs a command on the final repository; it has `regex` on the trace, the
+final message or one file, and `file_exists`. `04-docs-only/guide-fixed` is now a regex on the
+guide. `20-trivial-change/comment-fixed` and `owning-doc-updated` in cases 02 and 18 also say
+no other file changed, which a regex on one file cannot check, so they stay `llm` until such a
+type exists.
 
 ## Keep skills short
 
