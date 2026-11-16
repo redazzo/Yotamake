@@ -29,7 +29,7 @@ dated amendment section at the end.
 | [0005](./0005-parallel-sessions-in-worktrees.md) | Independent sessions of one effort may run in parallel worktrees | Accepted |
 | [0006](./0006-commit-stop-by-project-hook.md) | A project hook asks before commits, in place of the `ask` rule | Proposed |
 | [0007](./0007-autopilot-runs-sessions-in-subagents.md) | Autopilot runs an approved effort's sessions in subagents on one branch | Accepted |
-| [0008](./0008-facts-hooks-read-in-project-conf.md) | Hooks and scripts read their project facts from `.claude/yotamake/project.conf` | Proposed |
+| [0008](./0008-facts-hooks-read-in-project-conf.md) | Hooks and scripts read their project facts from `.claude/yotamake/project.conf` | Accepted |
 
 ## Template
 

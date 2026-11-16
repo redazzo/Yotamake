@@ -81,7 +81,7 @@ claude plugin install yotamake@yotamake</code></pre></div>
           <tr><td><code>.githooks/pre-commit</code></td><td>Runs <code>scripts/check --staged</code>, the fast checks only.</td></tr>
           <tr><td><code>.github/workflows/check.yml</code></td><td>CI runs <code>scripts/check --all</code>.</td></tr>
           <tr><td><code>.claude/settings.json</code></td><td>Enables the plugin, adds the <code>ask</code> rules for commit, merge and push, and two SessionStart hooks.</td></tr>
-          <tr><td><code>.claude/yotamake/</code></td><td>Protected paths, per-file checks, the skip list, the installed version, and the two session scripts.</td></tr>
+          <tr><td><code>.claude/yotamake/</code></td><td>Protected paths, per-file checks, the main branch and doc paths the hooks read (<code>project.conf</code>), the skip list, the installed version, and the two session scripts.</td></tr>
           <tr><td><code>docs/</code>, <code>scripts/docs/</code></td><td>The docs system and its linter. Left out in lite mode.</td></tr>
         </tbody>
       </table>
@@ -117,7 +117,7 @@ claude plugin install yotamake@yotamake</code></pre></div>
 
     <h2 id="doctor">Check the setup</h2>
     <div class="code"><pre><code>/yotamake:doctor</code></pre></div>
-    <p>A read-only check: the pre-commit hook, the harness version and pending upgrades, <code>FILL IN</code> placeholders left in <code>CLAUDE.md</code>, whether <code>scripts/check</code> runs any project checks, and whether CI runs it. It prints one screen with a fix for each problem.</p>
+    <p>A read-only check: the pre-commit hook, the harness version and pending upgrades, <code>FILL IN</code> placeholders left in <code>CLAUDE.md</code>, whether <code>scripts/check</code> runs any project checks, whether CI runs it, and whether <code>project.conf</code> agrees with <code>CLAUDE.md</code>. It prints one screen with a fix for each problem.</p>
 
     <h2 id="updating">Updating</h2>
     <div class="code"><pre><code>claude plugin update yotamake@yotamake</code></pre></div>

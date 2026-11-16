@@ -68,13 +68,15 @@ behaviour.
 ## Branching and releases
 
 - **Main branch:** `main`. Feature work happens on branches cut from it, never on it directly.
-  A hook blocks edits while this branch is checked out; it reads the name from this line.
+  A hook blocks edits while this branch is checked out. Hooks read the name from
+  `main-branch` in `.claude/yotamake/project.conf`; change both together.
 - **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`.
 - **Commits:** Conventional Commits, `type(scope): summary`.
 - **Integration:** <!-- FILL IN: "local `git merge --no-ff` into main" (default) or "push and open a pull request" -->
 - **Docs-only:** a branch that changes only files under `docs/` and Markdown files at the
   repository root other than `CLAUDE.md`. <!-- Change the paths if the docs live elsewhere,
-  or if some of these files are prompts or other Markdown that acts as code. -->
+  or if some of these files are prompts or other Markdown that acts as code. Then change the
+  `docs` lines in `.claude/yotamake/project.conf` to match: a hook reads them. -->
 - **Version bump:** <!-- FILL IN or delete: the command (e.g. `pnpm run version:patch`), the
   file it changes, and the rule (e.g. "code changes get a patch bump as its own commit,
   `chore(release): bump version to X.Y.Z`; docs-only branches do not"). -->

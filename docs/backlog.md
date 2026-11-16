@@ -176,9 +176,10 @@ only (files under `docs/`, and Markdown at the root other than `CLAUDE.md`). Oth
 paths count as code, so Claude runs `scripts/check` once more than it needs to.
 
 The design is [ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)
-(Proposed): a `.claude/yotamake/project.conf` with `main-branch` and `docs` globs, which the
-installer seeds and `setup` fills in. `CLAUDE.md` stays the source, and `doctor` fails when
-the two disagree. Next step: the user accepts the ADR, then it is built.
+(Accepted 2026-11-17): a `.claude/yotamake/project.conf` with `main-branch` and `docs` globs,
+which the installer seeds and `setup` fills in. `CLAUDE.md` stays the source, and `doctor`
+fails when the two disagree. Built on `feat/medium-backlog` (0.35.0); delete this entry when
+that merges.
 
 ## Tag releases, keep a changelog, and test on the latest Claude Code
 

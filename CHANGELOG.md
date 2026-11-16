@@ -19,6 +19,10 @@ how a release closes it.
 - `simple-session` is shorter: "Harness upgrades", "Findings not acted on" and the commit
   and merge or pull-request step read their detail from `plugin/reference/` when they apply.
   `scripts/check` fails when a `SKILL.md` passes 250 lines.
+- Hooks and `scripts/check` read the main branch and doc paths from a new project-owned
+  `.claude/yotamake/project.conf` (ADR-0008), falling back to `CLAUDE.md`; the edit-marking
+  hook follows a project's own doc paths. `setup` fills the file and `doctor` checks it
+  against `CLAUDE.md`. Older installs get it from `upgrades.md`.
 
 ## 0.34.1 — 2026-11-17
 

@@ -6,7 +6,7 @@ status: current
 
 # ADR-0008: Hooks and scripts read their project facts from `.claude/yotamake/project.conf`
 
-- **Status:** Proposed (2026-11-17). The user accepts or changes it before it is built.
+- **Status:** Accepted (2026-11-17)
 - **Date:** 2026-11-17
 - **Work record:** none yet
 - **Amends:** [ADR-0002](./0002-project-facts-in-named-claude-md-sections.md): the facts
@@ -92,7 +92,8 @@ accepting two copies of each fact and a check that they agree.
 ## Consequences
 
 - **Positive:** hooks read the main branch and doc paths exactly; a project with docs
-  outside `docs/` stops paying for an extra check; the `sed` copies go.
+  outside `docs/` stops paying for an extra check; the `sed` copies stay only as the fallback
+  for installs without the conf.
 - **Negative / accepted trade-offs:** two copies of two facts, kept in step by `setup` and
   checked by `doctor`, not enforced on every edit in other repositories. Renaming a key is
   a breaking change, like renaming a `CLAUDE.md` section.

@@ -20,6 +20,29 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.35.0 — Hooks read the main branch and doc paths from project.conf
+
+- **Check:** `.claude/yotamake/project.conf` exists, its `main-branch` line names the branch
+  of the `Main branch` line in `CLAUDE.md`, and `main_branches()` in `scripts/check` reads
+  `project.conf` (or `scripts/check` has no `main_branches()`).
+- **Apply:** copy the plugin's `template/.claude/yotamake/project.conf` into
+  `.claude/yotamake/`. Set `main-branch` to the `Main branch` name in `CLAUDE.md`, and the
+  `docs` lines to the paths its `Docs-only` line names (one glob per line; a glob with no `/`
+  matches only root files; a `!` line is an exception). In `scripts/check`, make
+  `main_branches()` read the conf before `CLAUDE.md`: put these lines in place of its `m=$(sed
+  …)` line, keeping that line as the fallback:
+
+  ```bash
+  m=$(awk '{ sub(/#.*/, "") } $1 == "main-branch" && NF == 2 { print $2; exit }' .claude/yotamake/project.conf 2>/dev/null)
+  [[ -n "$m" ]] ||
+      m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
+  ```
+
+  In `CLAUDE.md`, end the `Main branch` line with "Hooks read the name from `main-branch` in
+  `.claude/yotamake/project.conf`; change both together." in place of "it reads the name
+  from this line", and tell the user that a change to the `Main branch` or `Docs-only` line
+  now needs the same change in `project.conf` (`/yotamake:doctor` checks they agree).
+
 ## 0.35.0 — An empty gate writes no pass stamp
 
 - **Check:** `scripts/check` writes `yotamake-check-passed` only when at least one check ran

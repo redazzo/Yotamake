@@ -86,7 +86,8 @@ says how). Put them in the report and ask before running them (see Commands).
 ## Branching and releases
 
 - **Main branch:** `main`. Feature work happens on branches cut from it, never on it directly.
-  A hook blocks edits while this branch is checked out; it reads the name from this line.
+  A hook blocks edits while this branch is checked out. Hooks read the name from
+  `main-branch` in `.claude/yotamake/project.conf`; change both together.
 - **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`. A
   cloud session that is assigned a branch works on that branch as named, with no prefix.
 - **Commits:** Conventional Commits, `type(scope): summary`.
@@ -166,14 +167,16 @@ not list stops before any edit and is raised with the user, whoever asked for it
   hook. Skills read project facts only from named `CLAUDE.md` sections. The installer never
   overwrites a project-owned file, and merges `.claude/settings.json` without removing
   anything. Hooks let the edit through (exit 0) when they cannot decide.
-- **Shared code:** `plugin/hooks/lib.sh` for the hooks (reading the tool call);
+- **Shared code:** `plugin/hooks/lib.sh` for the hooks (reading the tool call, and `read_fact` for
+  `project.conf`);
   `plugin/reference/` for text several skills need;
   `plugin/skills/multi-session/templates/` for working-folder files (`spec` uses `spec.md`);
   `generate-records-index.mjs` exports the front-matter reader `lint-docs.mjs` uses;
   `plugin/evals/_fixture/` builds and installs eval repositories, and
   `plugin/evals/_graders/` holds the source copy of graders several cases share.
 - **Patterns:** hooks get the edited path with `tool_file_path` from `lib.sh`, and block with
-  exit 2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`.
+  exit 2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`;
+  the project facts hooks read are in `project.conf`, a copy of `CLAUDE.md` lines (ADR-0008).
   Skills name the `CLAUDE.md` sections they read in bold and say what to do when one is
   missing or unfilled. A change to a project-owned template file gets an `upgrades.md` entry.
 - **Constraints:** needs only `bash`, `git` and Node 18+; no npm dependencies. Runs on Linux

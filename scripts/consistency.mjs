@@ -37,6 +37,8 @@
  *     Constraints: the harness runs on macOS too).
  *   - harness copies: this repository's own harness-owned files (it installs its own
  *     harness) match plugin/template/. Re-run ./plugin/install.sh . to refresh them.
+ *   - project conf: main-branch in .claude/yotamake/project.conf names the branch the
+ *     CLAUDE.md "Main branch" line does (ADR-0008: CLAUDE.md is the source; fix the conf).
  *
  * Exit 0 when every rule holds, 1 otherwise.
  */
@@ -360,6 +362,17 @@ function checkHarnessCopies() {
   }
 }
 
+function checkProjectConf() {
+  const conf = '.claude/yotamake/project.conf';
+  if (!existsSync(path.join(ROOT, conf))) return fail('project conf', `${conf} is missing; copy plugin/template/${conf}`);
+  const facts = read(conf).split('\n').map((l) => l.replace(/#.*/, '').trim().split(/\s+/));
+  const confMain = facts.find((w) => w.length === 2 && w[0] === 'main-branch')?.[1];
+  const prose = read('CLAUDE.md').match(/^[-*]\s*\*\*Main branch:\*\*\s*`([^`]*)`/m)?.[1];
+  if (confMain !== prose) {
+    fail('project conf', `${conf} says main-branch ${confMain}, CLAUDE.md's Main branch line says ${prose}; change the conf to match`);
+  }
+}
+
 function checkUpgrades(changed) {
   if (changed.includes('plugin/reference/upgrades.md')) return;
   // Template files that reach older installs on their own. The last two mirror special
@@ -393,6 +406,7 @@ if (process.argv[2] === 'upgrades') {
   checkSharedGraders();
   checkPortableSed();
   checkHarnessCopies();
+  checkProjectConf();
 }
 
 for (const p of problems) console.error(p);

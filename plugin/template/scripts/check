@@ -18,12 +18,15 @@ cd "$(git rev-parse --show-toplevel)" || exit 2
 
 mode=${1:-changed}
 
-# The main branch: CHECK_BASE, else the "Main branch" line in CLAUDE.md (the same
-# line the plugin's main-branch hook reads), else main or master.
+# The main branch: CHECK_BASE, else main-branch in .claude/yotamake/project.conf, else
+# the "Main branch" line in CLAUDE.md (as the plugin's main-branch hook reads them), else
+# main or master.
 main_branches() {
     if [[ -n "${CHECK_BASE:-}" ]]; then echo "$CHECK_BASE"; return; fi
     local m
-    m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
+    m=$(awk '{ sub(/#.*/, "") } $1 == "main-branch" && NF == 2 { print $2; exit }' .claude/yotamake/project.conf 2>/dev/null)
+    [[ -n "$m" ]] ||
+        m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
     if [[ -n "$m" ]]; then echo "$m"; else printf '%s\n' main master; fi
 }
 

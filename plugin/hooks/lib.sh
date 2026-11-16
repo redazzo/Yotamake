@@ -61,16 +61,29 @@ gate_file() {
 # Older installs do not, and then the gate hooks stay out of the way.
 uses_gate_stamp() { grep -qs 'yotamake-check-passed' "$1/scripts/check"; }
 
+# read_fact <repo root> <key>: print each value of <key> in the repository's
+# .claude/yotamake/project.conf (ADR-0008), one per line, and succeed; fail when the file or
+# the key is missing. A line is "key value"; "#" starts a comment; a line with any other
+# number of words is skipped. session-context.sh and scripts/check read main-branch with
+# the same awk, since they run without the plugin.
+read_fact() {
+    awk -v k="$2" '{ sub(/#.*/, "") } $1 == k && NF == 2 { print $2; n++ } END { exit !n }' \
+        "$1/.claude/yotamake/project.conf" 2>/dev/null
+}
+
 # guarded_main_branch <repo root>: print the main branch the repository is on, and succeed;
 # fail (printing nothing) when it is on another branch, has no commits yet, or works on main
-# on purpose (an empty file at .claude/yotamake/allow-edits-on-main). The main branch is read
-# from CLAUDE.md's "- **Main branch:** `<name>`" line; without one, both main and master
-# count. A detached HEAD counts when it sits at a main branch's tip.
+# on purpose (an empty file at .claude/yotamake/allow-edits-on-main). The main branch is
+# project.conf's main-branch, else CLAUDE.md's "- **Main branch:** `<name>`" line; without
+# either, both main and master count. A detached HEAD counts when it sits at a main
+# branch's tip.
 guarded_main_branch() {
     local main m branch head
     [[ -f "$1/.claude/yotamake/allow-edits-on-main" ]] && return 1
     git -C "$1" rev-parse --verify -q HEAD >/dev/null || return 1
-    main=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' "$1/CLAUDE.md" 2>/dev/null | head -n1)
+    main=$(read_fact "$1" main-branch) && main=${main%%$'\n'*}
+    [[ -n "$main" ]] ||
+        main=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' "$1/CLAUDE.md" 2>/dev/null | head -n1)
     if branch=$(git -C "$1" symbolic-ref --short -q HEAD); then
         for m in ${main:-main master}; do
             [[ "$branch" == "$m" ]] && { printf '%s' "$m"; return 0; }
