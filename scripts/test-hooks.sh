@@ -43,6 +43,10 @@ expect 0 pre-edit-protect.sh "$p/id_rsa_dir/notes.txt"
 expect 0 pre-edit-protect.sh "$p/src/app.js"
 expect 2 pre-edit-protect.sh "/x/.env" CLAUDE_PROJECT_DIR="$tmp/none"   # the template's list
 expect 0 pre-edit-protect.sh ""                               # no path: let it through
+read_call() { printf '{"tool_name":"Read","tool_input":{"file_path":"%s"}}' "$1"; }
+expect 2 pre-edit-protect.sh "$(read_call "$p/.env")"          # reads are refused too
+expect 0 pre-edit-protect.sh "$(read_call "$p/.env.example")"
+expect 0 pre-edit-protect.sh "$(read_call "$p/src/app.js")"
 
 # --- pre-edit-main-branch.sh --------------------------------------------------
 unset CLAUDE_PROJECT_DIR
@@ -80,6 +84,22 @@ git_expect 2 'git commit -m x'                  # on main
 git_expect 2 'git add a && git commit -am "x"' "$b/sub"   # compound, subfolder
 git_expect 2 "git -C $b commit -m x" "$tmp"          # git -C
 git_expect 2 "cd $b && git commit -m x" "$tmp"       # cd first
+git_expect 2 '{ git commit -m x; }'             # wrapped forms (backlog, 2026-11-16)
+git_expect 2 'if true; then git commit -m x; fi'
+git_expect 2 'for f in a; do git commit -m x; done'
+git_expect 2 'time git commit -m x'
+git_expect 2 'time -p git commit -m x'
+git_expect 2 'nohup git commit -m x'
+git_expect 2 '! git commit -m x'
+git_expect 2 'env A=1 git commit -m x'
+git_expect 2 'env -u HOME git commit -m x'
+git_expect 2 'bash -c "git commit -m x"'
+git_expect 2 "sh -c 'cd sub && git commit -m x'"
+git_expect 2 "/bin/bash -lc 'git add a; git commit -m x'"
+git_expect 0 'bash -c "echo git commit"'          # quoted text inside the script
+git_expect 0 'bash script.sh commit'              # no -c: not read
+git_expect 2 "bash -c 'cd $tmp'; git commit -m x"   # a cd inside the script stays there
+git_expect 0 'command -v git && echo commit'      # a lookup, not a git call
 git_expect 0 'git status'                       # not a commit
 git_expect 0 'echo "git commit"'                # quoted text
 git_expect 0 'git commit -m x' "$tmp"                # not a repository
@@ -90,6 +110,10 @@ git_expect 2 'git commit -anm x'                # -n in a cluster
 git_expect 2 'git push --no-verify'
 git_expect 2 'git merge --squash --no-verify x'   # --squash takes no value here
 git_expect 2 'git status; git -c a=b commit -n'
+git_expect 2 'env git commit --no-verify -m x'
+git_expect 2 'bash -c "git commit --no-verify -m x"'
+git_expect 2 "bash -c 'bash -c \"git push --no-verify\"'"   # nested
+git_expect 0 'bash -c "unclosed'                 # cannot read the script: let through
 git_expect 0 'git commit -m "docs: mention --no-verify"'   # in the message
 git_expect 0 'git commit -mn'                   # n is the message
 git_expect 0 'git commit -m -n'                 # so is -n here
@@ -139,6 +163,10 @@ expect 0 post-edit-mark.sh "$(edit s1 "$tmp/gate-link/docs/x.md")"   # a doc thr
 [[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc or ignored file was marked"; failed=1; }
 expect 0 post-edit-mark.sh "$(edit s1 "$g/CLAUDE.md")"   # CLAUDE.md is code
 [[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: CLAUDE.md not marked"; failed=1; }
+rm -f "$marker"
+printf '{}\n' > "$g/src/n.ipynb"
+expect 0 post-edit-mark.sh "$(printf '{"session_id":"s1","tool_input":{"notebook_path":"%s"}}' "$g/src/n.ipynb")"
+[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: a notebook edit not marked"; failed=1; }
 rm -f "$marker"
 expect 0 post-edit-mark.sh "$(edit s1 "$g/src/a.js")"
 expect 2 stop-check-ran.sh "$(stop s1)"                   # code edited, no check yet
@@ -333,6 +361,20 @@ out=$(cd "$m" && bash "$scx" 2>&1)
 grep -qF "Worktree of" <<<"$out" &&
     { echo "FAIL session-context.sh calls the main worktree a worktree: '$out'"; failed=1; }
 unset CLAUDE_PROJECT_DIR
+
+# --- hooks.json registers each hook for every tool it covers --------------------
+node -e '
+const h = require(process.argv[1]).hooks;
+const has = (ev, hook, tool) => (h[ev] || []).some((e) =>
+    new RegExp("^(" + e.matcher + ")$").test(tool) && JSON.stringify(e.hooks).includes(hook));
+const want = [["PreToolUse", "pre-edit-protect.sh", "Read"]];
+for (const t of ["Edit", "Write", "MultiEdit", "NotebookEdit"]) {
+    for (const k of ["pre-edit-protect.sh", "pre-edit-main-branch.sh"]) want.push(["PreToolUse", k, t]);
+    for (const k of ["post-edit-check.sh", "post-edit-mark.sh"]) want.push(["PostToolUse", k, t]);
+}
+const miss = want.filter((w) => !has(...w));
+for (const m of miss) console.log("FAIL hooks.json: " + m[1] + " not registered for " + m[2]);
+process.exit(miss.length ? 1 : 0);' "$hooks/hooks.json" || failed=1
 
 # --- Every hook lets the edit through when it cannot read the tool call ---------
 for hook in pre-edit-protect.sh pre-edit-main-branch.sh pre-bash-git.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do

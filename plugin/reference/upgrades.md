@@ -20,6 +20,15 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.34.1 — Protected paths are not read either
+
+- **Check:** the first comment line of `.claude/yotamake/protected-paths.conf` says "read or
+  edit". A missing file, or one whose comments the project has rewritten, passes.
+- **Apply:** in that comment, change "Files Claude may not edit" to "Files Claude may not
+  read or edit", and "pre-edit-protect.sh hook." to "pre-edit-protect.sh hook, on Edit,
+  Write and Read." The hook reads the list on Read from this version on, whatever the
+  comment says; take out a line whose file Claude needs to read.
+
 ## 0.32.0 — Domain language line
 
 - **Check:** the Architecture section of `CLAUDE.md` has a `**Domain language:**` line.

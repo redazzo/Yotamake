@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# PreToolUse hook for Edit/Write: refuse edits to protected files.
+# PreToolUse hook for Edit/Write, and for Read: refuse edits to protected files, and reads
+# of them, so a secret such as .env does not land in Claude's context either.
 # The list is the .claude/yotamake/protected-paths.conf of the file's repository, else the
 # project's, else the plugin template's copy of that file.
 # Claude Code passes the tool call as JSON on stdin. Exit 2 blocks the call and
@@ -42,7 +43,11 @@ done < <(grep -v '^\s*\(#\|$\)' "$conf")
 while read -r pattern; do
     [[ "$pattern" == !* ]] && continue
     if matches "$pattern"; then
-        echo "BLOCKED: $fp matches protected pattern '$pattern' ($conf). Ask the user to edit it by hand." >&2
+        if [[ "$(hook_field tool_name <<<"$in")" == Read ]]; then
+            echo "BLOCKED: $fp matches protected pattern '$pattern' ($conf), so Claude may not read it. Ask the user for what you need from it, without the secret values." >&2
+        else
+            echo "BLOCKED: $fp matches protected pattern '$pattern' ($conf). Ask the user to edit it by hand." >&2
+        fi
         exit 2
     fi
 done < <(grep -v '^\s*\(#\|$\)' "$conf")

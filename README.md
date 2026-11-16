@@ -100,7 +100,7 @@ plugin/
     drawio/           draw.io diagrams
   hooks/
     hooks.json                     registers the seven hooks below
-    pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates)
+    pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates), and reads of them
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
     pre-bash-git.sh                blocks --no-verify, and git commit on the main branch, from Bash
     post-edit-check.sh             runs a fast per-file check after each edit
@@ -130,7 +130,7 @@ scripts/check                   the one gate: skills, the pre-commit hook and CI
 .claude/yotamake/
   set-hooks-path.sh             sets core.hooksPath to .githooks in a clone that lacks it
   session-context.sh            tells Claude the branch, active efforts and the session rule
-  protected-paths.conf          files Claude may not edit
+  protected-paths.conf          files Claude may not read or edit
   post-edit-checks.conf         glob → per-file check command
   skip                          optional: template paths the installer must never write
   version                       the plugin version the harness files were installed from
@@ -187,7 +187,9 @@ source (tested 2026-10-28 with Claude Code 2.1.312, in the same file and across 
 Cutting or switching branches with `git switch`, staging files and a fast-forward pull are
 under `allow`, so they do not prompt. `git switch` with `-f`, `--force`,
 `--discard-changes`, `-C` or `--force-create` first in its options is under `ask`, since it
-drops uncommitted work or resets a branch. The rules match from the start of the command, so
+drops uncommitted work or resets a branch. Listing branches with `git branch` is under
+`allow`, but `git branch` with `-D`, `-f`, `--force`, `-M`, `-C` or `--delete` first is
+under `ask`, since it deletes, moves or overwrites a branch. The rules match from the start of the command, so
 the same flag later on is not caught.
 
 **No edits on the main branch.** A hook refuses Edit and Write while the file's repository is
@@ -197,6 +199,11 @@ affected, nor are git-ignored ones (such as a multi-session `.scratchpad/` folde
 `.claude/yotamake/allow-edits-on-main`. The protected-paths list stops Claude creating it
 with Edit or Write; a person makes it.
 
+**No reading secrets.** The same protected-paths hook also runs on Read, so a protected file
+such as `.env` or a key does not land in Claude's context. The `!` exceptions, such as
+`.env.example`, can still be read. A project that wants Claude to read a listed file takes
+its line out of the list, which lets Claude edit it too.
+
 **No skipped hooks, no commits on main.** A hook on Bash refuses any git command with
 `--no-verify` (or `git commit -n`), so Claude cannot step past the gate, even in a repository
 that opted out above. A person who wants to skip it runs the command themselves with
@@ -204,7 +211,9 @@ that opted out above. A person who wants to skip it runs the command themselves 
 read as above, unless a merge is being finished, the repository has no commits yet, or it
 opted out. It reads the
 command with a small quote-aware parser and follows `cd <dir>` and `git -C <dir>`; text inside
-quotes, such as a commit message, does not count. A command it cannot read goes through.
+quotes, such as a commit message, does not count. It skips shell keywords and wrappers in
+front of git (`{`, `if`, `then`, `do`, `!`, `time`, `env`, `nohup`, `command`, `exec`),
+and reads the script given to `bash -c` or `sh -c` the same way. A command it cannot read goes through.
 
 **Worktrees.** Every hook acts on the repository of the file being edited, else on the
 session's own directory (the `cwd` in the hook's input), and only then on
@@ -217,7 +226,7 @@ the efforts in the main worktree's `.scratchpad/`, by full path, because a workt
 copy of that git-ignored folder.
 
 **What the hooks do not cover.** The main-branch, protected-paths and edit-marking hooks
-watch Edit and Write only. The Bash hook above watches git commands only. A shell command gets past them: `sed -i`, `echo > .env`, `touch`
+watch Edit, Write and NotebookEdit only (the protected-paths hook Read too, but not Grep). The Bash hook above watches git commands only. A shell command gets past them: `sed -i`, `echo > .env`, `touch`
 on the opt-out file, or a code change made from the shell, which the `Stop` hook never sees. Claude Code's own permission prompt for Bash is the guard there. The `ask`
 rules are separate, and `git -C . commit` still asked in a test (one run, Claude Code
 2.1.312).

@@ -81,6 +81,22 @@ settings_merge_keeps_ours() {
         if (d.model !== "x" || !d.permissions.allow.includes("Bash(make:*)")) process.exit(1);'
 }
 
+# A refresh adds the harness's ask rules to an older settings file, such as the forced
+# forms of git branch (backlog, 2026-11-16), and keeps git branch itself allowed.
+settings_merge_adds_ask_rules() {
+    cd "$full"
+    node -e '
+        const fs = require("fs"), p = ".claude/settings.json", d = JSON.parse(fs.readFileSync(p));
+        d.permissions.ask = d.permissions.ask.filter((r) => !r.startsWith("Bash(git branch"));
+        fs.writeFileSync(p, JSON.stringify(d));'
+    "$plugin/install.sh" "$full" >/dev/null
+    node -e '
+        const p = require("./.claude/settings.json").permissions;
+        for (const f of ["-D", "-f", "--force", "-M", "-C", "--delete"])
+            if (!p.ask.includes(`Bash(git branch ${f}:*)`)) process.exit(1);
+        if (!p.allow.includes("Bash(git branch:*)")) process.exit(1);'
+}
+
 # The SessionStart entry: added once, beside the repository's own hooks (ADR-0004).
 # session_start_count [script]: SessionStart entries naming it (default set-hooks-path.sh).
 session_start_count() {
@@ -144,6 +160,7 @@ step "a refresh regenerates a stale records index" refresh_regenerates_stale_ind
 step "a quoted status is read the same by the index and the linter" quoted_status_agrees
 step "the settings merge keeps the repository's own entries" settings_merge_keeps_ours
 step "the settings merge adds the SessionStart hook once" settings_merge_adds_hook_once
+step "a refresh adds new ask rules to older settings" settings_merge_adds_ask_rules
 step "a skipped hooks-path script leaves only its hook entry out" \
     skipped_script_leaves_only_its_hook_out set-hooks-path.sh session-context.sh
 step "a skipped session-context script leaves only its hook entry out" \
