@@ -11,6 +11,9 @@ how a release closes it.
 - A changelog, release tags and a check that each version has an entry. `simple-session`
   does the project's after-merge release steps, such as a tag. CI also runs weekly on the
   latest Claude Code.
+- `scripts/check` writes no pass stamp when no check ran, and its note names
+  `/yotamake:setup`; `simple-session` reports an empty gate. Older installs get it from
+  `upgrades.md`.
 
 ## 0.34.1 — 2026-11-17
 

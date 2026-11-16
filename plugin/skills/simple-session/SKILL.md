@@ -197,7 +197,9 @@ Run `scripts/check`. It picks the checks that match what changed, and prints one
 fast checks (`--staged`), and this runs the slow ones too. If the project has no `scripts/check`, run the commands CLAUDE.md's
 **Checks** section lists instead, and say in the report that the project has no single gate.
 
-Do not add, skip or weaken a check to get a pass. Report only the summary lines.
+Do not add, skip or weaken a check to get a pass. Report only the summary lines. If it says
+no checks ran, the gate is empty and nothing was checked: say so in the report, and that
+`/yotamake:setup` can add the checks.
 
 If a check fails, fix it when the failure is yours. If it was already failing on the main
 branch, say so and show the line, rather than fixing it in this branch.

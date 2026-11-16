@@ -20,6 +20,29 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.35.0 — An empty gate writes no pass stamp
+
+- **Check:** `scripts/check` writes `yotamake-check-passed` only when at least one check ran
+  (the block below), or does not contain `yotamake-check-passed` at all.
+- **Apply:** replace the stamp lines at the end of `scripts/check`, just before its final
+  `exit $failed`, with these (and drop the old `no checks configured` note line):
+
+  ```bash
+  # A passing run outside the pre-commit hook leaves a stamp in the git directory. The
+  # plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
+  # pass. A run with no checks leaves none. Keep these lines when you edit the file.
+  if [[ $ran -eq 0 ]]; then
+      echo "note: no checks ran, so no pass stamp was written. Add checks to scripts/check (/yotamake:setup finds them)." >&2
+  elif [[ $failed -eq 0 && "$mode" != --staged ]]; then
+      touch "$(git rev-parse --git-path yotamake-check-passed)"
+  fi
+  ```
+
+  If the script has no `ran` counter, add `ran=0` beside `failed=0` and `ran=$((ran + 1))`
+  as the first line of `run()`. If it names its variables differently, use its names. Tell
+  the user that a run with no checks now leaves the `Stop` hook unsatisfied, so a session
+  that edits code says the gate is empty instead of counting it as checked.
+
 ## 0.34.1 — Protected paths are not read either
 
 - **Check:** the first comment line of `.claude/yotamake/protected-paths.conf` says "read or

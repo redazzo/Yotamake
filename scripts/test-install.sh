@@ -27,13 +27,19 @@ full_install() {
     git init -q -b main "$full"
     "$plugin/install.sh" "$full"
     cd "$full" && scripts/check --all
+    test -e "$(git rev-parse --git-path yotamake-check-passed)"
 }
 
 lite_install() {
     git init -q -b main "$lite"
     "$plugin/install.sh" "$lite" --lite
     test ! -e "$lite/docs" && test ! -e "$lite/scripts/docs"
-    cd "$lite" && scripts/check --all
+    # No checks are filled in, so the gate is empty: it passes, says so, and leaves no stamp.
+    local out
+    out=$(cd "$lite" && scripts/check --all 2>&1)
+    grep -q '/yotamake:setup' <<<"$out"
+    cd "$lite"
+    test ! -e "$(git rev-parse --git-path yotamake-check-passed)"
 }
 
 lite_refresh_adds_nothing() {
@@ -152,8 +158,8 @@ installer_hooks_path_notes() {
 
 export GIT_CONFIG_GLOBAL=$tmp/gitconfig GIT_CONFIG_NOSYSTEM=1
 : > "$GIT_CONFIG_GLOBAL"
-step "full install passes its own check" full_install
-step "lite install has no docs system and passes its check" lite_install
+step "full install passes its own check and writes the stamp" full_install
+step "lite install has no docs system, and its empty check leaves no stamp" lite_install
 step "a lite refresh adds no files" lite_refresh_adds_nothing
 step "the eval fixture passes its check" eval_fixture
 step "a refresh regenerates a stale records index" refresh_regenerates_stale_index

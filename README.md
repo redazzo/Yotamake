@@ -168,9 +168,10 @@ loaded, and says so in one line. A teammate who never opens Claude Code there mu
 `git config core.hooksPath .githooks` themselves. CI covers everyone.
 
 **Claude cannot end a turn with unchecked code.** When `scripts/check` passes (not with
-`--staged`), it touches `yotamake-check-passed` in the git directory. When Claude edits a code
-file with Edit or Write, a hook writes the session id to `yotamake-edited` there. Docs and
-git-ignored files do not count. The hook uses the default `Docs-only` rule (files under
+`--staged`), it touches `yotamake-check-passed` in the git directory. A run in which no check
+ran (an empty gate, as in a lite install before `/yotamake:setup`) writes no stamp and says
+so. When Claude edits a code file with Edit or Write, a hook writes the session id to
+`yotamake-edited` there. Docs and git-ignored files do not count. The hook uses the default `Docs-only` rule (files under
 `docs/`, and Markdown at the root other than `CLAUDE.md`): it cannot read a project's own
 `Docs-only` line, so other doc paths count as code and cost one extra check run. When Claude ends a turn after
 editing code in this session and the stamp is older than that edit, a `Stop` hook blocks

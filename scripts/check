@@ -106,9 +106,12 @@ full && [[ "$mode" == changed ]] && touches '^plugin/' &&
 full && [[ "$mode" == changed ]] && touches '^plugin/(skills/|hooks/|install\.sh|template/)' &&
     node scripts/consistency.mjs pages-for <<<"$changed"
 
-[[ $ran -gt 0 ]] || echo "note: no checks configured; add them to scripts/check." >&2
 # A passing run outside the pre-commit hook leaves a stamp in the git directory. The
 # plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
-# pass. Keep this line when you edit the file.
-[[ $failed -eq 0 && "$mode" != --staged ]] && touch "$(git rev-parse --git-path yotamake-check-passed)"
+# pass. A run with no checks leaves none. Keep these lines when you edit the file.
+if [[ $ran -eq 0 ]]; then
+    echo "note: no checks ran, so no pass stamp was written. Add checks to scripts/check (/yotamake:setup finds them)." >&2
+elif [[ $failed -eq 0 && "$mode" != --staged ]]; then
+    touch "$(git rev-parse --git-path yotamake-check-passed)"
+fi
 exit $failed
