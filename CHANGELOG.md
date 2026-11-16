@@ -6,7 +6,7 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
-## Unreleased
+## 0.35.0 — 2026-11-17
 
 - A changelog, release tags and a check that each version has an entry. `simple-session`
   does the project's after-merge release steps, such as a tag. CI also runs weekly on the
