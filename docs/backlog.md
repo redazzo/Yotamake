@@ -494,8 +494,16 @@ take in our own plain words.
 - **Eval fixture leaks.** What is still open: the sandbox path `/tmp/claude-eval-*` that the
   agent can see (outside our control); the author and branch literals repeated in each
   `scaffold.sh` (one shared `_fixture/env.sh` would hold them); and case 15's
-  `history.jsonl`, hand-edited for the rename, which `record.sh` should regenerate.
-  Trigger: the Δ run, or the next re-record of case 15.
+  `history.jsonl`, hand-edited for the rename, which `record.sh` should regenerate. It also
+  still holds an older `simple-session` text (findings "in the report as suggestions", no
+  trivial tier), so case 15 does not test the skill as shipped. Trigger: the Δ run, or the
+  next re-record of case 15.
+- **Watch the backlog rule's cost.** 0.34.0 writes each finding a branch does not fix into
+  `docs/backlog.md` (`simple-session`, "Findings not acted on"). Two risks: parallel
+  branches that each add an entry conflict in that file at merge (this rule's own branch
+  did), and undone `/simplify` cleanups fill the backlog with small items whose line numbers
+  go stale. Trigger: a merge conflict in `docs/backlog.md` between two session branches, or
+  more than a few cleanup entries from one branch.
 
 ## Small harness ideas
 
