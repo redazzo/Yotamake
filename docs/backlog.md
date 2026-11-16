@@ -121,6 +121,14 @@ sessions take ("Harness upgrades", the pull-request path, "Autopilot", "Running 
 parallel") into `plugin/reference/` files the skill reads on demand. Raised to Medium: every
 other fix that adds wording makes this worse.
 
+Done on `feat/medium-backlog` (2026-11-17): `scripts/check` fails when a `SKILL.md` passes
+250 lines (`scripts/consistency.mjs`, skill length). `multi-session` moved "Autopilot" and
+"Running sessions in parallel" to `plugin/reference/` (312 to 193 lines); `simple-session`
+moved the detail of "Harness upgrades", "Findings not acted on" and "On yes: commit, bump,
+integrate" (320 to 249 lines). Left: this repository's `CLAUDE.md` (about 11 KB) is still
+read whole, and `simple-session` sits at the limit, so its next addition must move
+something out first.
+
 ## Session overhead on small changes
 
 **Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** the Δ run above gives cost

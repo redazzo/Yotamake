@@ -25,6 +25,8 @@
  *     and each row's Skills cell names one or more skills that exist.
  *   - site skills: site/skills.html has a card for every folder in plugin/skills/, and no
  *     card for a skill that does not exist.
+ *   - skill length: no SKILL.md passes 250 lines. Move a path few sessions take into a
+ *     plugin/reference/ file the skill reads on demand, behind a stub heading.
  *   - step refs: a pointer to another skill's step names its heading, as
  *     `simple-session`, "Design and reuse", and that heading exists. No pointer uses a
  *     step number, which would break silently when the skill is renumbered.
@@ -179,6 +181,17 @@ function checkSiteSkills() {
   const cards = siteCards();
   for (const s of skills) if (!cards.has(s)) fail('site skills', `site/skills.html has no card for plugin/skills/${s}`);
   for (const c of cards) if (!skills.has(c)) fail('site skills', `site/skills.html has a card for "${c}", not in plugin/skills/`);
+}
+
+/** No SKILL.md passes MAX_SKILL_LINES lines: every skill is read whole into context. */
+const MAX_SKILL_LINES = 250;
+function checkSkillLength() {
+  for (const [, file] of skillFiles()) {
+    const lines = read(file).split('\n').length - 1;
+    if (lines > MAX_SKILL_LINES) {
+      fail('skill length', `${file} has ${lines} lines, over ${MAX_SKILL_LINES}; move a rare path into plugin/reference/`);
+    }
+  }
 }
 
 /**
@@ -375,6 +388,7 @@ if (process.argv[2] === 'upgrades') {
   checkLabels();
   checkEvals();
   checkSiteSkills();
+  checkSkillLength();
   checkStepRefs();
   checkSharedGraders();
   checkPortableSed();

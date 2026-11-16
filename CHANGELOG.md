@@ -16,6 +16,9 @@ how a release closes it.
   `upgrades.md`.
 - `multi-session` is shorter: its autopilot and parallel-session rules moved to
   `plugin/reference/`, which it reads only when they apply.
+- `simple-session` is shorter: "Harness upgrades", "Findings not acted on" and the commit
+  and merge or pull-request step read their detail from `plugin/reference/` when they apply.
+  `scripts/check` fails when a `SKILL.md` passes 250 lines.
 
 ## 0.34.1 — 2026-11-17
 

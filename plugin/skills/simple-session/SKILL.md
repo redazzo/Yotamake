@@ -40,47 +40,16 @@ it is not trivial.
 A finding not acted on is a real problem you see, at any step, that this branch does not
 fix: work outside the task, a `/simplify` fix you undid, a review finding outside the
 branch's concern. This holds on every branch, and a backlog entry does not stop a branch
-being docs-only or trivial.
-
-Drop a finding you judge wrong, and say why in one line in the report. Write every other
-one into `docs/backlog.md` as part of this branch's changes, as the `write-doc` skill says,
-with the file and line. Add to an entry that already covers it rather than a duplicate, and
-put one branch's small cleanups in a single entry. List the findings in the report instead
-when there is no `docs/backlog.md`, or when the user has limited which files may change.
-Inside a `multi-session` effort, add them to the ledger's Backlog line instead; close-out
-writes the entry. Write the ones you know before a `scripts/check` run, so that run covers
-them; one written after the last run means running it again before the report.
+being docs-only or trivial. When you have one, read
+`<this skill's directory>/../../reference/findings-not-acted-on.md`: where to write it, or
+why to drop it. Write it before your last `scripts/check` run, so that run covers it.
 
 ## 0. Harness upgrades — first
 
-Do this once per conversation, before step 1. When the repository's harness is older than
-the plugin, the plugin's `SessionStart` hook puts a line starting `Harness upgrades:` in your
-context, with both versions, or saying it could not compare them (then read them yourself,
-as below). With the plugin loaded, no such line means the versions match: carry on without
-comment.
-
-Without the plugin, compare the versions yourself: the plugin's is in
-`<this skill's directory>/../../.claude-plugin/plugin.json`, the repository's in
-`.claude/yotamake/version`. If that file is missing, the repository was set up before 0.11.0.
-
-If the repository's version is older, read
-`<this skill's directory>/../../reference/upgrades.md` and run the **Check** of each entry newer than the repository's version. If every check
-passes, carry on without comment.
-
-Otherwise list the entries whose check fails, one line each, and ask the user to pick one:
-
-- **Apply now** (recommended): on its own branch, `chore/yotamake-upgrade` (cut as in
-  step 2), run the plugin's `install.sh` against the repository root, which refreshes the
-  harness files and the version file. Then do each pending entry's **Apply**, oldest first,
-  run `scripts/check`, and report and ask as in step 7. After it is merged, go back to the
-  user's request at step 1. On an assigned branch, do this as its own commit there instead.
-- **Not now:** carry on with the request. The next conversation asks again.
-- **Skip these:** once step 2 has cut the request's branch, write the plugin's version to
-  `.claude/yotamake/version` there, name it in the report, and carry on. No session asks
-  about these entries again.
-
-If the user said not to ask, do not stop for this: carry on and list the pending entries in
-the report.
+Do this once per conversation, before step 1. With the plugin loaded, no line starting
+`Harness upgrades:` in your context means the versions match: carry on without comment.
+When there is such a line, or the plugin is not loaded, read
+`<this skill's directory>/../../reference/harness-upgrades.md` and follow it.
 
 ## 1. Check the size — before branching
 
@@ -270,51 +239,12 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).
 
-Then ask whether to commit and merge, or, if the project works through pull requests (below),
+Then ask whether to commit and merge, or, if the project works through pull requests (step 8),
 whether to commit, push and open a pull request.
 
 ## 8. On yes: commit, bump, integrate
 
-Only after the user says yes. Claude Code will also ask before `git commit`, `git merge` and
-`git push` when the project's settings put them under `ask`; that is expected. Stage the files
-you changed by name, not `git add -A`. If the pre-commit hook fails, fix the cause; never pass
-`--no-verify`. The plugin's Bash hook refuses it; if the user wants the hook skipped, they run
-the command themselves with `! <command>`.
-
-```bash
-git add <files>
-git commit -m "<message>"
-```
-
-If CLAUDE.md defines a version bump, code changes get one as its own commit on the branch,
-using the command and file it names. Docs-only branches do not.
-
-Then integrate the way the `Integration` line in CLAUDE.md says.
-
-**Local merge** (the default, when the line is missing or unfilled):
-
-```bash
-git switch <main-branch>
-git merge --no-ff <branch> -m "Merge <branch> into <main-branch>"
-```
-
-Then do any after-merge step that a release or tags line in CLAUDE.md, **Branching and
-releases**, lists, such as a release tag. With no such line, there is none. Do not push or
-delete the branch unless the user asks.
-
-**Pull request** (when the line says the project works through pull requests, or the
-environment says to push to an assigned branch):
-
-1. Push the branch: `git push -u origin <branch>`.
-2. If a pull request for this branch is already open, stop there: the push updated it.
-3. Otherwise open one against the main branch. Use the GitHub tools the environment provides,
-   or `gh pr create --base <main-branch>`. If the repository has a pull request template,
-   follow its headings. Title: the commit summary. Body: what changed and why, the docs
-   updated, the check and review results, and any attribution lines the environment asks for.
-4. If you cannot open one (no tool, no access), say so and give the branch name instead.
-
-Do not merge the pull request yourself; that is the reviewer's or the user's call. If the
-environment says not to open pull requests unless asked, push only and offer to open one.
-
-Never deploy; that is always the user's call. Finish with one line: the merge commit hash, or
-the pull request link (or the pushed branch), and the new version, if any.
+Only after the user says yes. Read `<this skill's directory>/../../reference/integrate.md`
+and follow it: stage files by name (never `git add -A` or `--no-verify`) and commit, the
+version bump CLAUDE.md defines, then a local merge or a pull request as its `Integration`
+line says. Never deploy.
