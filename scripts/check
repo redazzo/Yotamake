@@ -108,10 +108,10 @@ full && [[ "$mode" == changed ]] && touches '^plugin/(skills/|hooks/|install\.sh
 
 # A passing run outside the pre-commit hook leaves a stamp in the git directory. The
 # plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
-# pass. A run with no checks leaves none. Keep these lines when you edit the file.
-if [[ $ran -eq 0 ]]; then
-    echo "note: no checks ran, so no pass stamp was written. Add checks to scripts/check (/yotamake:setup finds them)." >&2
-elif [[ $failed -eq 0 && "$mode" != --staged ]]; then
+# pass. A run in which no check ran leaves none. Keep these lines when you edit the file.
+if [[ $ran -eq 0 && "$mode" != --staged ]]; then
+    echo "note: no check ran for this change, so no pass stamp was written. If scripts/check has no checks yet, add them (/yotamake:setup finds them)." >&2
+elif [[ $ran -gt 0 && $failed -eq 0 && "$mode" != --staged ]]; then
     touch "$(git rev-parse --git-path yotamake-check-passed)"
 fi
 exit $failed

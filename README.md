@@ -113,6 +113,8 @@ plugin/
   reference/module-design.md       deep and shallow modules, seams, the deletion test
   reference/domain-language.md     the glossary: its rules, its format, naming drift
   reference/upgrades.md            per version: what to add to a repo's own files, and how
+  reference/autopilot.md           multi-session autopilot: sessions run in agents on one branch
+  reference/parallel-sessions.md   multi-session: two sessions at once in sibling worktrees
   install.sh                       installs template/ into a repo
   template/                        the per-repo files
   evals/                           the eval suite (see below)

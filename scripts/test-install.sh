@@ -38,6 +38,9 @@ lite_install() {
     local out
     out=$(cd "$lite" && scripts/check --all 2>&1)
     grep -q '/yotamake:setup' <<<"$out"
+    # The pre-commit run never writes a stamp, so it stays quiet about it.
+    out=$(cd "$lite" && scripts/check --staged 2>&1)
+    if grep -q 'no check ran' <<<"$out"; then return 1; fi
     cd "$lite"
     test ! -e "$(git rev-parse --git-path yotamake-check-passed)"
 }

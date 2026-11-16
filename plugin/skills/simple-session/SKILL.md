@@ -198,8 +198,8 @@ fast checks (`--staged`), and this runs the slow ones too. If the project has no
 **Checks** section lists instead, and say in the report that the project has no single gate.
 
 Do not add, skip or weaken a check to get a pass. Report only the summary lines. If it says
-no checks ran, the gate is empty and nothing was checked: say so in the report, and that
-`/yotamake:setup` can add the checks.
+no check ran, nothing was checked: say so in the report. If `scripts/check` has no checks
+yet, say that the gate is empty and that `/yotamake:setup` can add them.
 
 If a check fails, fix it when the failure is yours. If it was already failing on the main
 branch, say so and show the line, rather than fixing it in this branch.

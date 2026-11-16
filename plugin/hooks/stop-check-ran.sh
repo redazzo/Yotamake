@@ -48,5 +48,5 @@ done < <(git -C "$root" worktree list --porcelain 2>/dev/null)
 (( ${#pending[@]} )) || exit 0
 
 trees=$(printf '%s, ' "${pending[@]}")
-echo "BLOCKED: code was edited in this session after the last passing scripts/check. Run scripts/check in ${trees%, } (cd there first), and the review if it has not run, before you report (simple-session, \"Run the checks\"). If you are stopping to ask the user something first, say so and end the turn again: this hook blocks only once. If the check says no checks ran, it cannot pass: say so in the report and end the turn." >&2
+echo "BLOCKED: code was edited in this session after the last passing scripts/check. Run scripts/check in ${trees%, } (cd there first), and the review if it has not run, before you report (simple-session, \"Run the checks\"). If you are stopping to ask the user something first, say so and end the turn again: this hook blocks only once. If the check says no check ran, it cannot pass: say so in the report and end the turn." >&2
 exit 2

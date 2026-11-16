@@ -14,6 +14,8 @@ how a release closes it.
 - `scripts/check` writes no pass stamp when no check ran, and its note names
   `/yotamake:setup`; `simple-session` reports an empty gate. Older installs get it from
   `upgrades.md`.
+- `multi-session` is shorter: its autopilot and parallel-session rules moved to
+  `plugin/reference/`, which it reads only when they apply.
 
 ## 0.34.1 — 2026-11-17
 
