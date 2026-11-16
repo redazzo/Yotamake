@@ -16,7 +16,7 @@
  *
  * Rules:
  *   - version: plugin.json, marketplace.json and .claude/yotamake/version name the same
- *     version.
+ *     version, and CHANGELOG.md has a `## X.Y.Z` entry for it.
  *   - sections: every CLAUDE.md section a skill names ("the **X** section",
  *     "CLAUDE.md, **X**") or the template's top comment lists is a heading in the template.
  *   - labels: the template's Architecture labels are all in the eval fixture's CLAUDE.md
@@ -105,6 +105,10 @@ function checkVersion() {
   const installed = read('.claude/yotamake/version').trim();
   if (installed !== plugin) {
     fail('version', `.claude/yotamake/version says ${installed}, plugin.json says ${plugin}; run ./plugin/install.sh .`);
+  }
+  const escaped = plugin.replace(/\./g, '\\.');
+  if (!new RegExp(`^## ${escaped}(?![\\w.])`, 'm').test(read('CHANGELOG.md'))) {
+    fail('version', `CHANGELOG.md has no "## ${plugin}" entry; the bump commit adds it (or renames "## Unreleased")`);
   }
 }
 

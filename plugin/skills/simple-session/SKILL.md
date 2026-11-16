@@ -296,7 +296,9 @@ git switch <main-branch>
 git merge --no-ff <branch> -m "Merge <branch> into <main-branch>"
 ```
 
-Do not push or delete the branch unless the user asks.
+Then do any after-merge step that a release or tags line in CLAUDE.md, **Branching and
+releases**, lists, such as a release tag. With no such line, there is none. Do not push or
+delete the branch unless the user asks.
 
 **Pull request** (when the line says the project works through pull requests, or the
 environment says to push to an assigned branch):

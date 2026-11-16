@@ -376,7 +376,10 @@ calls, `scripts/test-hooks.sh`), the installer (scratch installs, `scripts/test-
 and `claude plugin validate`. After changing a harness-owned template file
 (`scripts/docs/*.mjs`, `.githooks/pre-commit`), re-run `./plugin/install.sh .` so this
 repository's own copies match; the check fails until they do. Releases re-run it too (CLAUDE.md,
-Version bump). The docs baseline
+Version bump), add their entry to [CHANGELOG.md](./CHANGELOG.md), and are tagged `vX.Y.Z`
+after the merge from 0.35.0 on. CI (`.github/workflows/ci.yml`) runs `scripts/check --all`
+on a pinned Claude Code for each push, and once a week on the latest one, so a new release
+that breaks the plugin shows up without turning every push red. The docs baseline
 (`scripts/docs/docs-lint-baseline.txt`) holds one entry on purpose: the template `CLAUDE.md`
 links `./README.md`, which exists only once the template is installed.
 

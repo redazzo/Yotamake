@@ -45,7 +45,8 @@ how it is split.
 doc and which doc owns what) · [README.md](./README.md) (the overview of the harness; each
 skill's `SKILL.md` owns its own rules) · [docs/decisions/](./docs/decisions/README.md) (ADRs — never edited,
 only superseded or amended) · [docs/records/](./docs/records/README.md) (history) ·
-[docs/backlog.md](./docs/backlog.md) (open work)
+[docs/backlog.md](./docs/backlog.md) (open work) · [CHANGELOG.md](./CHANGELOG.md) (what each
+release changed)
 
 ## Commands
 
@@ -98,13 +99,16 @@ says how). Put them in the report and ask before running them (see Commands).
   bumps `version` in both `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json`: patch for a fix, minor for a feature. It is its own
   commit, `chore(release): bump version to X.Y.Z`, which also runs `./plugin/install.sh .`
-  and includes what it changes, so this repository's own harness moves with the release.
+  and includes what it changes, so this repository's own harness moves with the release. It
+  also gives the version its `CHANGELOG.md` entry: rename `## Unreleased` to
+  `## X.Y.Z — YYYY-MM-DD`, or add that heading, with one line per change users see.
   Docs-only, evals-only and `scripts/`-only branches do not bump. `scripts/check` fails when
-  the two files or `.claude/yotamake/version` disagree.
+  the two files or `.claude/yotamake/version` disagree, or the version has no changelog entry.
 - **Worktree setup:** none. `scripts/check` needs only bash, git and Node, and the working
   folder is reached by its absolute path.
-- **Release:** merging to main is the release. Users get it with
-  `claude plugin update yotamake@yotamake`.
+- **Release:** merging to main is the release. After the merge, tag the merge commit
+  `vX.Y.Z` with the new version (`git tag vX.Y.Z`); only releases from 0.35.0 on have tags.
+  Users get it with `claude plugin update yotamake@yotamake`.
 
 ## Conventions
 
