@@ -2,8 +2,8 @@
 # PreToolUse hook for Edit/Write: refuse edits while the file's repository is on
 # its main branch. Work happens on a branch cut from main (`simple-session`, "Branch").
 #
-# The main branch is read from the repository's CLAUDE.md line
-# "- **Main branch:** `<name>`"; without one, both main and master count.
+# The main branch is main-branch in .claude/yotamake/project.conf, else the CLAUDE.md
+# line "- **Main branch:** `<name>`"; without either, both main and master count.
 # Files outside a git repository (scratchpad, /tmp) are always allowed, and so are
 # git-ignored files (a multi-session .scratchpad/ folder, made on main) and a
 # repository with no commits yet. A repository that works on main on purpose

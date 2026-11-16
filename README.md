@@ -107,12 +107,17 @@ plugin/
     post-edit-mark.sh              notes that this session edited a code file
     stop-check-ran.sh              blocks the end of a turn once when scripts/check has not passed since
     session-upgrades.sh            at session start, tells Claude when the repo's harness is older than the plugin
-    lib.sh                         shared by the hooks: reads the hook input, finds the gate files
+    lib.sh                         shared by the hooks: reads the hook input and project.conf, finds the gate files
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
   reference/module-design.md       deep and shallow modules, seams, the deletion test
   reference/domain-language.md     the glossary: its rules, its format, naming drift
   reference/upgrades.md            per version: what to add to a repo's own files, and how
+  reference/autopilot.md           multi-session autopilot: sessions run in agents on one branch
+  reference/parallel-sessions.md   multi-session: two sessions at once in sibling worktrees
+  reference/harness-upgrades.md    simple-session: offer the upgrades an older harness is missing
+  reference/findings-not-acted-on.md  simple-session: where a finding the branch leaves goes
+  reference/integrate.md           simple-session: commit, bump, merge or open a pull request
   install.sh                       installs template/ into a repo
   template/                        the per-repo files
   evals/                           the eval suite (see below)
@@ -132,6 +137,7 @@ scripts/check                   the one gate: skills, the pre-commit hook and CI
   session-context.sh            tells Claude the branch, active efforts and the session rule
   protected-paths.conf          files Claude may not read or edit
   post-edit-checks.conf         glob → per-file check command
+  project.conf                  the main branch and doc paths, for hooks (copied from CLAUDE.md)
   skip                          optional: template paths the installer must never write
   version                       the plugin version the harness files were installed from
 docs/                           README (rulebook and index), backlog, decisions, records, …
@@ -143,7 +149,9 @@ scripts/docs/                   docs linter and records index generator
 **Skills hold the method. `CLAUDE.md` holds the facts.** Skills read named sections
 (Checks, Branching and releases, Migrations, Deploying, Conventions, Architecture). If one is
 missing or unfilled, the skill says so and uses a stated default, or stops and asks. It never
-guesses a deploy or migration command.
+guesses a deploy or migration command. Hooks read the two facts they need, the main branch
+and the doc paths, from a copy in `.claude/yotamake/project.conf`, which `/yotamake:doctor`
+checks against `CLAUDE.md`.
 
 **Design comes before code.** The `Architecture` section of `CLAUDE.md` has seven lines the
 skills read: **Style**, **Modules**, **Boundaries**, **Shared code**, **Patterns**,
@@ -168,13 +176,15 @@ loaded, and says so in one line. A teammate who never opens Claude Code there mu
 `git config core.hooksPath .githooks` themselves. CI covers everyone.
 
 **Claude cannot end a turn with unchecked code.** When `scripts/check` passes (not with
-`--staged`), it touches `yotamake-check-passed` in the git directory. When Claude edits a code
-file with Edit or Write, a hook writes the session id to `yotamake-edited` there. Docs and
-git-ignored files do not count. The hook uses the default `Docs-only` rule (files under
-`docs/`, and Markdown at the root other than `CLAUDE.md`): it cannot read a project's own
-`Docs-only` line, so other doc paths count as code and cost one extra check run. When Claude ends a turn after
-editing code in this session and the stamp is older than that edit, a `Stop` hook blocks
-once and tells it to run the check. A second stop goes through, so Claude can still stop to
+`--staged`), it touches `yotamake-check-passed` in the git directory. A run in which no check
+ran (an empty gate, as in a lite install before `/yotamake:setup`) writes no stamp and says
+so. When Claude edits a code file with Edit or Write, a hook writes the session id to
+`yotamake-edited` there. Docs and git-ignored files do not count. The hook reads which files
+are docs from the `docs` globs in `.claude/yotamake/project.conf`, a copy of the `Docs-only`
+line ([ADR-0008](./docs/decisions/0008-facts-hooks-read-in-project-conf.md)); without them it
+uses the default rule (files under `docs/`, and Markdown at the root other than
+`CLAUDE.md`). When Claude ends a turn after editing code in this session and the stamp is
+older than that edit, a `Stop` hook blocks once and tells it to run the check. A second stop goes through, so Claude can still stop to
 ask a question. A turn that edited no code, such as a question, is never blocked, and neither
 is a repository whose `scripts/check` does not write the stamp (one set up before 0.15.0).
 
@@ -193,7 +203,8 @@ under `ask`, since it deletes, moves or overwrites a branch. The rules match fro
 the same flag later on is not caught.
 
 **No edits on the main branch.** A hook refuses Edit and Write while the file's repository is
-on its main branch (the `Main branch` line in `CLAUDE.md`, else `main` or `master`). Claude
+on its main branch (`main-branch` in `.claude/yotamake/project.conf`, else the `Main branch`
+line in `CLAUDE.md`, else `main` or `master`). Claude
 has to cut a branch first, even when a skill did not fire. Files outside a repository are not
 affected, nor are git-ignored ones (such as a multi-session `.scratchpad/` folder). A repository that works on main on purpose opts out with an empty file at
 `.claude/yotamake/allow-edits-on-main`. The protected-paths list stops Claude creating it
@@ -376,7 +387,10 @@ calls, `scripts/test-hooks.sh`), the installer (scratch installs, `scripts/test-
 and `claude plugin validate`. After changing a harness-owned template file
 (`scripts/docs/*.mjs`, `.githooks/pre-commit`), re-run `./plugin/install.sh .` so this
 repository's own copies match; the check fails until they do. Releases re-run it too (CLAUDE.md,
-Version bump). The docs baseline
+Version bump), add their entry to [CHANGELOG.md](./CHANGELOG.md), and are tagged `vX.Y.Z`
+after the merge from 0.35.0 on. CI (`.github/workflows/ci.yml`) runs `scripts/check --all`
+on a pinned Claude Code for each push, and once a week on the latest one, so a new release
+that breaks the plugin shows up without turning every push red. The docs baseline
 (`scripts/docs/docs-lint-baseline.txt`) holds one entry on purpose: the template `CLAUDE.md`
 links `./README.md`, which exists only once the template is installed.
 

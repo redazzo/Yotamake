@@ -69,6 +69,15 @@ printf -- '- **Main branch:** `trunk`\n' > "$r/CLAUDE.md"
 expect 0 pre-edit-main-branch.sh "$r/a.js"                    # CLAUDE.md names another main
 git -C "$r" switch -q -c trunk
 expect 2 pre-edit-main-branch.sh "$r/a.js"
+# project.conf's main-branch wins over CLAUDE.md (ADR-0008); a broken line is skipped.
+printf -- '# facts\nmain-branch feat/x # comment\n' > "$r/.claude/yotamake/project.conf"
+expect 0 pre-edit-main-branch.sh "$r/a.js"                    # conf names another main
+git -C "$r" switch -q feat/x
+expect 2 pre-edit-main-branch.sh "$r/a.js"                    # on the conf's main
+printf 'main-branch\nmain-branch a b\n' > "$r/.claude/yotamake/project.conf"
+git -C "$r" switch -q trunk
+expect 2 pre-edit-main-branch.sh "$r/a.js"                    # no usable key: CLAUDE.md's line
+rm "$r/.claude/yotamake/project.conf"
 git init -q -b main "$tmp/empty"
 expect 0 pre-edit-main-branch.sh "$tmp/empty/a.js"            # no commits yet
 
@@ -176,6 +185,28 @@ sleep 0.05; (cd "$g" && bash scripts/check)
 expect 0 stop-check-ran.sh "$(stop s1)"                   # check passed after the edit
 sleep 0.05; expect 0 post-edit-mark.sh "$(edit s1 "$g/src/a.js")"
 expect 2 stop-check-ran.sh "$(stop s1)"                   # edited again after the pass
+# project.conf's docs globs replace the default rule (ADR-0008).
+rm -f "$marker"
+mkdir -p "$g/.claude/yotamake" "$g/guides/sub" && printf 'x\n' > "$g/guides/sub/g.md"
+printf 'x\n' > "$g/AGENTS.md"
+printf 'docs guides/*\ndocs *.md\ndocs !AGENTS.md\n' > "$g/.claude/yotamake/project.conf"
+for f in guides/sub/g.md README.md CLAUDE.md; do
+    expect 0 post-edit-mark.sh "$(edit s1 "$g/$f")"
+done
+[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc by project.conf was marked"; failed=1; }
+expect 0 post-edit-mark.sh "$(edit s1 "$g/docs/x.md")"   # docs/ is not in this conf's globs
+[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: docs/x.md not marked by project.conf"; failed=1; }
+rm -f "$marker"
+expect 0 post-edit-mark.sh "$(edit s1 "$g/AGENTS.md")"   # an exception wins
+[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: a ! exception not marked"; failed=1; }
+rm -f "$marker"
+# The template's conf gives the same answers as the built-in default rule.
+cp "$hooks/../template/.claude/yotamake/project.conf" "$g/.claude/yotamake/project.conf"
+for f in docs/x.md README.md; do expect 0 post-edit-mark.sh "$(edit s1 "$g/$f")"; done
+[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc by the template conf was marked"; failed=1; }
+expect 0 post-edit-mark.sh "$(edit s1 "$g/CLAUDE.md")"
+[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: CLAUDE.md not marked by the template conf"; failed=1; }
+rm -f "$marker" "$g/.claude/yotamake/project.conf"
 : > "$g/scripts/check"
 expect 0 stop-check-ran.sh "$(stop s1)"                   # an older scripts/check: no stamp
 expect 0 stop-check-ran.sh "$(stop s1)" CLAUDE_PROJECT_DIR="$tmp/none"   # not a repository
@@ -256,6 +287,9 @@ ctx_has "reads the main branch from CLAUDE.md" '^Branch: master \(not the main b
 git -C "$c" switch -q -c trunk
 ctx_has "knows the CLAUDE.md main branch" '^Branch: trunk, the main branch'
 expect 2 pre-edit-main-branch.sh "$c/a.txt"   # the edit hook agrees on the main branch
+mkdir -p "$c/.claude/yotamake" && printf 'main-branch master\n' > "$c/.claude/yotamake/project.conf"
+ctx_has "reads the main branch from project.conf first" '^Branch: trunk \(not the main branch, master\)'
+rm "$c/.claude/yotamake/project.conf"
 git -C "$c" switch -q -c feat/x
 ctx_has "names a feature branch" '^Branch: feat/x \(not the main branch, trunk\)'
 git -C "$c" switch -q --detach

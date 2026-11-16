@@ -1,5 +1,5 @@
 ---
-type: llm
+type: regex
+flags: "i"
 ---
-
-The final message says that src/name.js is not listed on the Modules line of CLAUDE.md's Architecture section.
+Drift[^\n]*\n(?:(?!\n#)[\s\S]){0,600}?name\.js[\s\S]{0,200}?(Modules|not (listed|in)|isn.t (listed|in)|missing)

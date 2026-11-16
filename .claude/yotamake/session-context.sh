@@ -12,9 +12,12 @@
 
 root=$(git -C "${1:-.}" rev-parse --show-toplevel 2>/dev/null) || exit 0
 
-# The main branch, read as pre-edit-main-branch.sh reads it; without the line, both
-# main and master count.
-main=$(sed -n '/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/{s//\1/p;q;}' "$root/CLAUDE.md" 2>/dev/null)
+# The main branch, read as pre-edit-main-branch.sh reads it: main-branch in
+# .claude/yotamake/project.conf, else the CLAUDE.md line; without either, both main and
+# master count.
+main=$(awk '{ sub(/#.*/, "") } $1 == "main-branch" && NF == 2 { print $2; exit }' "$root/.claude/yotamake/project.conf" 2>/dev/null)
+[[ -n "$main" ]] ||
+    main=$(sed -n '/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/{s//\1/p;q;}' "$root/CLAUDE.md" 2>/dev/null)
 mains=${main:-main master}
 if branch=$(git -C "$root" symbolic-ref --short -q HEAD); then
     case " $mains " in

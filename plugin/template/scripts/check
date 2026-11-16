@@ -18,12 +18,15 @@ cd "$(git rev-parse --show-toplevel)" || exit 2
 
 mode=${1:-changed}
 
-# The main branch: CHECK_BASE, else the "Main branch" line in CLAUDE.md (the same
-# line the plugin's main-branch hook reads), else main or master.
+# The main branch: CHECK_BASE, else main-branch in .claude/yotamake/project.conf, else
+# the "Main branch" line in CLAUDE.md (as the plugin's main-branch hook reads them), else
+# main or master.
 main_branches() {
     if [[ -n "${CHECK_BASE:-}" ]]; then echo "$CHECK_BASE"; return; fi
     local m
-    m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
+    m=$(awk '{ sub(/#.*/, "") } $1 == "main-branch" && NF == 2 { print $2; exit }' .claude/yotamake/project.conf 2>/dev/null)
+    [[ -n "$m" ]] ||
+        m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
     if [[ -n "$m" ]]; then echo "$m"; else printf '%s\n' main master; fi
 }
 
@@ -92,9 +95,12 @@ run docs node scripts/docs/lint-docs.mjs
 # touches '^db/migrations/'         && run db-lint     pnpm run lint:db
 # full && touches '^proxy/'         && run proxy-tests bash -c 'cd proxy && npm test'
 
-[[ $ran -gt 0 ]] || echo "note: no checks configured; add them to scripts/check." >&2
 # A passing run outside the pre-commit hook leaves a stamp in the git directory. The
 # plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
-# pass. Keep this line when you edit the file.
-[[ $failed -eq 0 && "$mode" != --staged ]] && touch "$(git rev-parse --git-path yotamake-check-passed)"
+# pass. A run in which no check ran leaves none. Keep these lines when you edit the file.
+if [[ $ran -eq 0 && "$mode" != --staged ]]; then
+    echo "note: no check ran for this change, so no pass stamp was written. If scripts/check has no checks yet, add them (/yotamake:setup finds them)." >&2
+elif [[ $ran -gt 0 && $failed -eq 0 && "$mode" != --staged ]]; then
+    touch "$(git rev-parse --git-path yotamake-check-passed)"
+fi
 exit $failed

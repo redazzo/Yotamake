@@ -85,32 +85,35 @@ In six runs of `23-improve-architecture` (2026-11-15, 0.31.0), every final messa
 the case asks, yet the judges split or failed. `rating` voted FAIL three times on a message
 with "**Rating:** Strong", and `drift` did the same on one saying `src/name.js` "is
 not in Architecture → Modules". Splitting each grader into one short claim fixed
-`shallow-module` (3 of 3) but not the rest. Next step: one run with `--keep-temp`, to see
-exactly what the judge is given as the final message.
+`shallow-module` (3 of 3) but not the rest.
 
-Review of 2026-11-16: more cases could use graders that need no judge. Find out whether the
-eval runner has a grader type that runs a command on the final repository (which files
-changed, no new commit, the stamp is there). Where it does, replace `llm` graders that only
-check file state. This does not get round "Eval sandbox denies `git`": `scripts/check`
-itself needs git.
+2026-11-17: `rating` is now a regex on the final message, so no judge reads it and the skill
+text Claude read cannot match it. A paid run (`--runs 3`, $0.90) passed it 3 of 3, but the
+judges still split on `drift` and `asks-which` although every message met them. Both are now
+regexes too, checked against the six saved final messages (all match) and against messages
+that should fail. Starting work is still caught by `no-file-changes`. Why the judges failed
+is not known: they may be given the wrong text, which would touch every `llm` grader. Next
+step: one run of case 23 with `--keep-temp`, to see what the judges of `no-file-changes` and
+`shallow-module` are given; delete this entry if it scores 1.00 and the judge input is right.
+
+Review of 2026-11-16: more cases could use graders that need no judge. The eval runner has
+no grader type that runs a command on the final repository; it has `regex` on the trace, the
+final message or one file, and `file_exists`. `04-docs-only/guide-fixed` is now a regex on the
+guide. `20-trivial-change/comment-fixed` and `owning-doc-updated` in cases 02 and 18 also say
+no other file changed, which a regex on one file cannot check, so they stay `llm` until such a
+type exists.
 
 ## Keep skills short
 
-**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** a fix for a step Claude
-skipped adds more wording to a skill, or a `SKILL.md` passes 350 lines.
+**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** a change needs to add
+wording to a `SKILL.md` that is at the 250-line limit.
 
-From the same review. `simple-session` and `multi-session` are each about 300 lines, and this
-repository's `CLAUDE.md` is about 10 KB, all in context. Past misses (the review skipped, the
-skill not firing on a named branch) were fixed by adding text, which makes the next miss more
-likely. Options: move edge cases into `plugin/reference/` files that skills read on demand,
-and have `scripts/check` warn when a skill passes a line limit.
-
-Review of 2026-11-16: the skills total about 100 KB. `simple-session` is 17.5 KB,
-`multi-session` 20.5 KB and this repository's `CLAUDE.md` 11 KB. First steps: have
-`scripts/check` fail when a `SKILL.md` passes a line limit, then move the paths few
-sessions take ("Harness upgrades", the pull-request path, "Autopilot", "Running sessions in
-parallel") into `plugin/reference/` files the skill reads on demand. Raised to Medium: every
-other fix that adds wording makes this worse.
+From a review of 2026-11-14. Past misses were fixed by adding text to skills, which makes the
+next miss more likely. Done in 0.35.0: `scripts/check` fails when a `SKILL.md` passes 250
+lines, and the paths few sessions take moved into `plugin/reference/` files read on demand
+([record](./records/2026/2026-11-17-releases-short-skills-project-conf.md)). Left:
+`simple-session` sits at 250 of 250 lines, so its next addition must move something out
+first; and this repository's `CLAUDE.md` (about 11 KB) is still read whole at every start.
 
 ## Session overhead on small changes
 
@@ -129,59 +132,6 @@ design-read agent and two or three permission prompts. A middle tier to try firs
 diff inside one module runs the check and `/code-review` only. Take the threshold from the
 cost numbers, not from a guess.
 
-## An empty gate still writes the pass stamp
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** the next change to
-`plugin/template/scripts/check`, or a repository with no checks filled in reports a green gate.
-
-From the same review. The template `scripts/check` touches `yotamake-check-passed` whenever
-nothing failed, even when no check ran (a lite install before `setup` fills it in runs
-none). It prints a note on stderr, but the `Stop` gate then counts unchecked code as
-checked. Options: do not write the stamp when `ran` is 0, or have `doctor` and the session
-report say plainly that the gate is empty. `scripts/check` is project-owned, so the change
-needs an `upgrades.md` entry.
-
-## A facts file that hooks can read
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** a hook needs a project fact
-it cannot read from prose, a reworded `Main branch` line changes what a hook does, or a project
-whose `Docs-only` line names other doc paths reports that editing those docs blocks the end of
-a turn.
-
-From the same review. Hooks and `scripts/check` read project facts by parsing `CLAUDE.md`
-prose. The same `sed` for the `Main branch` line sits in four places (`plugin/hooks/lib.sh`,
-`session-context.sh`, and both copies of `scripts/check`), and a reworded bullet changes
-what they do without an error. Other facts, such as `Docs-only` and `Integration`, cannot
-be read at all.
-
-One case is already felt: `post-edit-mark.sh` counts an edit as docs with the default rule
-only (files under `docs/`, and Markdown at the root other than `CLAUDE.md`). Other doc
-paths count as code, so Claude runs `scripts/check` once more than it needs to.
-
-A fix: a `.claude/yotamake/project.conf` (main branch, docs globs, integration mode) that
-the installer seeds and `setup` fills in. `CLAUDE.md` keeps the prose for skills, and
-`doctor` or `scripts/check` fails when the two disagree. It needs an ADR first, since
-ADR-0002 puts project facts in named `CLAUDE.md` sections. A smaller first step is a
-`docs-paths.conf` of globs for the `Docs-only` case alone.
-
-## Tag releases, keep a changelog, and test on the latest Claude Code
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** a user asks what changed in
-a version or how to go back to one, or a Claude Code release changes how `ask` rules or hooks
-behave.
-
-From the same review. Merging to main is the release, with no git tag and no changelog, so a
-user cannot pin a version or read what changed; `upgrades.md` covers only project-owned
-files. And CI pins Claude Code 2.1.312, while the claim that an `ask` rule wins over
-`allow` was tested once, on that version.
-
-- Tag each `chore(release)` commit `vX.Y.Z` after the merge. `git tag` is already under
-  `ask`.
-- Keep a `CHANGELOG.md` with one line per version, written in the version-bump commit.
-  `scripts/check` could fail when the current version has no line.
-- Add a scheduled CI job that runs `scripts/check --all` with the latest Claude Code, so a
-  release that breaks `claude plugin validate` shows up without turning the main job red.
-
 ## Enforce the session steps in order with hooks
 
 **Priority: Low** · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders a
@@ -198,8 +148,8 @@ refusing a step with the Boundary that hooks let the edit through when they cann
 as ADR-0006 does under "Failing open". Open question: how a hook can tell
 that `/simplify` and `/code-review` ran, from what it sees. Find that out before the ADR.
 
-Review of 2026-11-16: do this after "A facts file that hooks can read", so the hooks have
-facts they can rely on.
+Review of 2026-11-16: do this after the facts file, so the hooks have facts they can rely
+on. That is now built ([ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)).
 
 ## Gaps left in the git and protected-paths guards
 
@@ -212,6 +162,28 @@ From the review of the 0.34.1 hook fixes. `ask` rules match from the start of a 
 anywhere, since it already reads flag clusters. The wrapper list in `pre-bash-git.sh` is best
 effort: `sudo`, `xargs`, `eval` and `$(…)` still hide git. And the protected-paths hook runs
 on Read but not Grep, so a Grep on a folder can still show a secret.
+
+## Tag releases from CI
+
+**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** a release goes untagged.
+
+From the review of the changelog work (0.35.0). The `vX.Y.Z` tag is a manual step after the
+merge (`CLAUDE.md`, "Branching and releases"), so it can be forgotten. A workflow on push to
+`main` could tag the merge when the version in `plugin/.claude-plugin/plugin.json` has no
+tag yet.
+
+## Copies of the main-branch reader
+
+**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** one copy changes without the
+others.
+
+From the review of `project.conf` (0.35.0). The `awk` that reads `main-branch` from
+`.claude/yotamake/project.conf`, and its `sed` fallback on the `CLAUDE.md` line, are copied
+into `plugin/hooks/lib.sh`, `session-context.sh` (template and this repository) and both
+`scripts/check` copies. This is on purpose: those scripts run without the plugin
+([ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)). A rule in
+`scripts/consistency.mjs` could check the `awk` copies stay identical (the `sed` in
+`session-context.sh` already has a different form).
 
 ## Shell commands get past the edit hooks
 

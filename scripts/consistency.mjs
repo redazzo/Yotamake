@@ -16,7 +16,7 @@
  *
  * Rules:
  *   - version: plugin.json, marketplace.json and .claude/yotamake/version name the same
- *     version.
+ *     version, and CHANGELOG.md has a `## X.Y.Z` entry for it.
  *   - sections: every CLAUDE.md section a skill names ("the **X** section",
  *     "CLAUDE.md, **X**") or the template's top comment lists is a heading in the template.
  *   - labels: the template's Architecture labels are all in the eval fixture's CLAUDE.md
@@ -25,6 +25,8 @@
  *     and each row's Skills cell names one or more skills that exist.
  *   - site skills: site/skills.html has a card for every folder in plugin/skills/, and no
  *     card for a skill that does not exist.
+ *   - skill length: no SKILL.md passes 250 lines. Move a path few sessions take into a
+ *     plugin/reference/ file the skill reads on demand, behind a stub heading.
  *   - step refs: a pointer to another skill's step names its heading, as
  *     `simple-session`, "Design and reuse", and that heading exists. No pointer uses a
  *     step number, which would break silently when the skill is renumbered.
@@ -35,6 +37,8 @@
  *     Constraints: the harness runs on macOS too).
  *   - harness copies: this repository's own harness-owned files (it installs its own
  *     harness) match plugin/template/. Re-run ./plugin/install.sh . to refresh them.
+ *   - project conf: main-branch in .claude/yotamake/project.conf names the branch the
+ *     CLAUDE.md "Main branch" line does (ADR-0008: CLAUDE.md is the source; fix the conf).
  *
  * Exit 0 when every rule holds, 1 otherwise.
  */
@@ -106,6 +110,10 @@ function checkVersion() {
   if (installed !== plugin) {
     fail('version', `.claude/yotamake/version says ${installed}, plugin.json says ${plugin}; run ./plugin/install.sh .`);
   }
+  const escaped = plugin.replace(/\./g, '\\.');
+  if (!new RegExp(`^## ${escaped}(?![\\w.])`, 'm').test(read('CHANGELOG.md'))) {
+    fail('version', `CHANGELOG.md has no "## ${plugin}" entry; the bump commit adds it (or renames "## Unreleased")`);
+  }
 }
 
 /** Section names a skill reads: "the **X** section", "CLAUDE.md, **X**", "(CLAUDE.md, X)". */
@@ -175,6 +183,17 @@ function checkSiteSkills() {
   const cards = siteCards();
   for (const s of skills) if (!cards.has(s)) fail('site skills', `site/skills.html has no card for plugin/skills/${s}`);
   for (const c of cards) if (!skills.has(c)) fail('site skills', `site/skills.html has a card for "${c}", not in plugin/skills/`);
+}
+
+/** No SKILL.md passes MAX_SKILL_LINES lines: every skill is read whole into context. */
+const MAX_SKILL_LINES = 250;
+function checkSkillLength() {
+  for (const [, file] of skillFiles()) {
+    const lines = read(file).split('\n').length - 1;
+    if (lines > MAX_SKILL_LINES) {
+      fail('skill length', `${file} has ${lines} lines, over ${MAX_SKILL_LINES}; move a rare path into plugin/reference/`);
+    }
+  }
 }
 
 /**
@@ -343,6 +362,17 @@ function checkHarnessCopies() {
   }
 }
 
+function checkProjectConf() {
+  const conf = '.claude/yotamake/project.conf';
+  if (!existsSync(path.join(ROOT, conf))) return fail('project conf', `${conf} is missing; copy plugin/template/${conf}`);
+  const facts = read(conf).split('\n').map((l) => l.replace(/#.*/, '').trim().split(/\s+/));
+  const confMain = facts.find((w) => w.length === 2 && w[0] === 'main-branch')?.[1];
+  const prose = read('CLAUDE.md').match(/^[-*]\s*\*\*Main branch:\*\*\s*`([^`]*)`/m)?.[1];
+  if (confMain !== prose) {
+    fail('project conf', `${conf} says main-branch ${confMain}, CLAUDE.md's Main branch line says ${prose}; change the conf to match`);
+  }
+}
+
 function checkUpgrades(changed) {
   if (changed.includes('plugin/reference/upgrades.md')) return;
   // Template files that reach older installs on their own. The last two mirror special
@@ -371,10 +401,12 @@ if (process.argv[2] === 'upgrades') {
   checkLabels();
   checkEvals();
   checkSiteSkills();
+  checkSkillLength();
   checkStepRefs();
   checkSharedGraders();
   checkPortableSed();
   checkHarnessCopies();
+  checkProjectConf();
 }
 
 for (const p of problems) console.error(p);

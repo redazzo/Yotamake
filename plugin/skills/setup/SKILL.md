@@ -91,6 +91,10 @@ from guesses:
   check.
 - **`.github/workflows/check.yml`** — the toolchain setup steps, or ask whether to delete it.
 - **`.claude/yotamake/post-edit-checks.conf`** — one fast per-file linter line per language.
+- **`.claude/yotamake/project.conf`** — the facts the hooks read, copied from what you wrote
+  in `CLAUDE.md`: `main-branch` is the `Main branch` name, and the `docs` lines are the globs
+  of the `Docs-only` line (one per line; a glob with no `/` matches only root files; a `!`
+  line is an exception). `CLAUDE.md` stays the source: when the two differ, change the conf.
 
 Leave a placeholder in place, and list it in the report, wherever the repository does not
 answer the question.

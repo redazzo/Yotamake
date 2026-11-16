@@ -5,6 +5,11 @@ name: ci
 on:
   push:
   pull_request:
+  # Weekly, against the latest Claude Code: a new CLI release that breaks the plugin shows
+  # up here, while pushes keep the pinned version and stay green.
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 jobs:
   check:
@@ -15,9 +20,13 @@ jobs:
         with:
           node-version: 22
 
-      # validate needs no login. Pinned so a new CLI release cannot turn CI red on its own;
-      # bump it on purpose.
+      # validate needs no login. Pushes use a pinned CLI so a new release cannot turn CI red
+      # on its own; bump it on purpose. The weekly and manual runs use the latest: when one
+      # fails and pushes pass, the new release broke something, so fix the plugin, then bump
+      # the pin.
       - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code@2.1.312
+        env:
+          CLAUDE_CODE_VERSION: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'latest' || '2.1.312' }}
+        run: npm install -g "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION"
 
       - run: scripts/check --all

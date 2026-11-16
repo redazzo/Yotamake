@@ -1,5 +1,5 @@
 ---
-type: llm
+type: regex
+flags: "i"
 ---
-
-The final message gives at least one candidate a rating of Strong, Worth exploring or Speculative.
+Rating\W{0,6}(Strong|Worth exploring|Speculative)

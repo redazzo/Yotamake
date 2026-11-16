@@ -45,7 +45,8 @@ how it is split.
 doc and which doc owns what) · [README.md](./README.md) (the overview of the harness; each
 skill's `SKILL.md` owns its own rules) · [docs/decisions/](./docs/decisions/README.md) (ADRs — never edited,
 only superseded or amended) · [docs/records/](./docs/records/README.md) (history) ·
-[docs/backlog.md](./docs/backlog.md) (open work)
+[docs/backlog.md](./docs/backlog.md) (open work) · [CHANGELOG.md](./CHANGELOG.md) (what each
+release changed)
 
 ## Commands
 
@@ -85,7 +86,8 @@ says how). Put them in the report and ask before running them (see Commands).
 ## Branching and releases
 
 - **Main branch:** `main`. Feature work happens on branches cut from it, never on it directly.
-  A hook blocks edits while this branch is checked out; it reads the name from this line.
+  A hook blocks edits while this branch is checked out. Hooks read the name from
+  `main-branch` in `.claude/yotamake/project.conf`; change both together.
 - **Branch prefixes:** `feat/`, `fix/`, `refactor/`, `perf/`, `docs/`, `test/`, `chore/`. A
   cloud session that is assigned a branch works on that branch as named, with no prefix.
 - **Commits:** Conventional Commits, `type(scope): summary`.
@@ -98,13 +100,16 @@ says how). Put them in the report and ask before running them (see Commands).
   bumps `version` in both `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json`: patch for a fix, minor for a feature. It is its own
   commit, `chore(release): bump version to X.Y.Z`, which also runs `./plugin/install.sh .`
-  and includes what it changes, so this repository's own harness moves with the release.
+  and includes what it changes, so this repository's own harness moves with the release. It
+  also gives the version its `CHANGELOG.md` entry: rename `## Unreleased` to
+  `## X.Y.Z — YYYY-MM-DD`, or add that heading, with one line per change users see.
   Docs-only, evals-only and `scripts/`-only branches do not bump. `scripts/check` fails when
-  the two files or `.claude/yotamake/version` disagree.
+  the two files or `.claude/yotamake/version` disagree, or the version has no changelog entry.
 - **Worktree setup:** none. `scripts/check` needs only bash, git and Node, and the working
   folder is reached by its absolute path.
-- **Release:** merging to main is the release. Users get it with
-  `claude plugin update yotamake@yotamake`.
+- **Release:** merging to main is the release. After the merge, tag the merge commit
+  `vX.Y.Z` with the new version (`git tag vX.Y.Z`); only releases from 0.35.0 on have tags.
+  Users get it with `claude plugin update yotamake@yotamake`.
 
 ## Conventions
 
@@ -162,14 +167,16 @@ not list stops before any edit and is raised with the user, whoever asked for it
   hook. Skills read project facts only from named `CLAUDE.md` sections. The installer never
   overwrites a project-owned file, and merges `.claude/settings.json` without removing
   anything. Hooks let the edit through (exit 0) when they cannot decide.
-- **Shared code:** `plugin/hooks/lib.sh` for the hooks (reading the tool call);
+- **Shared code:** `plugin/hooks/lib.sh` for the hooks (reading the tool call, and `read_fact` for
+  `project.conf`);
   `plugin/reference/` for text several skills need;
   `plugin/skills/multi-session/templates/` for working-folder files (`spec` uses `spec.md`);
   `generate-records-index.mjs` exports the front-matter reader `lint-docs.mjs` uses;
   `plugin/evals/_fixture/` builds and installs eval repositories, and
   `plugin/evals/_graders/` holds the source copy of graders several cases share.
 - **Patterns:** hooks get the edited path with `tool_file_path` from `lib.sh`, and block with
-  exit 2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`.
+  exit 2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`;
+  the project facts hooks read are in `project.conf`, a copy of `CLAUDE.md` lines (ADR-0008).
   Skills name the `CLAUDE.md` sections they read in bold and say what to do when one is
   missing or unfilled. A change to a project-owned template file gets an `upgrades.md` entry.
 - **Constraints:** needs only `bash`, `git` and Node 18+; no npm dependencies. Runs on Linux

@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: Check that the Yotamake harness is set up and working in the current repository — the pre-commit hook, the harness version and pending upgrades, FILL IN placeholders left in CLAUDE.md, whether scripts/check runs any project checks, and whether CI runs it — and print one screen of results with a fix for each problem. Read-only. Use when the user runs /yotamake:doctor or asks whether the harness is set up right.
+description: Check that the Yotamake harness is set up and working in the current repository — the pre-commit hook, the harness version and pending upgrades, FILL IN placeholders left in CLAUDE.md, whether scripts/check runs any project checks, whether CI runs it, and whether .claude/yotamake/project.conf agrees with CLAUDE.md — and print one screen of results with a fix for each problem. Read-only. Use when the user runs /yotamake:doctor or asks whether the harness is set up right.
 disable-model-invocation: true
 ---
 
@@ -11,7 +11,8 @@ edits no file, changes no git config and installs nothing. Each problem it finds
 the fix, and the user decides whether to run it.
 
 Run every check from the repository root (`git rev-parse --show-toplevel`). Gather what the
-checks need in as few commands as you can: one Bash call can read the version files,
+checks need in as few commands as you can: one Bash call can read the version files and
+`.claude/yotamake/project.conf`,
 `git config --get core.hooksPath`, and grep `CLAUDE.md`, `scripts/check` and the CI files.
 If the directory is not a git repository, say so and stop. If it has no `scripts/check` and
 no `.claude/yotamake/`, the harness is not installed: say so, suggest `/yotamake:setup`, and
@@ -75,6 +76,19 @@ Each check gets one of three results:
    - No CI: warn. Fix: the template's `.github/workflows/check.yml`, filled in by
      `/yotamake:setup`.
 
+6. **Project facts.** Read `.claude/yotamake/project.conf` (one `key value` per line, `#`
+   starts a comment) beside the `Main branch` and `Docs-only` lines of `CLAUDE.md`, which
+   is the source.
+   - `main-branch` names the `Main branch` line's branch, and the `docs` globs name the paths
+     the `Docs-only` line does: ok. Show the globs on the line.
+   - The file is missing, or has no `main-branch`: warn. The hooks fall back to the
+     `CLAUDE.md` line and the default docs rule. Fix: copy
+     `<this skill's directory>/../../template/.claude/yotamake/project.conf` and set its
+     lines from `CLAUDE.md`.
+   - `main-branch` names another branch, or the `docs` globs clearly name other paths than
+     the `Docs-only` line: fail, because the hooks guard the wrong branch or count docs as
+     code. Fix: change the conf to match `CLAUDE.md`.
+
 ## Report
 
 One screen, in this shape:
@@ -87,6 +101,7 @@ fail  version           0.16.0 < 0.19.0; pending: 0.17.0 SessionStart hook tells
 warn  CLAUDE.md         FILL IN left in: Deploying, Conventions
 ok    project checks    lint, type-check, tests
 warn  CI                none found
+ok    project facts     main-branch main; docs docs/*, *.md, !CLAUDE.md
 
 Fixes
 - version: /yotamake:setup

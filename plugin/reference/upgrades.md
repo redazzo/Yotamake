@@ -20,6 +20,52 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.35.0 — Hooks read the main branch and doc paths from project.conf
+
+- **Check:** `.claude/yotamake/project.conf` exists, its `main-branch` line names the branch
+  of the `Main branch` line in `CLAUDE.md`, and `main_branches()` in `scripts/check` reads
+  `project.conf` (or `scripts/check` has no `main_branches()`).
+- **Apply:** copy the plugin's `template/.claude/yotamake/project.conf` into
+  `.claude/yotamake/`. Set `main-branch` to the `Main branch` name in `CLAUDE.md`, and the
+  `docs` lines to the paths its `Docs-only` line names (one glob per line; a glob with no `/`
+  matches only root files; a `!` line is an exception). In `scripts/check`, make
+  `main_branches()` read the conf before `CLAUDE.md`: put these lines in place of its `m=$(sed
+  …)` line, keeping that line as the fallback:
+
+  ```bash
+  m=$(awk '{ sub(/#.*/, "") } $1 == "main-branch" && NF == 2 { print $2; exit }' .claude/yotamake/project.conf 2>/dev/null)
+  [[ -n "$m" ]] ||
+      m=$(sed -n 's/^[-*][[:space:]]*\*\*Main branch:\*\*[[:space:]]*`\([^`]*\)`.*/\1/p' CLAUDE.md 2>/dev/null | head -n1)
+  ```
+
+  In `CLAUDE.md`, end the `Main branch` line with "Hooks read the name from `main-branch` in
+  `.claude/yotamake/project.conf`; change both together." in place of "it reads the name
+  from this line", and tell the user that a change to the `Main branch` or `Docs-only` line
+  now needs the same change in `project.conf` (`/yotamake:doctor` checks they agree).
+
+## 0.35.0 — An empty gate writes no pass stamp
+
+- **Check:** `scripts/check` writes `yotamake-check-passed` only when at least one check ran
+  (the block below), or does not contain `yotamake-check-passed` at all.
+- **Apply:** replace the stamp lines at the end of `scripts/check`, just before its final
+  `exit $failed`, with these (and drop the old `no checks configured` note line):
+
+  ```bash
+  # A passing run outside the pre-commit hook leaves a stamp in the git directory. The
+  # plugin's Stop hook reads it: Claude may not end a turn with code edited after the last
+  # pass. A run in which no check ran leaves none. Keep these lines when you edit the file.
+  if [[ $ran -eq 0 && "$mode" != --staged ]]; then
+      echo "note: no check ran for this change, so no pass stamp was written. If scripts/check has no checks yet, add them (/yotamake:setup finds them)." >&2
+  elif [[ $ran -gt 0 && $failed -eq 0 && "$mode" != --staged ]]; then
+      touch "$(git rev-parse --git-path yotamake-check-passed)"
+  fi
+  ```
+
+  If the script has no `ran` counter, add `ran=0` beside `failed=0` and `ran=$((ran + 1))`
+  as the first line of `run()`. If it names its variables differently, use its names. Tell
+  the user that a run with no checks now leaves the `Stop` hook unsatisfied, so a session
+  that edits code says the gate is empty instead of counting it as checked.
+
 ## 0.34.1 — Protected paths are not read either
 
 - **Check:** the first comment line of `.claude/yotamake/protected-paths.conf` says "read or

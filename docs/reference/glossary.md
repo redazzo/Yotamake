@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-15
+updated: 2026-11-17
 owns: [domain-language]
 ---
 
@@ -37,7 +37,8 @@ where the thing is that file or folder.
   checks. _Avoid:_ minimal install.
 - **Project fact:** something a skill needs to know about one repository, such as its check
   command or main branch. Skills read project facts only from named sections of its
-  `CLAUDE.md`.
+  `CLAUDE.md`. Hooks and `scripts/check` read a copy of two of them, the main branch and the
+  doc paths, from `.claude/yotamake/project.conf`.
 
 ## Working
 

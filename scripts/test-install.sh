@@ -27,13 +27,22 @@ full_install() {
     git init -q -b main "$full"
     "$plugin/install.sh" "$full"
     cd "$full" && scripts/check --all
+    test -e "$(git rev-parse --git-path yotamake-check-passed)"
 }
 
 lite_install() {
     git init -q -b main "$lite"
     "$plugin/install.sh" "$lite" --lite
     test ! -e "$lite/docs" && test ! -e "$lite/scripts/docs"
-    cd "$lite" && scripts/check --all
+    # No checks are filled in, so the gate is empty: it passes, says so, and leaves no stamp.
+    local out
+    out=$(cd "$lite" && scripts/check --all 2>&1)
+    grep -q '/yotamake:setup' <<<"$out"
+    # The pre-commit run never writes a stamp, so it stays quiet about it.
+    out=$(cd "$lite" && scripts/check --staged 2>&1)
+    if grep -q 'no check ran' <<<"$out"; then return 1; fi
+    cd "$lite"
+    test ! -e "$(git rev-parse --git-path yotamake-check-passed)"
 }
 
 lite_refresh_adds_nothing() {
@@ -97,6 +106,20 @@ settings_merge_adds_ask_rules() {
         if (!p.allow.includes("Bash(git branch:*)")) process.exit(1);'
 }
 
+# project.conf is project-owned (ADR-0008): seeded with the defaults, never rewritten, and
+# scripts/check reads its main branch from it.
+project_conf_seeded_and_kept() {
+    cd "$full"
+    grep -qx 'main-branch main' .claude/yotamake/project.conf
+    printf 'main-branch trunk\n' > .claude/yotamake/project.conf
+    "$plugin/install.sh" "$full" >/dev/null
+    grep -qx 'main-branch trunk' .claude/yotamake/project.conf
+    local out
+    out=$(scripts/check 2>&1 || true)
+    cp "$plugin/template/.claude/yotamake/project.conf" .claude/yotamake/project.conf
+    grep -qF 'no merge base with the main branch (trunk)' <<<"$out"
+}
+
 # The SessionStart entry: added once, beside the repository's own hooks (ADR-0004).
 # session_start_count [script]: SessionStart entries naming it (default set-hooks-path.sh).
 session_start_count() {
@@ -152,8 +175,8 @@ installer_hooks_path_notes() {
 
 export GIT_CONFIG_GLOBAL=$tmp/gitconfig GIT_CONFIG_NOSYSTEM=1
 : > "$GIT_CONFIG_GLOBAL"
-step "full install passes its own check" full_install
-step "lite install has no docs system and passes its check" lite_install
+step "full install passes its own check and writes the stamp" full_install
+step "lite install has no docs system, and its empty check leaves no stamp" lite_install
 step "a lite refresh adds no files" lite_refresh_adds_nothing
 step "the eval fixture passes its check" eval_fixture
 step "a refresh regenerates a stale records index" refresh_regenerates_stale_index
@@ -161,6 +184,7 @@ step "a quoted status is read the same by the index and the linter" quoted_statu
 step "the settings merge keeps the repository's own entries" settings_merge_keeps_ours
 step "the settings merge adds the SessionStart hook once" settings_merge_adds_hook_once
 step "a refresh adds new ask rules to older settings" settings_merge_adds_ask_rules
+step "project.conf is seeded once and scripts/check reads it" project_conf_seeded_and_kept
 step "a skipped hooks-path script leaves only its hook entry out" \
     skipped_script_leaves_only_its_hook_out set-hooks-path.sh session-context.sh
 step "a skipped session-context script leaves only its hook entry out" \
