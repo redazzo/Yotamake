@@ -25,6 +25,6 @@ test("adds", () => assert.equal(add(2, 3), 5));
 JS
 printf '# counter\n\nAdds numbers.\n' > README.md
 git add -A
-git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Initial"
+git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "Initial"
 git checkout -q -b chore/yotamake-harness
 bash "$(dirname "$0")/../_fixture/install-harness.sh"

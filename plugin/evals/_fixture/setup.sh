@@ -25,7 +25,7 @@ fs.writeFileSync(p, s);
 JS
 
 git add -A
-git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Initial fixture"
+git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "Initial commit"
 
 # The eval sandbox does not let the agent write inside .git, so a case that needs
 # work to happen starts on a branch made here.

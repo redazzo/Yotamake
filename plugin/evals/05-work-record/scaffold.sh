@@ -7,5 +7,5 @@ sed -i.bak 's/Hello, ${name}\./Hello, ${name}!/' src/greet.js && rm src/greet.js
 sed -i.bak "s/'Hello, Ada\.'/'Hello, Ada!'/" test/greet.test.js && rm test/greet.test.js.bak
 sed -i.bak 's/returns `Hello, <name>.` — the name, ending with a full stop./returns `Hello, <name>!` — the name, ending with an exclamation mark./' docs/reference/greeting.md && rm docs/reference/greeting.md.bak
 git add -A
-git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "feat(greet): end greetings with an exclamation mark"
-git checkout -q -b docs/eval-work
+git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "feat(greet): end greetings with an exclamation mark"
+git checkout -q -b docs/work

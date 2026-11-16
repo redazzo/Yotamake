@@ -2,7 +2,7 @@
 # The fixture plus a Migrations section and one migration already made today,
 # so the new one must take sequence 000002.
 set -euo pipefail
-bash "$(dirname "$0")/../_fixture/setup.sh" feat/eval-work
+bash "$(dirname "$0")/../_fixture/setup.sh" feat/work
 cat >> CLAUDE.md <<'MD'
 
 ## Migrations
@@ -17,4 +17,4 @@ mkdir -p db/migrations
 printf -- '-- Migration: create_greetings\n-- Created: %s\n\nCREATE TABLE greetings (id integer primary key);\n' "$(date +%F)" \
   > "db/migrations/$(date +%Y%m%d)000001_create_greetings.sql"
 git add -A
-git -c user.name="Eval Fixture" -c user.email=eval@example.invalid commit -qm "Add migrations" --no-verify
+git -c user.name="Dev" -c user.email=dev@example.invalid commit -qm "Add migrations" --no-verify

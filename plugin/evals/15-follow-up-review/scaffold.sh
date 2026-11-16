@@ -3,5 +3,5 @@
 # reviewed and reported, not committed.
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
-bash "$here/../_fixture/setup.sh" feat/eval-work
+bash "$here/../_fixture/setup.sh" feat/work
 git apply "$here/first-turn.patch"
