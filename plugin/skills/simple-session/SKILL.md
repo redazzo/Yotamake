@@ -155,8 +155,8 @@ that `/yotamake:setup` can fill it in.
 
 Follow CLAUDE.md. Keep to the one concern the branch is named for. The trivial side-fix
 policy (CLAUDE.md, Conventions) applies: fix a typo or stale comment you pass, and note it in
-the report. Anything with behavioural reach that is outside the task goes in the report as a
-suggestion, not in the diff.
+the report. Anything with behavioural reach that is outside the task is a finding not acted
+on (step 6), not part of the diff.
 
 **Test-first.** When **Checks** says `Test-first: yes`, start a change in behaviour with a
 test. Run just that test (not `scripts/check`) and see it fail for the reason you expect,
@@ -211,8 +211,8 @@ Otherwise review the branch's diff against the main branch in three parts:
 
 1. **Reuse.** Run the built-in `/simplify` skill. It applies its fixes itself. Keep the
    fixes to code this branch added or changed. Undo the others by hand (not with
-   `git checkout`, which would also drop your own uncommitted work) and list them in the
-   report as suggestions. If `/simplify` is not available, check by hand: for each new
+   `git checkout`, which would also drop your own uncommitted work) and record them as
+   "Findings not acted on" below. If `/simplify` is not available, check by hand: for each new
    function or block, search for code that already does the same, and reuse it.
 2. **Design.** Once part 1's fixes are in, start one built-in `general-purpose` agent in
    the background with the Agent tool, go on to part 3, and act on its answer when it
@@ -227,9 +227,18 @@ Otherwise review the branch's diff against the main branch in three parts:
 3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a
    real defect in this branch's change.
 
-If any part changed code, run `scripts/check` again. A finding you judge wrong, or one
-outside this branch's concern, goes in the report with one line on why you left it. If
-`/code-review` is not available, say so in the report and carry on.
+If any part changed code, run `scripts/check` again. If `/code-review` is not available,
+say so in the report and carry on.
+
+**Findings not acted on.** Drop a finding you judge wrong, and say why in one line in the
+report. Write every other finding this branch does not fix into `docs/backlog.md`, as part
+of this branch's changes. That covers a real defect or cleanup outside the branch's concern
+and a fix `/simplify` made that you undid. Give the file and line, the problem, and a
+**Trigger to act** (see the `write-doc` skill). Add to an entry that already covers it
+rather than a duplicate. With no `docs/backlog.md` (a lite install), list them in the
+report instead. The rule holds on every branch, even when the review is skipped (step 4
+can leave findings too). Inside a `multi-session` effort, add the finding to the ledger's
+Backlog line instead; close-out writes the entry.
 
 ## 7. Stop and report
 
@@ -246,9 +255,10 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
 - with `Test-first: yes`, the test you saw fail before the change;
 - for a bug fix, what `debugging`, "Report", asks for;
 - the check results (one line each);
-- the review: which skills you ran, what they found and fixed, what you left and why, or
+- the review: which skills you ran, what they found and fixed, or
   that it was skipped because the branch is docs-only, or trivial (and why);
-- any side-fixes and any suggestions you left out;
+- any side-fixes, the backlog entries you added for findings not acted on, and the findings
+  you dropped as wrong, one line each;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
   any attribution lines the environment asks for).
 
