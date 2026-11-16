@@ -22,6 +22,7 @@ _None._
 
 | Date | Record |
 |---|---|
+| 2026-11-17 | [The second Medium backlog: changelog and tags, empty gate, case 23, short skills, project.conf](./2026/2026-11-17-releases-short-skills-project-conf.md) |
 | 2026-11-12 | [Autopilot for multi-session efforts](./2026/2026-11-12-autopilot.md) |
 | 2026-11-12 | [The medium-priority backlog: cost, trivial tier, test-first, debugging, design read](./2026/2026-11-12-medium-backlog.md) |
 | 2026-11-11 | [Subagents for S0, and parallel sessions in worktrees](./2026/2026-11-11-subagents-and-worktrees.md) |

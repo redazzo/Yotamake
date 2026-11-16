@@ -8,7 +8,7 @@ status: current
 
 - **Status:** Accepted (2026-11-17)
 - **Date:** 2026-11-17
-- **Work record:** none yet
+- **Work record:** [2026-11-17, the second Medium backlog](../records/2026/2026-11-17-releases-short-skills-project-conf.md)
 - **Amends:** [ADR-0002](./0002-project-facts-in-named-claude-md-sections.md): the facts
   that hooks and scripts read get a copy in a config file, which ADR-0002 rejected. Skills
   still read facts only from named `CLAUDE.md` sections.

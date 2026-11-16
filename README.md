@@ -182,9 +182,9 @@ so. When Claude edits a code file with Edit or Write, a hook writes the session 
 `yotamake-edited` there. Docs and git-ignored files do not count. The hook reads which files
 are docs from the `docs` globs in `.claude/yotamake/project.conf`, a copy of the `Docs-only`
 line ([ADR-0008](./docs/decisions/0008-facts-hooks-read-in-project-conf.md)); without them it
-uses the default rule (files under `docs/`, and Markdown at the root other than `CLAUDE.md`). When Claude ends a turn after
-editing code in this session and the stamp is older than that edit, a `Stop` hook blocks
-once and tells it to run the check. A second stop goes through, so Claude can still stop to
+uses the default rule (files under `docs/`, and Markdown at the root other than
+`CLAUDE.md`). When Claude ends a turn after editing code in this session and the stamp is
+older than that edit, a `Stop` hook blocks once and tells it to run the check. A second stop goes through, so Claude can still stop to
 ask a question. A turn that edited no code, such as a question, is never blocked, and neither
 is a repository whose `scripts/check` does not write the stamp (one set up before 0.15.0).
 

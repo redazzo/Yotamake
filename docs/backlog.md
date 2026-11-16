@@ -105,29 +105,15 @@ type exists.
 
 ## Keep skills short
 
-**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** a fix for a step Claude
-skipped adds more wording to a skill, or a `SKILL.md` passes 350 lines.
+**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** a change needs to add
+wording to a `SKILL.md` that is at the 250-line limit.
 
-From the same review. `simple-session` and `multi-session` are each about 300 lines, and this
-repository's `CLAUDE.md` is about 10 KB, all in context. Past misses (the review skipped, the
-skill not firing on a named branch) were fixed by adding text, which makes the next miss more
-likely. Options: move edge cases into `plugin/reference/` files that skills read on demand,
-and have `scripts/check` warn when a skill passes a line limit.
-
-Review of 2026-11-16: the skills total about 100 KB. `simple-session` is 17.5 KB,
-`multi-session` 20.5 KB and this repository's `CLAUDE.md` 11 KB. First steps: have
-`scripts/check` fail when a `SKILL.md` passes a line limit, then move the paths few
-sessions take ("Harness upgrades", the pull-request path, "Autopilot", "Running sessions in
-parallel") into `plugin/reference/` files the skill reads on demand. Raised to Medium: every
-other fix that adds wording makes this worse.
-
-Done on `feat/medium-backlog` (2026-11-17): `scripts/check` fails when a `SKILL.md` passes
-250 lines (`scripts/consistency.mjs`, skill length). `multi-session` moved "Autopilot" and
-"Running sessions in parallel" to `plugin/reference/` (312 to 193 lines); `simple-session`
-moved the detail of "Harness upgrades", "Findings not acted on" and "On yes: commit, bump,
-integrate" (320 to 249 lines). Left: this repository's `CLAUDE.md` (about 11 KB) is still
-read whole, and `simple-session` sits at the limit, so its next addition must move
-something out first.
+From a review of 2026-11-14. Past misses were fixed by adding text to skills, which makes the
+next miss more likely. Done in 0.35.0: `scripts/check` fails when a `SKILL.md` passes 250
+lines, and the paths few sessions take moved into `plugin/reference/` files read on demand
+([record](./records/2026/2026-11-17-releases-short-skills-project-conf.md)). Left:
+`simple-session` sits at 250 of 250 lines, so its next addition must move something out
+first; and this repository's `CLAUDE.md` (about 11 KB) is still read whole at every start.
 
 ## Session overhead on small changes
 
@@ -146,59 +132,6 @@ design-read agent and two or three permission prompts. A middle tier to try firs
 diff inside one module runs the check and `/code-review` only. Take the threshold from the
 cost numbers, not from a guess.
 
-## An empty gate still writes the pass stamp
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** the next change to
-`plugin/template/scripts/check`, or a repository with no checks filled in reports a green gate.
-
-From the same review. The template `scripts/check` touches `yotamake-check-passed` whenever
-nothing failed, even when no check ran (a lite install before `setup` fills it in runs
-none). It prints a note on stderr, but the `Stop` gate then counts unchecked code as
-checked. Options: do not write the stamp when `ran` is 0, or have `doctor` and the session
-report say plainly that the gate is empty. `scripts/check` is project-owned, so the change
-needs an `upgrades.md` entry.
-
-## A facts file that hooks can read
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** a hook needs a project fact
-it cannot read from prose, a reworded `Main branch` line changes what a hook does, or a project
-whose `Docs-only` line names other doc paths reports that editing those docs blocks the end of
-a turn.
-
-From the same review. Hooks and `scripts/check` read project facts by parsing `CLAUDE.md`
-prose. The same `sed` for the `Main branch` line sits in four places (`plugin/hooks/lib.sh`,
-`session-context.sh`, and both copies of `scripts/check`), and a reworded bullet changes
-what they do without an error. Other facts, such as `Docs-only` and `Integration`, cannot
-be read at all.
-
-One case is already felt: `post-edit-mark.sh` counts an edit as docs with the default rule
-only (files under `docs/`, and Markdown at the root other than `CLAUDE.md`). Other doc
-paths count as code, so Claude runs `scripts/check` once more than it needs to.
-
-The design is [ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)
-(Accepted 2026-11-17): a `.claude/yotamake/project.conf` with `main-branch` and `docs` globs,
-which the installer seeds and `setup` fills in. `CLAUDE.md` stays the source, and `doctor`
-fails when the two disagree. Built on `feat/medium-backlog` (0.35.0); delete this entry when
-that merges.
-
-## Tag releases, keep a changelog, and test on the latest Claude Code
-
-**Priority: Medium** · **Added:** 2026-11-16 · **Trigger to act:** a user asks what changed in
-a version or how to go back to one, or a Claude Code release changes how `ask` rules or hooks
-behave.
-
-From the same review. Merging to main is the release, with no git tag and no changelog, so a
-user cannot pin a version or read what changed; `upgrades.md` covers only project-owned
-files. And CI pins Claude Code 2.1.312, while the claim that an `ask` rule wins over
-`allow` was tested once, on that version.
-
-- Tag each `chore(release)` commit `vX.Y.Z` after the merge. `git tag` is already under
-  `ask`.
-- Keep a `CHANGELOG.md` with one line per version, written in the version-bump commit.
-  `scripts/check` could fail when the current version has no line.
-- Add a scheduled CI job that runs `scripts/check --all` with the latest Claude Code, so a
-  release that breaks `claude plugin validate` shows up without turning the main job red.
-
 ## Enforce the session steps in order with hooks
 
 **Priority: Low** · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders a
@@ -215,8 +148,8 @@ refusing a step with the Boundary that hooks let the edit through when they cann
 as ADR-0006 does under "Failing open". Open question: how a hook can tell
 that `/simplify` and `/code-review` ran, from what it sees. Find that out before the ADR.
 
-Review of 2026-11-16: do this after "A facts file that hooks can read", so the hooks have
-facts they can rely on.
+Review of 2026-11-16: do this after the facts file, so the hooks have facts they can rely
+on. That is now built ([ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)).
 
 ## Gaps left in the git and protected-paths guards
 
@@ -229,6 +162,28 @@ From the review of the 0.34.1 hook fixes. `ask` rules match from the start of a 
 anywhere, since it already reads flag clusters. The wrapper list in `pre-bash-git.sh` is best
 effort: `sudo`, `xargs`, `eval` and `$(…)` still hide git. And the protected-paths hook runs
 on Read but not Grep, so a Grep on a folder can still show a secret.
+
+## Tag releases from CI
+
+**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** a release goes untagged.
+
+From the review of the changelog work (0.35.0). The `vX.Y.Z` tag is a manual step after the
+merge (`CLAUDE.md`, "Branching and releases"), so it can be forgotten. A workflow on push to
+`main` could tag the merge when the version in `plugin/.claude-plugin/plugin.json` has no
+tag yet.
+
+## Copies of the main-branch reader
+
+**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** one copy changes without the
+others.
+
+From the review of `project.conf` (0.35.0). The `awk` that reads `main-branch` from
+`.claude/yotamake/project.conf`, and its `sed` fallback on the `CLAUDE.md` line, are copied
+into `plugin/hooks/lib.sh`, `session-context.sh` (template and this repository) and both
+`scripts/check` copies. This is on purpose: those scripts run without the plugin
+([ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)). A rule in
+`scripts/consistency.mjs` could check the `awk` copies stay identical (the `sed` in
+`session-context.sh` already has a different form).
 
 ## Shell commands get past the edit hooks
 
