@@ -6,7 +6,7 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
-## Unreleased
+## 0.36.0 — 2026-11-17
 
 - `multi-session`: autopilot is the default. Approving S0's spec and plan starts it, unless
   you say "approve, step through". S0's last message lists the open decisions with the
