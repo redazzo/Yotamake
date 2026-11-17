@@ -30,6 +30,7 @@ dated amendment section at the end.
 | [0006](./0006-commit-stop-by-project-hook.md) | A project hook asks before commits, in place of the `ask` rule | Proposed |
 | [0007](./0007-autopilot-runs-sessions-in-subagents.md) | Autopilot runs an approved effort's sessions in subagents on one branch | Accepted |
 | [0008](./0008-facts-hooks-read-in-project-conf.md) | Hooks and scripts read their project facts from `.claude/yotamake/project.conf` | Accepted |
+| [0009](./0009-autopilot-is-the-default.md) | Autopilot is the default for a multi-session effort once S0 is approved | Proposed |
 
 ## Template
 
