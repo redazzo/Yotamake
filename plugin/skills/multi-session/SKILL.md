@@ -114,7 +114,9 @@ session, offer to resume that effort instead of starting a new one.
    another session could run beside it.
 5. Put every question for the user in `decisions.md`, tagged with the session that needs the
    answer. Give a recommendation with each. Ask at the start of that session, not all up front:
-   by then the earlier sessions may have changed the question.
+   by then the earlier sessions may have changed the question. Step 6 still lists them at the
+   end of S0, so the user can answer early; those left open are asked, or under autopilot
+   assumed, at their session.
 6. End S0 with one message: a summary of the spec (if any) and the plan with its Design
    section, and a request to approve them before S1. Write `spec.md` and `plan.md` before
    this message, so the user approves files, not a draft in the chat. In the same message:
@@ -125,9 +127,10 @@ session, offer to resume that effort instead of starting a new one.
    - list each open decision in `decisions.md` with the recommendation autopilot will take
      for it, and say they can answer any of them now.
 
-   Start no session, and write no `Autopilot:` line, before the user answers. On approval
-   with autopilot on, follow "Autopilot". With it off, record that as "Autopilot" says, then
-   tell them it is a good point to `/clear`.
+   Start no session, and write no `Autopilot:` line, before the user answers. First write
+   any answer they give in that reply into `decisions.md`, with the date, so autopilot does
+   not mark it `assumed`. On approval with autopilot on, follow "Autopilot". With it off,
+   record that as "Autopilot" says, then tell them it is a good point to `/clear`.
 
 ## Rules for every session
 
