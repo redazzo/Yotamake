@@ -128,5 +128,5 @@ bumped. The rest of the decision stands.
 
 ## Amendment (2026-11-17): autopilot becomes the default
 
-[ADR-0009](./0009-autopilot-is-the-default.md) (Proposed) changes decision 1: autopilot
+[ADR-0009](./0009-autopilot-is-the-default.md) (Accepted) changes decision 1: autopilot
 starts when the user approves S0, unless they turn it off. Everything else here stands.

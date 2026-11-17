@@ -2,4 +2,4 @@
 type: llm
 ---
 
-The final message offers autopilot as a choice for the user and says how to choose it (for example, by saying "run autopilot").
+The final message says that approving the plan starts autopilot (the remaining sessions run without the user), and says how to turn it off in the same answer (for example, "approve, step through").

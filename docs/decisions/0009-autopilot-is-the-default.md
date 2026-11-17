@@ -6,8 +6,8 @@ status: current
 
 # ADR-0009: Autopilot is the default for a multi-session effort once S0 is approved
 
-- **Status:** Proposed (2026-11-17). The user has decided it. It becomes Accepted when
-  `multi-session`, `plugin/reference/autopilot.md` and eval case 22 change to match.
+- **Status:** Accepted (2026-11-17), when `multi-session`, `plugin/reference/autopilot.md`
+  and eval case 22 changed to match.
 - **Date:** 2026-11-17
 - **Work record:** none yet
 - **Amends:** [ADR-0007](./0007-autopilot-runs-sessions-in-subagents.md), decision 1
