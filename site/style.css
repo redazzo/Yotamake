@@ -309,6 +309,7 @@ th, td { padding: 11px 14px; text-align: left; vertical-align: top; border-botto
 th { background: var(--surface-2); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
 tr:last-child td { border-bottom: 0; }
 td code { white-space: nowrap; }
+table.compare td:first-child { width: 45%; color: var(--muted); }
 
 /* ---- Doc pages ------------------------------------------------------- */
 
@@ -322,7 +323,7 @@ td code { white-space: nowrap; }
 @media (max-width: 900px) { .toc { position: static; } }
 
 .prose { max-width: 720px; }
-.prose h1 { font-size: clamp(32px, 4.5vw, 44px); }
+.hero h1, .prose h1 { font-size: clamp(32px, 4.5vw, 44px); }
 .prose h2 { margin-top: 56px; padding-top: 8px; font-size: 28px; }
 .prose h3 { margin-top: 28px; }
 .prose ul, .prose ol { padding-left: 22px; margin: 0 0 16px; }
