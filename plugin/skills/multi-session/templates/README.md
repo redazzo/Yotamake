@@ -5,8 +5,8 @@ Started <yyyy-mm-dd>. <One or two sentences: what this effort is, and its scope,
 **Setup:** <!-- one of: "Local: this folder is git-ignored; one branch per session." or
 "Committed: this folder is committed; all sessions are commits on branch `<branch>`." -->
 It carries the work across context clears. Workflow: the `multi-session` skill.
-<!-- If the user turns on autopilot, add: "Autopilot: on (<yyyy-mm-dd>), mother branch
-`<branch>`." -->
+<!-- Once the user answers S0, add one of: "Autopilot: on (<yyyy-mm-dd>), mother branch
+`<branch>`." or "Autopilot: off (<yyyy-mm-dd>)." -->
 
 The user resumes with: **"Read <folder path>/README.md and start the next session."**
 <!-- Under autopilot: **"Read <folder path>/README.md and continue autopilot."** -->

@@ -1,24 +1,27 @@
 # Autopilot
 
-The `multi-session` skill sends you here ("Autopilot") when the user turns autopilot on or
-resumes it.
+The `multi-session` skill sends you here ("Autopilot") when autopilot starts or resumes.
 
 Autopilot runs every session after S0 without the user, one after another, on one mother
-branch, then writes one report and asks one question: merge. ADR-0007 has the reasons. Each
-session still does the `simple-session` work, checks and review; what goes is the stop, the
-report and the `/clear` between sessions. Every `git commit` and `git merge` still prompts,
-and autopilot never pushes, merges into the main branch, tags or deploys without a yes.
+branch, then writes one report and asks one question: merge. ADR-0007 and ADR-0009 have the
+reasons. Each session still does the `simple-session` work, checks and review; what goes is
+the stop, the report and the `/clear` between sessions. Every `git commit` and `git merge`
+still prompts, and autopilot never pushes, merges into the main branch, tags or deploys
+without a yes.
 
-**Turning it on.** Only the user turns it on: when they answer the message that ends S0
-(`multi-session`, "Starting a new effort"), or later, with the line in "Resuming
-autopilot". When they do:
+**Turning it on.** Autopilot is on by default. It starts when the user approves S0's spec and
+plan (`multi-session`, "Starting a new effort"), unless they turn it off in that same answer
+(for example, "approve, step through"). It never starts before that approval. When it starts:
 
 1. Write `Autopilot: on (<yyyy-mm-dd>), mother branch <branch>.` under **Setup** in the
-   folder's `README.md`, and a row in `decisions.md` saying the user chose it.
+   folder's `README.md`, and a row in `decisions.md` saying it is on. Switch the resume
+   line to the autopilot one.
 2. Pick the mother branch. If the environment assigns a branch, that branch is the mother
    branch. Otherwise cut one from an up-to-date main branch, as in `simple-session`,
    "Branch", named `<prefix>/<effort-slug>` with the project's prefix for the effort's main
    kind of change (**Branching and releases**). No session gets a branch of its own.
+
+Turning it off is in `multi-session`, "Autopilot".
 
 **Each session.** Pick the first session in `plan.md` not `done` whose `Needs:` sessions are
 all `done`. Then, in the main conversation:

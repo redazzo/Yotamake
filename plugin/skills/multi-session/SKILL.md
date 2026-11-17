@@ -114,13 +114,23 @@ session, offer to resume that effort instead of starting a new one.
    another session could run beside it.
 5. Put every question for the user in `decisions.md`, tagged with the session that needs the
    answer. Give a recommendation with each. Ask at the start of that session, not all up front:
-   by then the earlier sessions may have changed the question.
+   by then the earlier sessions may have changed the question. Step 6 still lists them at the
+   end of S0, so the user can answer early; those left open are asked, or under autopilot
+   assumed, at their session.
 6. End S0 with one message: a summary of the spec (if any) and the plan with its Design
-   section, a request to approve them before S1, the resume line, and that it is a good point
-   to `/clear` once they are approved. Write `spec.md` and `plan.md` before this message, so
-   the user approves files, not a draft in the chat. In the same message, offer autopilot
-   (see "Autopilot"): approve and say "run autopilot", and the remaining sessions run without
-   them, ending with one report and one merge question. Start nothing on it until they do.
+   section, and a request to approve them before S1. Write `spec.md` and `plan.md` before
+   this message, so the user approves files, not a draft in the chat. In the same message:
+   - say that approving starts autopilot (see "Autopilot"): the remaining sessions run
+     without them, ending with one report and one merge question;
+   - say how to turn it off in the same answer (for example, "approve, step through"),
+     and give the resume line for that case;
+   - list each open decision in `decisions.md` with the recommendation autopilot will take
+     for it, and say they can answer any of them now.
+
+   Start no session, and write no `Autopilot:` line, before the user answers. First write
+   any answer they give in that reply into `decisions.md`, with the date, so autopilot does
+   not mark it `assumed`. On approval with autopilot on, follow "Autopilot". With it off,
+   record that as "Autopilot" says, then tell them it is a good point to `/clear`.
 
 ## Rules for every session
 
@@ -161,9 +171,16 @@ and follow it: when it is allowed, how to start one, and how to commit and merge
 ## Autopilot
 
 Autopilot runs every session after S0 without the user, on one mother branch, then writes one
-report and asks one question: merge (ADR-0007). Only the user turns it on. When they turn it
-on or resume it ("run autopilot", "continue autopilot"), or the folder's `README.md` says
-`Autopilot: on`, read `<this skill's directory>/../../reference/autopilot.md` and follow it. It overrides "Rules for every session" and "Closing out" where it says so.
+report and asks one question: merge (ADR-0007). It is on by default from S0's approval
+(ADR-0009, and step 6 of "Starting a new effort"). When it starts on approval, when the user
+turns it on or resumes it ("run autopilot", "continue autopilot"), or the folder's
+`README.md` says `Autopilot: on`, read `<this skill's directory>/../../reference/autopilot.md` and follow it. It overrides "Rules for every session" and "Closing out" where it says so.
+
+**Turning autopilot off.** When the user turns it off, at S0's approval or when resuming,
+write `Autopilot: off (<yyyy-mm-dd>).` under **Setup** in `README.md` (replacing any `on`
+line), a row in `decisions.md` saying they chose it, and the normal resume line. The effort
+then runs session by session. If sessions already ran under autopilot, their commits are on
+its mother branch: ask whether the next sessions build on that branch or it is merged first.
 
 ## Closing out
 

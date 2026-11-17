@@ -6,7 +6,7 @@ status: current
 
 # ADR-0007: Autopilot runs an approved effort's sessions in subagents on one branch
 
-- **Status:** Accepted (2026-11-12), with the effort's spec and plan. The tests are below.
+- **Status:** Accepted (2026-11-12), amended 2026-11-17, with the effort's spec and plan. The tests are below.
 - **Date:** 2026-11-12
 - **Work record:** [Autopilot for multi-session efforts](../records/2026/2026-11-12-autopilot.md)
 - **Supersedes / amends:** amends [ADR-0005](./0005-parallel-sessions-in-worktrees.md),
@@ -125,3 +125,8 @@ order is now: close-out (keeping the folder), the report, the one question; then
 each as its own commit: delete the folder, the version bump (still once, and still the last
 commit on the mother branch), and the merge or pull request. On no, nothing is deleted or
 bumped. The rest of the decision stands.
+
+## Amendment (2026-11-17): autopilot becomes the default
+
+[ADR-0009](./0009-autopilot-is-the-default.md) (Accepted) changes decision 1: autopilot
+starts when the user approves S0, unless they turn it off. Everything else here stands.

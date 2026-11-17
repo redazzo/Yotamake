@@ -103,6 +103,10 @@ guide. `20-trivial-change/comment-fixed` and `owning-doc-updated` in cases 02 an
 no other file changed, which a regex on one file cannot check, so they stay `llm` until such a
 type exists.
 
+2026-11-17: case 22 (0.36.0, `--runs 3`, $0.68) split the same way. It scored 0.88: the judges
+failed `gives-resume-line` in two runs and `offers-autopilot` in one, though all three final
+messages gave the resume line, said approval starts autopilot and said how to turn it off.
+
 ## Keep skills short
 
 **Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** a change needs to add
@@ -278,6 +282,10 @@ paths.
 - A Skill call made inside a subagent. A probe (2026-11-12) showed that `tool_used` graders
   count a subagent's Bash call, but not whether a subagent can call `/simplify` or
   `/code-review`. Test it before moving those two out of the main context.
+- Autopilot after S0's approval (ADR-0009): case 22 checks only that S0 states the default
+  and starts nothing. No case answers the approval and checks that autopilot starts, or that
+  "approve, step through" records `Autopilot: off`. A recorded history, as in case 15, could
+  test both, once the eval sandbox allows `git` (see "Eval sandbox denies `git`").
 
 ## Copied graders and a shared word
 
