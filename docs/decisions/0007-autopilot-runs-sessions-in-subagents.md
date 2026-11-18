@@ -6,7 +6,7 @@ status: current
 
 # ADR-0007: Autopilot runs an approved effort's sessions in subagents on one branch
 
-- **Status:** Accepted (2026-11-12), amended 2026-11-17, with the effort's spec and plan. The tests are below.
+- **Status:** Accepted (2026-11-12), amended 2026-11-17 and 2026-11-18, with the effort's spec and plan. The tests are below.
 - **Date:** 2026-11-12
 - **Work record:** [Autopilot for multi-session efforts](../records/2026/2026-11-12-autopilot.md)
 - **Supersedes / amends:** amends [ADR-0005](./0005-parallel-sessions-in-worktrees.md),
@@ -130,3 +130,13 @@ bumped. The rest of the decision stands.
 
 [ADR-0009](./0009-autopilot-is-the-default.md) (Accepted) changes decision 1: autopilot
 starts when the user approves S0, unless they turn it off. Everything else here stands.
+
+## Amendment (2026-11-18): the `Stop` gate in a subagent, tested
+
+"Tested" left open whether a subagent's hook calls carry the parent's `session_id`. A probe
+on 2026-11-18 (Claude Code 2.1.327, headless runs with a hook that logged every event) shows
+they do, and add `agent_id` and `agent_type`. This holds for Agent-tool subagents and for the
+fork `/code-review` starts. [ADR-0010](./0010-commit-gate-by-step-table.md) builds on it: the
+`Stop` gate now leaves out edits that carry an `agent_id`, so a background agent's edits do
+not block the main conversation's turns, and the commit gate counts them for the worktree
+they touched. The rest of this decision stands.

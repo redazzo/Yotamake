@@ -1,0 +1,14 @@
+{
+  "$comment": "The session steps each gated action needs (ADR-0010). steps.mjs reads this file; the order lives only here. scope: \"all-worktrees\" checks every worktree of the repository, else (\"tree\") only --tree or the hook's own tree. A step is \"check\" (the yotamake-check-passed stamp scripts/check writes) or the name of a review skill (a review event for that exact skill). afterLastEdit: steps that must come after the last edit; edits is \"code\" (docs do not count) or \"any\"; sameSession counts only this session's edits; mainOnly leaves out edits a subagent made (agent_id set), which the commit gate still counts. inReviewWindow: steps that must come after the first code edit of the review window, waived by the skips in skipWhen (\"docs-only\": every file the branch changes against the main branch is a doc; \"trailer\": the commit message has a Review-skipped: line).",
+  "actions": {
+    "stop": {
+      "scope": "all-worktrees",
+      "afterLastEdit": { "edits": "code", "sameSession": true, "mainOnly": true, "steps": ["check"] }
+    },
+    "commit": {
+      "scope": "tree",
+      "afterLastEdit": { "edits": "any", "steps": ["check"] },
+      "inReviewWindow": { "steps": ["simplify", "code-review"], "skipWhen": ["docs-only", "trailer"] }
+    }
+  }
+}

@@ -6,6 +6,18 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## 0.37.0 — 2026-11-18
+
+- A commit gate: the plugin's Bash hook refuses `git commit` until `scripts/check` has
+  passed since the last edit and both `/simplify` and `/code-review` have run on the change.
+  A docs-only branch, or a commit message with a `Review-skipped: <reason>` trailer line
+  (used for a trivial branch and for the release bump), needs the check but no review
+  (ADR-0010). `simple-session` now proposes that line for a trivial branch.
+- A new hook, `record-event.sh`, logs review skill calls (called or typed) and user prompts
+  for the gate.
+- The `Stop` hook no longer blocks the main conversation over edits a subagent made; the
+  commit gate still counts them.
+
 ## 0.36.1 — 2026-11-18
 
 - `simple-session` is shorter: what to do when a project has no `scripts/check`, an empty

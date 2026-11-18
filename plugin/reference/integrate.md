@@ -7,7 +7,8 @@ Only after the user says yes. Claude Code will also ask before `git commit`, `gi
 `git push` when the project's settings put them under `ask`; that is expected. Stage the files
 you changed by name, not `git add -A`. If the pre-commit hook fails, fix the cause; never pass
 `--no-verify`. The plugin's Bash hook refuses it; if the user wants the hook skipped, they run
-the command themselves with `! <command>`.
+the command themselves with `! <command>`. If the plugin's commit gate refuses, do the step
+it names and commit again.
 
 ```bash
 git add <files>
@@ -15,7 +16,10 @@ git commit -m "<message>"
 ```
 
 If CLAUDE.md defines a version bump, code changes get one as its own commit on the branch,
-using the command and file it names. Docs-only branches do not.
+using the command and file it names. Docs-only branches do not. After the bump's edits, run
+`scripts/check` again: the plugin's commit gate refuses a commit until the check has passed
+since the last edit. The bump comes after the review, so its message ends with the trailer
+line `Review-skipped: release bump`, which the gate accepts in place of a new review.
 
 Then integrate the way the `Integration` line in CLAUDE.md says.
 

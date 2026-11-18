@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-17
+updated: 2026-11-18
 owns: [domain-language]
 ---
 
@@ -54,6 +54,11 @@ where the thing is that file or folder.
   all run. _Avoid:_ linter, test suite.
 - **Stop point:** a step Claude takes only after the user says yes, such as a commit or a
   merge.
+- **Commit gate:** the plugin hook that refuses `git commit` until the session's steps are
+  done: `scripts/check` passed since the last edit, and both review skills ran in the review
+  window. Not the gate itself, which it only asks about. _Avoid:_ commit check.
+- **Review window:** the stretch of a session a review must cover, from the later of the
+  last commit and the last user prompt before the last code edit.
 - **Docs-only branch:** a branch where every changed file is a doc, as the `Docs-only` line
   of `CLAUDE.md` names them. `simple-session` says what it may skip.
 - **Trivial branch:** a branch that changes code, but where every changed line is a comment

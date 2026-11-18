@@ -107,3 +107,10 @@ accepting two copies of each fact and a check that they agree.
   `scripts/check`
 - `plugin/install.sh`, `plugin/skills/setup/SKILL.md`, `plugin/skills/doctor/SKILL.md`
 - [Backlog](../backlog.md), "A facts file that hooks can read"
+
+## Amendment (2026-11-18): a second reader in Node
+
+[ADR-0010](./0010-commit-gate-by-step-table.md) adds the step evaluator,
+`plugin/hooks/steps.mjs`, which reads `project.conf` with its own `readFact`. Item 4 then
+reads: `read_fact` in `lib.sh` serves the bash hooks, and `readFact` in `steps.mjs` serves
+the evaluator; a test keeps the two equal. ADR-0010 was accepted on 2026-11-18.

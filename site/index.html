@@ -123,8 +123,8 @@ Commit and merge into main?</span></div>
         <p>Edit and Write are refused while the repository is on its main branch.</p>
       </div>
       <div class="card">
-        <h3>Ending a turn with unchecked code</h3>
-        <p>If code was edited and <code>scripts/check</code> has not passed since, the Stop hook sends Claude back to run it once.</p>
+        <h3>Unchecked or unreviewed code</h3>
+        <p>If code was edited and <code>scripts/check</code> has not passed since, the Stop hook sends Claude back to run it once. A <code>git commit</code> is refused until the check has passed and both review skills have run on the change.</p>
       </div>
       <div class="card">
         <h3>Commit, merge or push without asking</h3>
