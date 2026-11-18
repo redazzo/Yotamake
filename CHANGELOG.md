@@ -6,7 +6,7 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
-## Unreleased
+## 0.36.1 — 2026-11-18
 
 - `simple-session` is shorter: what to do when a project has no `scripts/check`, an empty
   gate or an unfilled Architecture section, or a review tool is missing, moved to
