@@ -91,14 +91,14 @@ flowchart LR
   subgraph plugin["The plugin (plugin/)"]
     skills["skills/<br/>the method"]
     reference["reference/<br/>read on demand"]
+    install["install.sh"]
+    template["template/"]
     hooks["hooks/*.sh<br/>enforcement"]
     steps["steps.mjs<br/>step evaluator"]
     stepsjson["steps.json<br/>step order"]
-    install["install.sh"]
-    template["template/"]
     skills --> reference
-    hooks --> steps --> stepsjson
     install --> template
+    hooks --> steps --> stepsjson
   end
 
   subgraph repo["Each repository"]
