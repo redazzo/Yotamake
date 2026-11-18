@@ -27,19 +27,11 @@ hook still sets `core.hooksPath`; if `git config core.hooksPath` prints nothing 
 `.claude-plugin/marketplace.json` at the root lists it. `README.md` explains what it is and
 how it is split.
 
-- `plugin/template/` is what the installer copies. Project-owned files there are copied only
-  when missing; harness-owned ones (listed in `install.sh` as `managed`) are refreshed on
-  every run.
-- A skill that needs a project fact names the `CLAUDE.md` section it reads. If you rename a
-  section in `plugin/template/CLAUDE.md`, update every skill that names it, the eval
-  fixture's `CLAUDE.md`, and `README.md`.
-- A skill, hook or reference doc that points at another skill's step names its heading
-  without the number, as `simple-session`, "Design and reuse", so renumbering that skill
-  cannot break the pointer. Steps inside one skill may use numbers. `scripts/check` checks
-  both rules.
-- When you change a project-owned template file (anything in `plugin/template/` not listed as
-  `managed`), add an entry to `plugin/reference/upgrades.md`: how to check it is applied, and
-  how to apply it. Older installs get it from there.
+- `plugin/template/` is what the installer copies: harness-owned files (listed in
+  `install.sh` as `managed`) are refreshed on every run, project-owned ones copied once.
+- Before you change a project-owned template file, rename a `CLAUDE.md` section, or point at
+  another skill's step, read
+  [docs/guides/changing-the-harness.md](./docs/guides/changing-the-harness.md).
 
 **Docs:** [docs/README.md](./docs/README.md) (index — start here; explains the four kinds of
 doc and which doc owns what) · [README.md](./README.md) (the overview of the harness; each
@@ -108,8 +100,8 @@ says how). Put them in the report and ask before running them (see Commands).
 - **Worktree setup:** none. `scripts/check` needs only bash, git and Node, and the working
   folder is reached by its absolute path.
 - **Release:** merging to main is the release. After the merge, tag the merge commit
-  `vX.Y.Z` with the new version (`git tag vX.Y.Z`); only releases from 0.35.0 on have tags.
-  Users get it with `claude plugin update yotamake@yotamake`.
+  `vX.Y.Z` (`git tag vX.Y.Z`). `CHANGELOG.md` says which releases have tags and how users
+  update.
 
 ## Conventions
 
@@ -132,10 +124,6 @@ report which you updated.
 
 **Plain English.** Skills and docs use plain English and short sentences (see
 `plugin/output-styles/plain-english.md`).
-
-**Work that spans several contexts** runs as numbered sessions with a working folder that
-survives `/clear`: git-ignored under `.scratchpad/`, or committed under `.sessions/` in an
-ephemeral environment. See the `yotamake:multi-session` skill.
 
 **Stop points are enforced.** `.claude/settings.json` puts `git commit`, `merge`, `push`,
 `rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks before each one. Do not

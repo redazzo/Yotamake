@@ -21,7 +21,7 @@ Project specifics live in `CLAUDE.md`, not here. This skill reads these sections
   ADRs (step 3).
 
 If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
-report and use the defaults given below.
+report and use the defaults given below or in "Missing setup and tools".
 
 **Docs-only.** A docs-only branch skips the design and review steps and the version bump. A
 branch is docs-only when every file it changes is a doc, as the `Docs-only` line names them.
@@ -43,6 +43,11 @@ branch's concern. This holds on every branch, and a backlog entry does not stop 
 being docs-only or trivial. When you have one, read
 `<this skill's directory>/../../reference/findings-not-acted-on.md`: where to write it, or
 why to drop it. Write it before your last `scripts/check` run, so that run covers it.
+
+## Missing setup and tools
+
+No filled **Architecture** section, no `scripts/check` or an empty one, or a review tool
+missing: read `<this skill's directory>/../../reference/missing-setup.md` at that step.
 
 ## 0. Harness upgrades — first
 
@@ -128,13 +133,8 @@ section of CLAUDE.md and decide how the change fits before you write it.
    way that keeps the rule; changing the rule first (edit Architecture, or write a new ADR,
    which makes the work too big for one session, step 1; the order is in "Changing the style"
    in `<this skill's directory>/../../reference/architecture-styles.md`); or dropping that
-   part. Do this
-   every time, even when the user asked for exactly that change or said not to ask. The rule
-   is the project's, and changing it is a separate decision. Wait for the answer.
-
-If the Architecture section is missing or still holds `FILL IN` placeholders, follow the
-structure and patterns already in the code. Say once in the report that it is unfilled, and
-that `/yotamake:setup` can fill it in.
+   part. Do this every time, even when the user asked for exactly that change or said not to
+   ask. The rule is the project's, and changing it is a separate decision. Wait for the answer.
 
 ## 4. Do the work
 
@@ -153,9 +153,9 @@ back for step 5.
 
 If the change alters how something works, update the reference doc that owns it in the same
 branch. The "Owns" table in `docs/README.md` names it. Also fix CLAUDE.md if it describes the
-thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing is a
-finding not acted on. An architecturally significant decision needs an
-ADR in `docs/decisions/`; ask before writing one. The `write-doc` skill covers the formats.
+thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing is
+a finding not acted on. An architecturally significant decision needs an ADR in
+`docs/decisions/`; ask before writing one. The `write-doc` skill covers the formats.
 If the repository has no `docs/README.md` (a lite install), there is no docs system: fix
 CLAUDE.md or `README.md` where they describe the change.
 
@@ -163,12 +163,11 @@ CLAUDE.md or `README.md` where they describe the change.
 
 Run `scripts/check`. It picks the checks that match what changed, and prints one `PASS` or
 `FAIL` line per check. Run it even though a pre-commit hook exists: the hook runs only the
-fast checks (`--staged`), and this runs the slow ones too. If the project has no `scripts/check`, run the commands CLAUDE.md's
-**Checks** section lists instead, and say in the report that the project has no single gate.
+fast checks (`--staged`), and this runs the slow ones too.
 
 Do not add, skip or weaken a check to get a pass. Report only the summary lines. If it says
-no check ran, nothing was checked: say so in the report. If `scripts/check` has no checks
-yet, say that the gate is empty and that `/yotamake:setup` can add them.
+no check ran, nothing was checked: say so in the report. No `scripts/check`, or one with no
+checks yet: see "Missing setup and tools" above.
 
 If a check fails, fix it when the failure is yours. If it was already failing on the main
 branch, say so and show the line, rather than fixing it in this branch.
@@ -181,26 +180,23 @@ re-run only `scripts/check` (below). If the user asks for more changes after the
 the full review once more before the next report, on what changed since the last one: both
 skills again, however small the new change, unless that change alone is trivial.
 
-Skip this step when the branch is docs-only or trivial. Any other branch that changes code
-gets the full review: a one-line diff still runs both skills.
-Call each one with the Skill tool. Reading the diff yourself does not replace them, even
-when the diff looks too small to be worth it; a small diff makes a cheap review. The manual
-checks below are only for a skill the Skill tool says is not available. Call them from this
-context, not from a subagent you start for the review. Each already runs its own agents, so
-their reading stays out of this context. Only the design read (part 2) goes to a subagent.
+Skip this step when the branch is docs-only or trivial. Any other branch gets the full
+review, however small its diff: a small diff makes a cheap review, and reading it yourself
+does not replace the skills. Call each with the Skill tool from this context, not from a
+subagent you start: each runs its own agents, so their reading stays out of this context.
+Only the design read (part 2) goes to a subagent. A skill or the Agent tool not available:
+see "Missing setup and tools" above.
 
-Both skills read the diff with `git diff HEAD`, which leaves out new files git does not track
-yet. So first run `git add -N` on each new file this branch adds (`git status --short` marks
-them `??`). It marks them as intended for the next commit, so the diff shows them in full,
-but it stages no content and commits nothing.
+Both skills read `git diff HEAD`, which leaves out files git does not track yet. So first run
+`git add -N` on each new file this branch adds (`git status --short` marks them `??`): the
+diff then shows them in full, but nothing is staged or committed.
 
 Otherwise review the branch's diff against the main branch in three parts:
 
 1. **Reuse.** Run the built-in `/simplify` skill. It applies its fixes itself. Keep the
    fixes to code this branch added or changed. Undo the others by hand (not with
    `git checkout`, which would also drop your own uncommitted work) and treat them as
-   findings not acted on (above). If `/simplify` is not available, check by hand: for each
-   new function or block, search for code that already does the same, and reuse it.
+   findings not acted on (above).
 2. **Design.** Once part 1's fixes are in, start one built-in `general-purpose` agent in
    the background with the Agent tool, go on to part 3, and act on its answer when it
    comes. It did not write the change, so it reads it fresh. Its brief, self-contained: "Design read: run `git diff <main branch>`. Read the
@@ -208,14 +204,13 @@ Otherwise review the branch's diff against the main branch in three parts:
    what the diff touches. Find a broken boundary or constraint, a clash with an ADR, a part
    that does not fit the Style, a pattern the project does not use, or logic copied from
    elsewhere. Edit nothing. Return each conflict as file:line and the rule it breaks,
-   quoted, or 'none'." Without the Agent tool, read the diff yourself.
+   quoted, or 'none'."
    Fix what lies inside this change. A conflict you only see now gets the same stop as in
    step 3: ask before going on.
 3. **Bugs.** Run the built-in `/code-review` skill at low effort. Fix each finding that is a
    real defect in this branch's change.
 
-If any part changed a file, run `scripts/check` again. If `/code-review` is not
-available, say so in the report and carry on.
+If any part changed a file, run `scripts/check` again.
 
 ## 7. Stop and report
 
@@ -225,7 +220,7 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
 - what changed, by file, in a few lines;
 - for a code change, two lines: "Reused:" the existing code it reuses or extends (or
   "nothing"), and "New, because:" each new function, type, module or dependency and why
-  nothing existing fit (or "nothing new"); and that the Architecture section is unfilled, if it is;
+  nothing existing fit (or "nothing new");
 - which docs you updated, or why none needed it;
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
