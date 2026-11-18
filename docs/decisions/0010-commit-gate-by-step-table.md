@@ -8,7 +8,7 @@ status: current
 
 - **Status:** Proposed. Under autopilot the user accepts it with the effort's report.
 - **Date:** 2026-11-18
-- **Work record:** none yet (effort "Commit gate on session steps")
+- **Work record:** [Commit gate on session steps](../records/2026/2026-11-18-commit-gate.md)
 - **Amends:** [ADR-0008](./0008-facts-hooks-read-in-project-conf.md), item 4 ("Readers"):
   `plugin/hooks/steps.mjs` is a second reader of `project.conf` inside the plugin, in Node.
   It also reads the edited path itself, not with `tool_file_path`. See "Readers" below.

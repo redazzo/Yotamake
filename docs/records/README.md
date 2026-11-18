@@ -16,7 +16,9 @@ run `node scripts/docs/generate-records-index.mjs` after adding one.
 
 ## Open
 
-_None._
+| Started | Record |
+|---|---|
+| 2026-11-18 | [Commit gate on session steps](./2026/2026-11-18-commit-gate.md) |
 
 ## Complete
 

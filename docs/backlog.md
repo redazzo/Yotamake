@@ -497,8 +497,8 @@ take in our own plain words.
 
 - **A rule table with its enforcer.** Keep a table in `CLAUDE.md` pairing each rule with
   what enforces it (hook, check, type, or nothing). A rule with no enforcer is a repeat
-  waiting to happen. Trigger: a Claude mistake is corrected twice, or "Enforce the session
-  steps in order with hooks" is picked up. From pstack's `correct`.
+  waiting to happen. Trigger: a Claude mistake is corrected twice, or a new step goes into
+  the commit gate's `steps.json` (ADR-0010). From pstack's `correct`.
 - **A `/yotamake:correct` skill for target repos.** Find the mistakes agents keep making
   there, fix each at the highest level that works (design, then types, then a lint whose
   error names the fix, then a test, then docs), and prove each new check fails on a real
