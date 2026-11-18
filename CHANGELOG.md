@@ -6,6 +6,12 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## 0.37.1 — 2026-11-18
+
+- `multi-session`: S0, the planning session, is now defined, and `plan.md` lists it. It
+  starts `in progress` and becomes `done` when you approve the plan, so a resume never skips
+  an unapproved S0.
+
 ## 0.37.0 — 2026-11-18
 
 - A commit gate: the plugin's Bash hook refuses `git commit` until `scripts/check` has
