@@ -74,7 +74,8 @@ session, offer to resume that effort instead of starting a new one.
    folder as `spec.md` instead, and move its open questions into `decisions.md`. Always copy
    `docs.md`, the docs ledger (see the rules below); it starts with no rows. Leave out
    `report.md`: only autopilot uses it, at the end.
-2. Do the analysis once, in the first session (S0). Record what you found in `findings.md`
+2. Do the analysis once, in the first session, S0. It plans the work and changes no code;
+   the work sessions start at S1. Record what you found in `findings.md`
    with file:line references. Each finding gets an ID (F1, F2, …) and a severity. With a
    spec, first ask the questions that change scope or a criterion, one at a time, and wait for
    each answer. Then write the acceptance criteria (A1, A2, …) and go on to `plan.md` in the
@@ -104,9 +105,9 @@ session, offer to resume that effort instead of starting a new one.
    `<this skill's directory>/../../reference/architecture-styles.md`. Put the options and
    the recommendation in the Design section, and order the sessions as "Changing the style"
    says.
-4. Split the work into sessions in `plan.md`. Size each one to **one branch and one merge
-   (or, on an assigned branch, one set of commits) that fits in one context**, so a `/clear`
-   never lands mid-change. Order them so each makes
+4. Split the work into sessions in `plan.md`, below its S0 heading. Size each one to **one
+   branch and one merge (or, on an assigned branch, one set of commits) that fits in one
+   context**, so a `/clear` never lands mid-change. Order them so each makes
    the next one easier (bugs first, then deletions, then refactors, docs last so they describe
    the final state). With a spec, each session names the criteria it delivers, and every
    criterion is in some session. Give each session a `Needs:` line naming the sessions it
@@ -129,8 +130,9 @@ session, offer to resume that effort instead of starting a new one.
 
    Start no session, and write no `Autopilot:` line, before the user answers. First write
    any answer they give in that reply into `decisions.md`, with the date, so autopilot does
-   not mark it `assumed`. On approval with autopilot on, follow "Autopilot". With it off,
-   record that as "Autopilot" says, then tell them it is a good point to `/clear`.
+   not mark it `assumed`. On approval, set S0 to `done` in `plan.md`. Then, with autopilot
+   on, follow "Autopilot". With it off, record that as "Autopilot" says, then tell them it
+   is a good point to `/clear`.
 
 ## Rules for every session
 

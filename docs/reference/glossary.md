@@ -46,6 +46,9 @@ where the thing is that file or folder.
   change to code, tests or docs runs as a session. _Avoid:_ task, job.
 - **Multi-session effort:** work too big for one session, run as numbered sessions that share
   a working folder. _Avoid:_ project, epic.
+- **S0, S1, …:** the numbered sessions of a multi-session effort. S0 analyses the work and
+  writes the plan, and changes no code. It is numbered zero because it comes before the work
+  the plan lists, which starts at S1.
 - **Working folder:** the folder a multi-session effort keeps its plan, findings and log in,
   so the work survives a `/clear`.
 - **Spec:** a short agreement, made before any code, on what a change must do, as numbered

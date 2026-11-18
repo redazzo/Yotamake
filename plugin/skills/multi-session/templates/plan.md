@@ -1,7 +1,7 @@
 # Plan
 
-<N> sessions. Clear context between them (marked ✂). Each session is one branch (or, on an
-assigned branch, one set of commits), small enough to finish in one context. Order: <why this order>.
+<N> sessions after S0. Clear context between them (marked ✂). Each session is one branch
+(or, on an assigned branch, one set of commits), small enough to finish in one context. Order: <why this order>.
 
 Status values: `todo`, `in progress`, `done`, `skipped`.
 
@@ -19,6 +19,8 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
   work comes near, and how it keeps them; or "none">
 
 ---
+
+## S0 — Analysis and planning — `in progress`
 
 ## S1 — <title> (<finding IDs>, <criterion IDs if there is a spec>) — `todo`
 

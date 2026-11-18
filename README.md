@@ -326,8 +326,9 @@ bug fix follows [`debugging`](./plugin/skills/debugging/SKILL.md): reproduce it,
 failing test, find and name the root cause, then fix it. A change too big for one session becomes a
 [`multi-session`](./plugin/skills/multi-session/SKILL.md) effort, with a working folder that
 survives `/clear`: git-ignored at `.scratchpad/<date>-<slug>/`, or committed at
-`.sessions/<date>-<slug>/` in an ephemeral environment or on an assigned branch. You `/clear`
-between sessions and resume with:
+`.sessions/<date>-<slug>/` in an ephemeral environment or on an assigned branch. Its sessions
+are numbered: S0 analyses the work and writes the plan, and the work starts at S1. You
+`/clear` between sessions and resume with:
 "Read .scratchpad/<folder>/README.md and start the next session."
 
 **Specs.** For a new feature, or a change where "done" is unclear, run `/yotamake:spec`
