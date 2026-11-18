@@ -403,6 +403,24 @@ list and the report ticks them off. Keep it out of `multi-session`, whose `plan.
 splits work into sessions, and keep it short (`scripts/check` caps a `SKILL.md` at 250 lines). `spec` and case 12 cover
 it.
 
+## A feature folder with a feedback log
+
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-18 · **Trigger to act:** a user asks to note
+what they found while testing a merged change and have a later session work through it, or
+such notes get lost between sessions.
+
+From the comparison with [Claude Flow](https://github.com/kennyjpowers/claude-flow) of
+2026-11-18. It keeps each feature in one folder, `doc/specs/<slug>/`, with numbered files for
+each stage: `01-brainstorm`, `02-specification`, `03-tasks`, `04-implementation`,
+`05-feedback`. `/feedback:add` writes down an item found after testing, and
+`/feedback:resolve` sorts the open items and either fixes them or puts them off.
+Yotamake has the `spec` file and a `multi-session` working folder, but nothing that keeps
+feedback after the merge. A small version: a `feedback.md` next to the spec, or a step in
+`spec`, that a later session reads as its task list. Before adding a new folder kind, check
+it against the four doc kinds and the backlog (`docs/README.md`). Feedback that
+outlives the feature already belongs in the backlog.
+
 ## A quickstart guide
 
 **Priority: Low** · **Category:** Reach · **Status:** Waiting ·
@@ -461,6 +479,12 @@ agents would get the facts and `scripts/check` but none of the enforcement (revi
 Comparison of 2026-11-18: Spec Kit and BMAD run on several agents; Yotamake runs only on
 Claude Code. That is its main limit on reach, and the reason a team with mixed tools would
 pick something else.
+
+Claude Flow v2 (comparison of 2026-11-18) went tool-agnostic too. It ships only slash-command
+Markdown files, which it says work with Claude Code, OpenCode and other tools, and it dropped
+its hooks to get there. That shows the trade: the method can move between tools, but the
+enforcement cannot. A version for other tools would carry the skills' text and
+`scripts/check`, and say plainly which guards it loses.
 
 ## A dedicated architecture design skill
 
