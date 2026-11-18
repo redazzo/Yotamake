@@ -49,7 +49,9 @@ Yotamake" section says how it is published and kept in step.
 
 Task recipes. Read the one that matches what you are doing.
 
-_None yet._
+- [guides/changing-the-harness.md](./guides/changing-the-harness.md) — keeping the
+  repository in step when you change a project-owned template file, a `CLAUDE.md` section
+  name, or a pointer between skills.
 
 ## Decisions
 

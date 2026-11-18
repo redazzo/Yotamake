@@ -118,6 +118,7 @@ plugin/
   reference/harness-upgrades.md    simple-session: offer the upgrades an older harness is missing
   reference/findings-not-acted-on.md  simple-session: where a finding the branch leaves goes
   reference/integrate.md           simple-session: commit, bump, merge or open a pull request
+  reference/missing-setup.md       simple-session: no gate, no Architecture, or a review tool missing
   install.sh                       installs template/ into a repo
   template/                        the per-repo files
   evals/                           the eval suite (see below)

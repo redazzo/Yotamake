@@ -130,19 +130,6 @@ type exists.
 failed `gives-resume-line` in two runs and `offers-autopilot` in one, though all three final
 messages gave the resume line, said approval starts autopilot and said how to turn it off.
 
-## Keep skills short
-
-**Priority: Medium** · **Category:** Skills · **Status:** Waiting ·
-**Next review date:** 2027-02-18 · **Added:** 2026-11-14 · **Trigger to act:** a change needs to add
-wording to a `SKILL.md` that is at the 250-line limit.
-
-From a review of 2026-11-14. Past misses were fixed by adding text to skills, which makes the
-next miss more likely. Done in 0.35.0: `scripts/check` fails when a `SKILL.md` passes 250
-lines, and the paths few sessions take moved into `plugin/reference/` files read on demand
-([record](./records/2026/2026-11-17-releases-short-skills-project-conf.md)). Left:
-`simple-session` sits at 250 of 250 lines, so its next addition must move something out
-first; and this repository's `CLAUDE.md` (about 11 KB) is still read whole at every start.
-
 ## Session overhead on small changes
 
 **Priority: Medium** · **Category:** Skills · **Status:** Blocked ·
@@ -170,9 +157,11 @@ cutting anything.
 
 **Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
 **Next review date:** 2027-02-18 · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders a
-step that a hook could have caught, or "Keep skills short" fires.
+step that a hook could have caught, or a change must add wording to a `SKILL.md` at the
+250-line limit.
 
-Past misses were fixed by adding wording to skills (see "Keep skills short"). Hooks could
+Past misses were fixed by adding wording to skills, which makes the next miss more likely
+(`scripts/check` now caps a `SKILL.md` at 250 lines). Hooks could
 enforce the order instead. A per-session state file would hold the session's step (branched,
 edited, checked, reviewed, reported), and hooks would refuse a step that comes too early: for
 example, the commit stop would refuse while no review has run since the last edit.
@@ -425,7 +414,7 @@ of small tasks, each one checkable. Yotamake's `spec` writes scope and numbered 
 criteria, then hands over straight to a session. An optional last step could list the
 ordered tasks, each naming the criterion (A1, A2, …) it meets, so the session works down the
 list and the report ticks them off. Keep it out of `multi-session`, whose `plan.md` already
-splits work into sessions, and keep it short ("Keep skills short"). `spec` and case 12 cover
+splits work into sessions, and keep it short (`scripts/check` caps a `SKILL.md` at 250 lines). `spec` and case 12 cover
 it.
 
 ## A quickstart guide
@@ -447,6 +436,20 @@ A reference file under `plugin/reference/`, like `architecture-styles.md`, with 
 test and boundary-check lines for Node, Python, Go and Rust. `setup` would read it on demand.
 It stays generic: the plugin offers examples, and the project's `scripts/check` holds the
 choice.
+
+## No size cap on `CLAUDE.md`
+
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-18 · **Trigger to act:** this
+repository's `CLAUDE.md` passes 12 KB again, or a session misses a rule because `CLAUDE.md`
+is too long to follow.
+
+`scripts/consistency.mjs` caps a `SKILL.md` at 250 lines (`MAX_SKILL_LINES`), but nothing caps
+`CLAUDE.md`, which is read whole at every start. A trim on 2026-11-18 took it from 11.9 KB to
+11.0 KB by moving three rules `scripts/check` enforces into
+[guides/changing-the-harness.md](./guides/changing-the-harness.md). The rest is needed on most
+branches, so more cuts mean either a cap that forces moves, or tighter wording in
+Architecture (3.4 KB, the largest section). Found by the review of that trim.
 
 ## Stale-docs check: designed, not built
 
@@ -497,8 +500,8 @@ small interface) is a second source for the same idea.
 
 **Priority: Low** · **Category:** Skills · **Status:** Waiting ·
 **Next review date:** 2027-02-18 · **Added:** 2026-11-16 · **Trigger to act:** each item names its own. Do not take them
-together: "Keep skills short" and "Session overhead on small changes" say new text has a
-cost.
+together: the 250-line cap on a `SKILL.md` and "Session overhead on small changes" say new
+text has a cost.
 
 From a review of [pstack](https://github.com/cursor/plugins/tree/main/pstack) (Cursor's
 agent plugin: playbooks and principles, with no hooks or check command). It is strong at

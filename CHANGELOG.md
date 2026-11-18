@@ -6,6 +6,12 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## 0.36.1 — 2026-11-18
+
+- `simple-session` is shorter: what to do when a project has no `scripts/check`, an empty
+  gate or an unfilled Architecture section, or a review tool is missing, moved to
+  `plugin/reference/missing-setup.md`, read only when needed.
+
 ## 0.36.0 — 2026-11-17
 
 - `multi-session`: autopilot is the default. Approving S0's spec and plan starts it, unless
