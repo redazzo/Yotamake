@@ -243,13 +243,13 @@ seq() {
                 sj ",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$r/$f\"}" |
                     bash "$hooks/post-edit-mark.sh" ;;
             rm:*) rm "$r/${step#rm:}" ;;
-            prompt) sj ',"hook_event_name":"UserPromptSubmit","prompt":"go on"' | node "$steps_mjs" record prompt ;;
+            prompt) sj ',"hook_event_name":"UserPromptSubmit","prompt":"go on"' | bash "$hooks/record-event.sh" prompt ;;
             notify) sj ',"hook_event_name":"UserPromptSubmit","prompt":"<task-notification>done</task-notification>"' |
-                node "$steps_mjs" record prompt ;;
+                bash "$hooks/record-event.sh" prompt ;;
             review:*) sj ",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"${step#review:}\"}" |
-                node "$steps_mjs" record review ;;
+                bash "$hooks/record-event.sh" review ;;
             typed:*) sj ",\"hook_event_name\":\"UserPromptExpansion\",\"expansion_type\":\"slash_command\",\"command_name\":\"${step#typed:}\"" |
-                node "$steps_mjs" record review ;;
+                bash "$hooks/record-event.sh" review ;;
             check) (cd "$r" && bash scripts/check) ;;
             commit) git -C "$r" add -A && git -C "$r" -c user.name=t -c user.email=t@t commit -q -m "s$n" ;;
             msg:*) msg=${step#msg:} ;;
@@ -289,8 +289,9 @@ seq "a Review-skipped trailer waives the review, not the check" prompt edit chec
 
 Review-skipped: release bump' allow:commit edit refuse:commit=check 'msg:x Review-skipped: no' \
     refuse:commit=check,simplify,code-review 'msg:Review-skipped:' check refuse:commit=simplify,code-review
-seq "a subagent's edit and review count for the worktree" prompt edit+agent refuse:stop=check \
-    review:simplify+agent review:code-review check allow:stop allow:commit
+seq "a subagent's edit and review count for the commit, not the stop" prompt edit+agent allow:stop \
+    refuse:commit=check,simplify,code-review review:simplify+agent review:code-review check allow:commit \
+    edit refuse:stop=check edit+agent check edit+agent allow:stop refuse:commit=check
 seq "no events: nothing to decide" allow:commit allow:stop
 seq "an unreadable log lets everything through" edit corrupt allow:commit allow:stop
 seq "no merge base lets the commit through" prompt edit check nobase allow:commit
@@ -325,6 +326,95 @@ console.log((readFact(process.argv[1], process.argv[2]) ?? []).join(" "));
 ' "$f" "$k" </dev/null)
     [[ "$got" == "$want" ]] || { echo "FAIL readFact '$k': steps.mjs '$got', lib.sh '$want'"; failed=1; }
 done
+
+# record-event.sh starts no Node while the tree has no events log, and writes none.
+s=$(mktemp -d "$tmp/seq.XXXX") && git init -q "$s" && mkdir "$s/scripts" &&
+    printf 'yotamake-check-passed\n' > "$s/scripts/check"
+out=$(printf '{"session_id":"s1","cwd":"%s","prompt":"x"}' "$s" | bash "$hooks/record-event.sh" prompt 2>&1); st=$?
+[[ $st -eq 0 && -z "$out" && ! -e "$s/.git/yotamake-events" ]] ||
+    { echo "FAIL record-event.sh with no events log: status $st, output '$out'"; failed=1; }
+
+# --- pre-bash-git.sh: the commit gate (ADR-0010; spec A1-A4, A9) -----------------
+cg=$tmp/commit-gate
+git init -q -b main "$cg" && mkdir -p "$cg/scripts" "$cg/src" "$cg/docs"
+printf 'touch "$(git rev-parse --git-path yotamake-check-passed)"\n' > "$cg/scripts/check"
+git -C "$cg" add -A && git -C "$cg" -c user.name=t -c user.email=t@t commit -q -m init
+git -C "$cg" switch -q -c feat/x
+cg_ev() { printf '{"session_id":"s1","cwd":"%s"%s}' "$cg" "$1"; }
+cg_edit() { mkdir -p "$(dirname "$cg/$1")" && echo x >> "$cg/$1"; cg_ev ",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$cg/$1\"}" | bash "$hooks/post-edit-mark.sh"; }
+cg_review() { cg_ev ",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"$1\"}" | bash "$hooks/record-event.sh" review; }
+cg_prompt() { cg_ev ',"prompt":"go on"' | bash "$hooks/record-event.sh" prompt; }
+cg_check() { (cd "$cg" && bash scripts/check); }
+cg_commit() { git -C "$cg" add -A && git -C "$cg" -c user.name=t -c user.email=t@t commit -q -m "$1"; }
+# cg_expect <exit code> <command> [text stderr must contain] [cwd, default $cg]
+cg_expect() {
+    local out st
+    out=$(bash_call "$2" "${4:-$cg}" | bash "$hooks/pre-bash-git.sh" 2>&1 >/dev/null); st=$?
+    [[ $st == "$1" && "$out" == *"${3:-}"* ]] ||
+        { echo "FAIL commit gate: $2: want $1${3:+ and '$3'}, got $st: '$out'"; failed=1; }
+}
+heredoc_msg() { printf 'git commit -m "$(cat <<%sEOF%s\n%s\n\n%s\nEOF\n)"' "'" "'" "$1" "$2"; }
+cg_prompt; cg_edit src/a.js
+cg_expect 2 'git commit -m x' 'scripts/check, /simplify, /code-review ('              # A1, A2
+cg_expect 2 'git add src/a.js && git commit -m x' 'run it from'
+cg_expect 2 "git -C $cg commit -m x" 'scripts/check' "$tmp"
+cg_expect 0 'git merge --no-ff feat/y'                                   # merges are not gated
+cg_check
+cg_expect 2 'git commit -m x' ': /simplify, /code-review ('
+cg_review simplify
+cg_expect 2 'git commit -m x' ': /code-review ('
+cg_ev ',"hook_event_name":"UserPromptExpansion","command_name":"code-review"' | bash "$hooks/record-event.sh" review
+cg_expect 0 'git commit -m x'                                            # a typed command counts
+cg_edit src/a.js                                                         # a fix after the review
+cg_expect 2 "cd $cg && git commit -m x" ': scripts/check (' "$tmp"
+cg_check
+cg_expect 0 'git commit -m x'
+cg_commit one
+# A4: after a commit, a new edit needs a new review; the trailer waives it, not the check.
+cg_edit src/a.js
+cg_expect 2 'git commit -m x -m "Review-skipped: trivial"' ': scripts/check ('
+cg_check
+cg_expect 2 'git commit -m "x Review-skipped: no"' '/simplify'
+cg_expect 2 "echo 'Review-skipped: x'; git commit -m y" '/simplify'    # only the commit's message
+cg_expect 0 'git commit -m x -m "Review-skipped: a typo"'
+cg_expect 0 'git commit -am x --message="Review-skipped: a typo"'
+cg_expect 0 'git commit -m"Review-skipped: a typo"'
+cg_expect 0 "$(heredoc_msg 'fix: a "quoted" typo' 'Review-skipped: a typo')"
+cg_expect 0 "$(printf 'git commit -F - <<EOF\nx\n\nReview-skipped: a typo\nEOF')"
+printf 'x\n\nReview-skipped: a typo\n' > "$cg/.git/MSG"
+cg_expect 0 'git commit -F .git/MSG'
+cg_expect 0 "git -C $cg commit --file=.git/MSG" '' "$tmp"
+cg_expect 2 'git commit -F .git/none' '/simplify'                        # unreadable: no trailer
+cg_expect 2 'git commit -m "$MSG"' '/simplify'
+cg_expect 2 'git commit --amend --no-edit' '/simplify'
+# A9: the release bump as integrate.md describes it: after the reviewed commit, the bump's
+# edits, then scripts/check, then a commit with the trailer.
+cg_review simplify; cg_review code-review; cg_commit two
+cg_prompt; cg_edit src/version.json; cg_edit CHANGELOG.md
+bump=$(heredoc_msg 'chore(release): bump version to 1.2.0' 'Review-skipped: release bump')
+cg_expect 2 "$bump" ': scripts/check ('
+cg_check
+cg_expect 0 "$bump"
+cg_commit three
+# Finishing a merge is not gated; neither is a log it cannot read.
+cg_edit src/a.js
+cg_expect 2 'git commit --no-edit' 'scripts/check'
+git -C "$cg" rev-parse HEAD > "$cg/.git/MERGE_HEAD"
+cg_expect 0 'git commit --no-edit'
+rm "$cg/.git/MERGE_HEAD"
+echo 'not json' >> "$cg/.git/yotamake-events"
+cg_expect 0 'git commit -m x'
+# A3: a branch that changes only docs needs the check, not the review. An untracked code
+# file counts as a change, so `git add x && git commit` cannot slip one past.
+git -C "$cg" checkout -q -- . && git -C "$cg" switch -q -c docs/y main && rm "$cg/.git/yotamake-events"
+cg_prompt; cg_edit docs/x.md
+cg_expect 2 'git commit -m x' ': scripts/check ('
+cg_check
+cg_expect 0 'git commit -m x'
+cg_edit src/b.js; cg_check
+cg_expect 2 'git add src/b.js && git commit -m x' ': /simplify, /code-review ('
+rm "$cg/src/b.js"
+cg_expect 0 'git commit -m x'
 
 # --- set-hooks-path.sh: the template's SessionStart hook (ADR-0004) -------------
 shp="$hooks/../template/.claude/yotamake/set-hooks-path.sh"
@@ -514,8 +604,10 @@ unset CLAUDE_PROJECT_DIR
 node -e '
 const h = require(process.argv[1]).hooks;
 const has = (ev, hook, tool) => (h[ev] || []).some((e) =>
-    new RegExp("^(" + e.matcher + ")$").test(tool) && JSON.stringify(e.hooks).includes(hook));
-const want = [["PreToolUse", "pre-edit-protect.sh", "Read"]];
+    (e.matcher === undefined || new RegExp("^(" + e.matcher + ")$").test(tool)) &&
+    e.hooks.some((k) => k.command.includes(hook)));
+const want = [["PreToolUse", "pre-edit-protect.sh", "Read"], ["PreToolUse", "record-event.sh\" review", "Skill"],
+    ["UserPromptExpansion", "record-event.sh\" review"], ["UserPromptSubmit", "record-event.sh\" prompt"]];
 for (const t of ["Edit", "Write", "MultiEdit", "NotebookEdit"]) {
     for (const k of ["pre-edit-protect.sh", "pre-edit-main-branch.sh"]) want.push(["PreToolUse", k, t]);
     for (const k of ["post-edit-check.sh", "post-edit-mark.sh"]) want.push(["PostToolUse", k, t]);
@@ -525,8 +617,9 @@ for (const m of miss) console.log("FAIL hooks.json: " + m[1] + " not registered 
 process.exit(miss.length ? 1 : 0);' "$hooks/hooks.json" || failed=1
 
 # --- Every hook lets the edit through when it cannot read the tool call ---------
-for hook in pre-edit-protect.sh pre-edit-main-branch.sh pre-bash-git.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do  # steps.mjs: above
-    echo 'not json' | bash "$hooks/$hook" >/dev/null 2>&1 ||
+for hook in pre-edit-protect.sh pre-edit-main-branch.sh pre-bash-git.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh \
+    "record-event.sh review" "record-event.sh prompt"; do  # steps.mjs: above
+    echo 'not json' | bash "$hooks"/$hook >/dev/null 2>&1 ||
         { echo "FAIL $hook: unreadable input should exit 0"; failed=1; }
 done
 

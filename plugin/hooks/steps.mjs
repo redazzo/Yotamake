@@ -3,11 +3,12 @@
 //
 //   node steps.mjs record edit|review|prompt
 //       Append one event to the events log of the worktree it belongs to.
-//   node steps.mjs decide stop|commit [--tree <dir>] [--message <text>]
+//   node steps.mjs decide stop|commit [--tree <dir>] [--message <text> | --message-json <json>]
 //       Print one line per worktree with a missing step, "<tree>\t<step>,<step>", and
 //       nothing when the action may go ahead. stop looks in every worktree of the
 //       repository; commit in --tree, else the hook's own tree. --message is the commit
-//       message, for the Review-skipped: trailer.
+//       message, for the Review-skipped: trailer; --message-json gives it as a JSON string
+//       (null: the message could not be read).
 //
 // The steps each action needs are in steps.json beside this file. The events log is
 // yotamake-events in the worktree's git directory: one JSON line per event, in the order
@@ -243,7 +244,7 @@ export function missingSteps(action, tree, ctx) {
   if (ale) {
     const counts = ale.edits === 'any' ? edit : code;
     const last = findLast(events, 0, events.length, (e) => counts(e) &&
-      (!ale.sameSession || e.session === ctx.session));
+      (!ale.sameSession || e.session === ctx.session) && (!ale.mainOnly || !e.agent));
     if (last >= 0) for (const s of ale.steps) if (!done(s, last)) missing.push(s);
   }
 
@@ -312,6 +313,7 @@ function main(argv) {
   for (let i = 0; i < rest.length; i += 2) {
     if (rest[i] === '--tree') opts.tree = rest[i + 1];
     else if (rest[i] === '--message') opts.message = rest[i + 1];
+    else if (rest[i] === '--message-json') opts.message = JSON.parse(rest[i + 1]) ?? undefined;
   }
   const input = JSON.parse(fs.readFileSync(0, 'utf8')) || {};
   if (typeof input !== 'object') return;

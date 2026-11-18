@@ -99,12 +99,13 @@ plugin/
     doctor/           check the harness works in this repo, read-only (manual: /yotamake:doctor)
     drawio/           draw.io diagrams
   hooks/
-    hooks.json                     registers the seven hooks below
+    hooks.json                     registers the eight hooks below
     pre-edit-protect.sh            blocks edits to protected files (.env, keys, certificates), and reads of them
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
-    pre-bash-git.sh                blocks --no-verify, and git commit on the main branch, from Bash
+    pre-bash-git.sh                blocks --no-verify, git commit on the main branch, and a commit before the check and review
     post-edit-check.sh             runs a fast per-file check after each edit
     post-edit-mark.sh              logs each edit (code or doc) for the step evaluator
+    record-event.sh                logs review skill calls and user prompts for the step evaluator
     stop-check-ran.sh              blocks the end of a turn once when scripts/check has not passed since
     session-upgrades.sh            at session start, tells Claude when the repo's harness is older than the plugin
     lib.sh                         shared by the hooks: reads the hook input and project.conf, finds the gate files
@@ -193,8 +194,31 @@ than `CLAUDE.md`). When Claude ends a turn, a `Stop` hook asks the step evaluato
 edit came after the last passing check, the hook blocks once and tells Claude to run the
 check. A second stop goes through, so Claude can still stop to ask a question. A turn that
 edited no code, such as a question or a docs-only change, is never blocked, and neither is a
-repository whose `scripts/check` does not write the stamp (one set up before 0.15.0). When
-the evaluator cannot read its input, the log or git, the turn ends.
+repository whose `scripts/check` does not write the stamp (one set up before 0.15.0). Edits a
+subagent made (its events carry an `agent_id`) do not count for the stop, so a background
+agent's edits do not block the main conversation's turns; the commit gate below still counts
+them. When the evaluator cannot read its input, the log or git, the turn ends. The log keeps
+only its newer half once it passes 512 KB.
+
+**Claude cannot commit before the check and the review.** The Bash hook asks the same
+evaluator about each `git commit`, by the `commit` row of `steps.json`
+([ADR-0010](./docs/decisions/0010-commit-gate-by-step-table.md)). It refuses the commit, and
+names what is missing and how to fix it, unless `scripts/check` passed after the last edit,
+code or doc, and both `/simplify` and `/code-review` ran in the review window. A review
+counts when it came after the window's first code edit. The window starts at the later of
+the last commit and the last user prompt before the last code edit, so fixes made in the
+review's own turn count as reviewed, and a change asked for in a later turn needs a new
+review. A hook records each review: a Skill call by Claude, or the command typed by the user
+(exact names only; a plugin's `x:simplify` is another skill). Another records each user
+prompt, but not the notice a background agent sends when it finishes. Two cases need the
+check but no review: a branch whose changes against the main branch are all docs (untracked
+files count, so a code file about to be `git add`ed is seen), and a commit message with a
+`Review-skipped: <reason>` trailer line, used for a trivial branch and for the release bump
+commit, which comes after the review. The hook reads the message from `-m`, `--message`,
+`-F`/`--file` and the `"$(cat <<'EOF' … EOF)"` form; one it cannot read counts as having
+no trailer. A commit that finishes a merge is not gated, nor is `git merge`. When the
+evaluator cannot read its input, the log or git, the commit goes through; the `ask` rule
+still asks.
 
 **Stop points are enforced, not just asked for.** The skills stop before commit, version
 bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `push`,
@@ -246,7 +270,10 @@ copy of that git-ignored folder.
 
 **What the hooks do not cover.** The main-branch, protected-paths and edit-marking hooks
 watch Edit, Write and NotebookEdit only (the protected-paths hook Read too, but not Grep). The Bash hook above watches git commands only. A shell command gets past them: `sed -i`, `echo > .env`, `touch`
-on the opt-out file, or a code change made from the shell, which the `Stop` hook never sees. Claude Code's own permission prompt for Bash is the guard there. The `ask`
+on the opt-out file, or a code change made from the shell, which neither the `Stop` hook nor
+the commit gate sees (a known limit, ADR-0010). Claude Code's own permission prompt for Bash
+is the guard there. The commit gate sees that a review skill was called, not that its
+findings were fixed. The `ask`
 rules are separate, and `git -C . commit` still asked in a test (one run, Claude Code
 2.1.312).
 

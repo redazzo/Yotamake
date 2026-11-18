@@ -90,16 +90,23 @@ Claude Code reports to it.
    step 6 says. The commit boundary means each autopilot session, which runs inside one
    parent turn, needs its own review.
 6. **The check rule.** For a turn's end, the check must have passed after this session's
-   last code edit; this is the rule `stop-check-ran.sh` had before. For a commit, it must
+   last code edit; this is the rule `stop-check-ran.sh` had before, except that edits a
+   subagent made (`agent_id` set) do not count, so a background agent's edits do not block
+   the main conversation's turns. For a commit, it must
    have passed after the last edit of any kind, docs included, so a docs-only branch is
    checked too (item 7).
 7. **Skips.** On a branch whose changes against the main branch are all docs (the `docs`
-   globs in `project.conf`), the commit needs the check but no review. A commit message with
+   globs in `project.conf`), the commit needs the check but no review. Untracked files
+   count as changes, so a code file about to be added by `git add x && git commit` is
+   seen. A commit message with
    a `Review-skipped: <reason>` trailer needs no review events either, so the skip is in
    history. The release bump commit in `plugin/reference/integrate.md` carries one, because
    it edits version files after the review. Neither skip waives the check.
 8. **Where.** In the plugin's `pre-bash-git.sh`, which already recognises a `git commit`.
-   It refuses with exit 2 and names the missing step on stderr, as the other hooks do.
+   It refuses with exit 2 and names the missing step on stderr, as the other hooks do. It
+   reads the message from `-m`, `--message`, `-F`/`--file` and the heredoc forms; a message
+   it cannot read counts as having no trailer. A commit that finishes a merge (`MERGE_HEAD`
+   exists) is not gated, as `git merge` is not.
 
 **The Boundary holds.** `CLAUDE.md` says hooks let the edit through when they cannot decide.
 The gate refuses only when it can decide: it read its input, the events log and git, and
@@ -123,7 +130,10 @@ needs no exception.
   hook call, since `lib.sh`'s reader starts Node too, and more plumbing. So the plugin has
   one reader per language: `read_fact` in `lib.sh` for bash hooks, `readFact` in
   `steps.mjs` for the evaluator. `scripts/test-hooks.sh` checks that both read the same
-  file the same way. Chosen by the user on 2026-11-18.
+  file the same way. Chosen by the user on 2026-11-18. One short-cut stays in bash: `record-event.sh`
+  reads `cwd` with a text match and drops events that cannot count (no events log yet, a
+  Skill that names neither review skill, a `<task-notification>` prompt) before starting
+  Node. Anything it does not drop goes to `steps.mjs`, which decides exactly.
 - [ADR-0007](./0007-autopilot-runs-sessions-in-subagents.md): its "Tested" section left
   open whether a subagent's hook calls carry the parent's `session_id`. The probe shows they
   do. The events log is keyed by worktree anyway, so the gate does not depend on it.

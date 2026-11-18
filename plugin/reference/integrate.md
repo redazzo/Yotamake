@@ -15,7 +15,10 @@ git commit -m "<message>"
 ```
 
 If CLAUDE.md defines a version bump, code changes get one as its own commit on the branch,
-using the command and file it names. Docs-only branches do not.
+using the command and file it names. Docs-only branches do not. After the bump's edits, run
+`scripts/check` again: the plugin's commit gate refuses a commit until the check has passed
+since the last edit. The bump comes after the review, so its message ends with the trailer
+line `Review-skipped: release bump`, which the gate accepts in place of a new review.
 
 Then integrate the way the `Integration` line in CLAUDE.md says.
 
