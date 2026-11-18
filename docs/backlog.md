@@ -17,6 +17,22 @@ not a backlog entry. Items with substantial written analysis keep a detail docum
 Low. **The entries are ranked:** High first, then Medium, then Low, and inside each group the
 one to do first sits on top. A new entry goes in at its rank, not at the end.
 
+Each entry also carries these three fields:
+
+- **Category**, one of these:
+  - **Evals**: the eval suite, its graders and its runs.
+  - **Skills**: what the skills say and do.
+  - **Hooks**: the hooks, and what gets past them.
+  - **Tooling**: `scripts/check`, the installer, CI and releases.
+  - **Reach**: bringing the harness to new users and other agents.
+- **Status**, one of these:
+  - **Ready**: the trigger has fired, and the work can start now.
+  - **Waiting**: the trigger has not fired.
+  - **Blocked**: the work cannot start until another entry closes or a fix lands outside
+    this repository. The entry says which.
+- **Next review date**: the day to check the trigger and the status again. A review sets the
+  next date. A new entry that is Waiting gets a date three months after it was added.
+
 **Done means gone.** Delete the entry when the work lands, and write a
 [record](./records/README.md) if it was worth explaining.
 
@@ -24,7 +40,8 @@ one to do first sits on top. A new entry goes in at its rank, not at the end.
 
 ## Eval sandbox denies `git`
 
-**Priority: High** · **Added:** 2026-11-10 · **Trigger to act:** a new Claude Code release, or
+**Priority: High** · **Category:** Evals · **Status:** Blocked ·
+**Next review date:** 2026-12-01 · **Added:** 2026-11-10 · **Trigger to act:** a new Claude Code release, or
 a fix posted on [claude-code#108887](https://github.com/anthropics/claude-code/issues/108887).
 
 The cause is a Claude Code bug (confirmed 2026-11-11, Claude Code 2.1.322, git 2.56.0,
@@ -63,7 +80,8 @@ that a git case (`01-branches-first`, about $0.20) creates its branch.
 
 ## Show that the harness helps: Δ and cost against the baseline
 
-**Priority: High** · **Added:** 2026-11-14 · **Trigger to act:** "Eval sandbox denies `git`" is
+**Priority: High** · **Category:** Evals · **Status:** Blocked ·
+**Next review date:** 2026-12-18 · **Added:** 2026-11-14 · **Trigger to act:** "Eval sandbox denies `git`" is
 closed.
 
 From a review of Yotamake against other harnesses (2026-11-14). No Δ (score with the plugin
@@ -81,7 +99,8 @@ claim the others cannot make. Until it is published, that strength is still a pl
 
 ## LLM judges fail case 23 on text that meets them
 
-**Priority: Medium** · **Added:** 2026-11-15 · **Trigger to act:** case 23 scores below 1.00 on
+**Priority: Medium** · **Category:** Evals · **Status:** Blocked ·
+**Next review date:** 2026-12-18 · **Added:** 2026-11-15 · **Trigger to act:** case 23 scores below 1.00 on
 a run whose final messages a person reads as passing, or another case shows the same split
 votes.
 
@@ -113,7 +132,8 @@ messages gave the resume line, said approval starts autopilot and said how to tu
 
 ## Keep skills short
 
-**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** a change needs to add
+**Priority: Medium** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-14 · **Trigger to act:** a change needs to add
 wording to a `SKILL.md` that is at the 250-line limit.
 
 From a review of 2026-11-14. Past misses were fixed by adding text to skills, which makes the
@@ -125,7 +145,8 @@ first; and this repository's `CLAUDE.md` (about 11 KB) is still read whole at ev
 
 ## Session overhead on small changes
 
-**Priority: Medium** · **Added:** 2026-11-14 · **Trigger to act:** the Δ run above gives cost
+**Priority: Medium** · **Category:** Skills · **Status:** Blocked ·
+**Next review date:** 2026-12-18 · **Added:** 2026-11-14 · **Trigger to act:** the Δ run above gives cost
 per case, or a user reports that small fixes cost too much time or money.
 
 From the same review. Any change that is not docs-only or trivial runs `scripts/check`,
@@ -147,7 +168,8 @@ cutting anything.
 
 ## Enforce the session steps in order with hooks
 
-**Priority: Low** · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders a
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders a
 step that a hook could have caught, or "Keep skills short" fires.
 
 Past misses were fixed by adding wording to skills (see "Keep skills short"). Hooks could
@@ -166,7 +188,8 @@ on. That is now built ([ADR-0008](./decisions/0008-facts-hooks-read-in-project-c
 
 ## Gaps left in the git and protected-paths guards
 
-**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** a session deletes or moves a
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-17 · **Trigger to act:** a session deletes or moves a
 branch, commits on the main branch, skips the pre-commit hook or reads a secret through one of
 these forms.
 
@@ -178,7 +201,8 @@ on Read but not Grep, so a Grep on a folder can still show a secret.
 
 ## Tag releases from CI
 
-**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** a release goes untagged.
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-17 · **Trigger to act:** a release goes untagged.
 
 From the review of the changelog work (0.35.0). The `vX.Y.Z` tag is a manual step after the
 merge (`CLAUDE.md`, "Branching and releases"), so it can be forgotten. A workflow on push to
@@ -187,7 +211,8 @@ tag yet.
 
 ## Copies of the main-branch reader
 
-**Priority: Low** · **Added:** 2026-11-17 · **Trigger to act:** one copy changes without the
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-17 · **Trigger to act:** one copy changes without the
 others.
 
 From the review of `project.conf` (0.35.0). The `awk` that reads `main-branch` from
@@ -200,7 +225,8 @@ into `plugin/hooks/lib.sh`, `session-context.sh` (template and this repository) 
 
 ## Shell commands get past the edit hooks
 
-**Priority: Low** · **Added:** 2026-11-14 · **Trigger to act:** a session changes a protected
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-14 · **Trigger to act:** a session changes a protected
 file, edits on the main branch, or edits code without the `Stop` gate noticing, by running a
 shell command instead of Edit or Write.
 
@@ -217,7 +243,8 @@ the eval work above is done.
 
 ## Two gaps left in the `Stop` gate
 
-**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** a session edits code in a
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** a session edits code in a
 separate repository by absolute path and ends its turn unchecked, or two sessions edit the same
 tree and one of them stops without its check.
 
@@ -230,7 +257,8 @@ session's turn ends unchecked. Both gaps were there before the fix.
 
 ## Test the `Stop` gate after a subagent's edit
 
-**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** the next session where the
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** the next session where the
 plugin's hooks run and a subagent edits code (an autopilot run, for example).
 
 `stop-check-ran.sh` matches on `session_id`. The Claude Code docs suggest a subagent's hook
@@ -241,7 +269,8 @@ the result in ADR-0007's "Tested" section with a dated amendment.
 
 ## Two clashes `scripts/check` misses after a merge
 
-**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** the next branch that merges
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** the next branch that merges
 main and hits either clash, or any change to `scripts/consistency.mjs`.
 
 Merging main into the autopilot branch showed both; each was fixed by hand.
@@ -255,7 +284,8 @@ Merging main into the autopilot branch showed both; each was fixed by hand.
 
 ## Re-check two fixes on the next full eval run
 
-**Priority: Low** · **Added:** 2026-10-29 · **Trigger to act:** the next full suite run
+**Priority: Low** · **Category:** Evals · **Status:** Blocked ·
+**Next review date:** 2026-12-18 · **Added:** 2026-10-29 · **Trigger to act:** the next full suite run
 (`claude plugin eval . --scaffold --allow-tools Bash Write Edit --ablation with-without`).
 
 - **`simple-session` could miss when the user names a branch.** After a first fix it fired in
@@ -273,7 +303,8 @@ Both look fixed. Delete this entry if the full run agrees.
 
 ## Keep eval results over time
 
-**Priority: Low** · **Added:** 2026-11-10 · **Trigger to act:** the next full eval run.
+**Priority: Low** · **Category:** Evals · **Status:** Blocked ·
+**Next review date:** 2026-12-18 · **Added:** 2026-11-10 · **Trigger to act:** the next full eval run.
 
 Store each full run's per-case scores, costs, plugin version and Claude Code version as a
 record, so a drop shows up as a regression. Running each case several times would also show
@@ -282,7 +313,8 @@ numbers for one run, ready to paste into a record.
 
 ## Untested paths
 
-**Priority: Low** · **Added:** 2026-10-29 · **Trigger to act:** the next change to one of these
+**Priority: Low** · **Category:** Evals · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-10-29 · **Trigger to act:** the next change to one of these
 paths.
 
 - `spec`: case 12 passed 3 of 3 runs, but nothing tests the question-at-a-time path or the
@@ -302,7 +334,8 @@ paths.
 
 ## Copied graders and a shared word
 
-**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** the next change to an eval
+**Priority: Low** · **Category:** Evals · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** the next change to an eval
 grader, or to the side-fix policy in `CLAUDE.md`, **Conventions**.
 
 - `skill-fired.md` and `asks-before-commit.md` sit in many case folders with the same
@@ -316,7 +349,8 @@ grader, or to the side-fix policy in `CLAUDE.md`, **Conventions**.
 
 ## Harness-owned scripts listed one by one
 
-**Priority: Low** · **Added:** 2026-11-10 · **Trigger to act:** a third script in
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-10 · **Trigger to act:** a third script in
 `.claude/yotamake/`.
 
 `install.sh`'s `managed` list and `scripts/consistency.mjs` name each harness-owned script in
@@ -325,7 +359,8 @@ for each new script.
 
 ## The size check can misjudge a change
 
-**Priority: Low** · **Added:** 2026-11-14 · **Trigger to act:** a user or an eval run reports a
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-14 · **Trigger to act:** a user or an eval run reports a
 change wrongly called too big for one session, or one that should have been.
 
 From the same review. `simple-session`, "Check the size", uses fixed tests (more than one new
@@ -334,7 +369,8 @@ Collect the misjudged cases before changing the tests; case 03 covers the too-bi
 
 ## Autopilot context growth
 
-**Priority: Low** · **Added:** 2026-11-12 · **Trigger to act:** an autopilot run whose main
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** an autopilot run whose main
 conversation compacts before the end.
 
 Under autopilot the main conversation runs the review of every session, so each review's
@@ -343,7 +379,8 @@ hand the review's fixes to a fix agent, and keep only its summary.
 
 ## Let a hook approve commits in opted-in worktrees
 
-**Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in parallel
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in parallel
 worktree sessions is reported as too costly, even with the opt-in that skips the
 stop-and-report exchange (ADR-0005, rule 6).
 
@@ -354,7 +391,8 @@ fires, run the tests it lists under "Before acceptance" first, then build it.
 
 ## Spawn worktree sessions from the main conversation
 
-**Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** users find opening one Claude
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-11 · **Trigger to act:** users find opening one Claude
 Code conversation per worktree too slow, or a subagent can stop and ask the user before a
 commit.
 
@@ -368,7 +406,8 @@ parallel sessions under autopilot.
 
 ## Plugin agent definitions
 
-**Priority: Low** · **Added:** 2026-11-11 · **Trigger to act:** the agent briefs in skills grow
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-11 · **Trigger to act:** the agent briefs in skills grow
 long, or the same brief is repeated in two or more skills.
 
 Skills hand work to Claude Code's built-in agents, with the brief in the skill text
@@ -377,7 +416,8 @@ brief, but it changes the Architecture Style line.
 
 ## A tasks step in `spec`
 
-**Priority: Low** · **Added:** 2026-11-18 · **Trigger to act:** a session built from a spec
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-18 · **Trigger to act:** a session built from a spec
 misses one of the spec's acceptance criteria, or a user asks for a task list before code.
 
 From the comparison of 2026-11-18. GitHub Spec Kit goes spec → plan → tasks: an ordered list
@@ -390,7 +430,8 @@ it.
 
 ## A quickstart guide
 
-**Priority: Low** · **Added:** 2026-11-10 · **Trigger to act:** a new user asks how to start,
+**Priority: Low** · **Category:** Reach · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-10 · **Trigger to act:** a new user asks how to start,
 or the plugin is listed somewhere public.
 
 `README.md` is accurate but dense. A five-minute guide in `docs/guides/`: install, run
@@ -398,7 +439,8 @@ or the plugin is listed somewhere public.
 
 ## `scripts/check` recipes per stack
 
-**Priority: Low** · **Added:** 2026-11-10 · **Trigger to act:** `setup` fills in
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-10 · **Trigger to act:** `setup` fills in
 `scripts/check` badly or slowly for a common stack.
 
 A reference file under `plugin/reference/`, like `architecture-styles.md`, with lint, type,
@@ -408,7 +450,8 @@ choice.
 
 ## Stale-docs check: designed, not built
 
-**Priority: Low** · **Added:** 2026-10-29 · **Trigger to act:** a reference doc is found wrong
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-10-29 · **Trigger to act:** a reference doc is found wrong
 in use, and this check would have flagged it.
 
 A report of reference docs whose code changed after their `updated:` date. Design,
@@ -416,7 +459,8 @@ measurements and build plan: [backlog/stale-docs-check.md](./backlog/stale-docs-
 
 ## An `AGENTS.md` for other agents
 
-**Priority: Low** · **Added:** 2026-11-10 · **Trigger to act:** a project using the harness
+**Priority: Low** · **Category:** Reach · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-10 · **Trigger to act:** a project using the harness
 also uses Codex, Cursor, Gemini CLI or Copilot.
 
 Those tools read `AGENTS.md`, not `CLAUDE.md`. The installer could offer an `AGENTS.md` that
@@ -431,7 +475,8 @@ pick something else.
 
 ## A dedicated architecture design skill
 
-**Priority: Low** · **Added:** 2026-11-15 · **Trigger to act:** users ask for quality-attribute
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-15 · **Trigger to act:** users ask for quality-attribute
 scenarios, a deeper comparison of options, or C4 or draw.io diagrams as deliverables. Or the
 design text in `setup` and `multi-session` grows past a short paragraph each.
 
@@ -450,7 +495,8 @@ small interface) is a second source for the same idea.
 
 ## Ideas from the pstack review
 
-**Priority: Low** · **Added:** 2026-11-16 · **Trigger to act:** each item names its own. Do not take them
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-16 · **Trigger to act:** each item names its own. Do not take them
 together: "Keep skills short" and "Session overhead on small changes" say new text has a
 cost.
 
@@ -501,7 +547,8 @@ take in our own plain words.
 
 ## Small harness ideas
 
-**Priority: Low** · **Added:** 2026-11-10 · **Trigger to act:** a change to the area each one
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-11-10 · **Trigger to act:** a change to the area each one
 touches.
 
 - A status line showing the branch and the current session of an effort.
@@ -511,6 +558,7 @@ touches.
 
 ## No plugin icon
 
-**Priority: Low** · **Added:** 2026-10-29 · **Trigger to act:** `claude plugin validate
+**Priority: Low** · **Category:** Reach · **Status:** Waiting ·
+**Next review date:** 2027-02-18 · **Added:** 2026-10-29 · **Trigger to act:** `claude plugin validate
 --strict` turns `ICON_MISSING` from a warning into an error, or the plugin is listed somewhere
 public.
