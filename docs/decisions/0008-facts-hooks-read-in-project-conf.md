@@ -113,4 +113,4 @@ accepting two copies of each fact and a check that they agree.
 [ADR-0010](./0010-commit-gate-by-step-table.md) adds the step evaluator,
 `plugin/hooks/steps.mjs`, which reads `project.conf` with its own `readFact`. Item 4 then
 reads: `read_fact` in `lib.sh` serves the bash hooks, and `readFact` in `steps.mjs` serves
-the evaluator; a test keeps the two equal. This holds once ADR-0010 is accepted.
+the evaluator; a test keeps the two equal. ADR-0010 was accepted on 2026-11-18.

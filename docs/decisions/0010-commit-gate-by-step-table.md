@@ -6,7 +6,7 @@ status: current
 
 # ADR-0010: A plugin hook refuses `git commit` until the check and the review are done, by one step table
 
-- **Status:** Proposed. Under autopilot the user accepts it with the effort's report.
+- **Status:** Accepted (2026-11-18)
 - **Date:** 2026-11-18
 - **Work record:** [Commit gate on session steps](../records/2026/2026-11-18-commit-gate.md)
 - **Amends:** [ADR-0008](./0008-facts-hooks-read-in-project-conf.md), item 4 ("Readers"):

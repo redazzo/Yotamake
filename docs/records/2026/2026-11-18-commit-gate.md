@@ -6,9 +6,9 @@ status: current
 
 # Commit gate on session steps
 
-**Date:** 2026-11-18 · **Status:** open, on `feat/commit-gate`; released as 0.37.0 when it
-merges into `main` · **Design:** [ADR-0010](../../decisions/0010-commit-gate-by-step-table.md)
-(Proposed; the user accepts it with the effort's report).
+**Date:** 2026-11-18 · **Status:** done, released as 0.37.0 · **Design:**
+[ADR-0010](../../decisions/0010-commit-gate-by-step-table.md) (Accepted 2026-11-18, with
+the assumed decisions D9 and D10 confirmed).
 
 Sessions sometimes committed before `scripts/check` or the review had run on the final diff.
 Each miss had been fixed with more skill wording, and `simple-session` was at 245 of its 250
