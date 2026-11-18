@@ -93,12 +93,12 @@ flowchart LR
     reference["reference/<br/>read on demand"]
     install["install.sh"]
     template["template/"]
-    hooks["hooks/*.sh<br/>enforcement"]
-    steps["steps.mjs<br/>step evaluator"]
-    stepsjson["steps.json<br/>step order"]
     skills --> reference
     install --> template
     hooks --> steps --> stepsjson
+    hooks["hooks/*.sh<br/>enforcement"]
+    steps["steps.mjs<br/>step evaluator"]
+    stepsjson["steps.json<br/>step order"]
   end
 
   subgraph repo["Each repository"]
