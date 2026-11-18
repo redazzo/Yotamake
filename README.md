@@ -81,6 +81,44 @@ upgrades still missing (`simple-session`, "Harness upgrades").
 | Each repository | `CLAUDE.md` facts, `scripts/check`, `docs/`, hook config, CI workflow | The project |
 | Each repository, harness-owned | `scripts/docs/*.mjs`, `.githooks/pre-commit`, `.claude/yotamake/set-hooks-path.sh`, `.claude/yotamake/session-context.sh`, `.claude/yotamake/version` | Refreshed by the installer |
 
+How the parts connect. Solid arrows are what runs or reads what; the dotted arrow is the
+one-time copy the installer makes.
+
+```mermaid
+flowchart LR
+  market[".claude-plugin/<br/>marketplace.json"] -->|lists| plugin
+
+  subgraph plugin["The plugin (plugin/)"]
+    skills["skills/<br/>the method"]
+    reference["reference/<br/>read on demand"]
+    hooks["hooks/*.sh<br/>enforcement"]
+    steps["steps.mjs<br/>step evaluator"]
+    stepsjson["steps.json<br/>step order"]
+    install["install.sh"]
+    template["template/"]
+    skills --> reference
+    hooks --> steps --> stepsjson
+    install --> template
+  end
+
+  subgraph repo["Each repository"]
+    claudemd["CLAUDE.md<br/>project facts"]
+    conf[".claude/yotamake/<br/>project.conf, *.conf"]
+    check["scripts/check<br/>the one gate"]
+    precommit[".githooks/pre-commit"]
+    ci["CI workflow"]
+    settings[".claude/settings.json<br/>ask rules, SessionStart"]
+  end
+
+  template -.->|copied by install.sh| repo
+  skills -->|read named sections| claudemd
+  skills -->|run| check
+  hooks -->|read| conf
+  precommit -->|"run --staged"| check
+  ci -->|"run --all"| check
+  settings -->|sets core.hooksPath| precommit
+```
+
 ### The plugin
 
 ```
