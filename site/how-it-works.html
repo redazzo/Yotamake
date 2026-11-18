@@ -74,7 +74,7 @@
     <h2 id="multi">Bigger work</h2>
     <p>Work that will not fit one context runs as <a href="skills.html#multi-session"><code>multi-session</code></a>: numbered sessions with a working folder that survives <code>/clear</code>. The folder is git-ignored at <code>.scratchpad/&lt;date&gt;-&lt;slug&gt;/</code>, or committed under <code>.sessions/</code> in a cloud session. It holds the plan, findings and a log.</p>
     <ul>
-      <li><strong>S0 plans.</strong> It hands its reading to agents, one per area, so the main context keeps room for the plan. You approve the plan before S1.</li>
+      <li><strong>S0 plans,</strong> and changes no code. It hands its reading to agents, one per area, so the main context keeps room for the plan. You approve the plan before S1, where the work starts.</li>
       <li><strong>Stepping through,</strong> resume after <code>/clear</code> with "Read .scratchpad/&lt;folder&gt;/README.md and start the next session."</li>
       <li><strong>Parallel sessions.</strong> Two sessions that change different files and need nothing from each other can run at once, each in its own git worktree, and merge one at a time.</li>
       <li><strong>Autopilot, by default.</strong> Approve the plan and the remaining sessions each run in a fresh agent. The plan's open decisions are listed first, with the choice autopilot will make. Say "approve, step through" to go session by session instead. It ends with one report and one question: merge? Every commit still asks, and nothing is pushed or merged without your yes.</li>
