@@ -180,4 +180,4 @@ needs no exception.
 - `scripts/check` (the `yotamake-check-passed` stamp), `scripts/test-hooks.sh`
 - `plugin/reference/integrate.md` (the release bump commit)
 - `plugin/skills/simple-session/SKILL.md`, step 6
-- [Backlog](../backlog.md), "Enforce the session steps in order with hooks"
+- The backlog entry "Enforce the session steps in order with hooks", which this work closed

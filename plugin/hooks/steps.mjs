@@ -28,8 +28,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const LOG = 'yotamake-events';
 const STAMP = 'yotamake-check-passed';
-// Read by older stop hooks; S5 of the commit-gate effort removes it.
-const MARKER = 'yotamake-edited';
 // The default Docs-only rule (CLAUDE.md, Branching and releases).
 const DEFAULT_DOCS = ['docs/*', '*.md', '!CLAUDE.md'];
 // Past this size the log keeps only its newer half.
@@ -187,7 +185,6 @@ export function record(kind, input) {
     if (git(root, 'check-ignore', '-q', '--', rel) !== null) return;
     const doc = isDoc(rel, docGlobs(root));
     append(gd, { ...base, path: rel, ...(doc ? { doc: true } : {}), head: headOf(root), stamp: mtime(path.join(gd, STAMP)) });
-    if (!doc) fs.writeFileSync(path.join(gd, MARKER), `${input.session_id || 'unknown'}\n`);
     return;
   }
   let extra;

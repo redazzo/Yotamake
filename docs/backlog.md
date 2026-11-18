@@ -153,21 +153,6 @@ task needs it, so a small fix costs little. Here every code change pays for the 
 session. This is the main cost of the harness's strength (enforcement), so measure it before
 cutting anything.
 
-## Enforce the session steps in order with hooks
-
-**Priority: Low** · **Category:** Hooks · **Status:** Ready ·
-**Next review date:** 2027-02-18 · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders a
-step that a hook could have caught, or a change must add wording to a `SKILL.md` at the
-250-line limit.
-
-Work started on 2026-11-18, on branch `feat/commit-gate`. The design is
-[ADR-0010](./decisions/0010-commit-gate-by-step-table.md) (Proposed): a plugin hook refuses
-`git commit` until the check has passed since the last code edit and both review skills ran
-in the review window, read from one step table by one evaluator over a per-worktree events
-log. It stays inside the Boundary and does not need
-[ADR-0006](./decisions/0006-commit-stop-by-project-hook.md). Delete this entry when the
-gate lands.
-
 ## Gaps left in the git and protected-paths guards
 
 **Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
@@ -209,45 +194,35 @@ into `plugin/hooks/lib.sh`, `session-context.sh` (template and this repository) 
 
 **Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
 **Next review date:** 2027-02-18 · **Added:** 2026-11-14 · **Trigger to act:** a session changes a protected
-file, edits on the main branch, or edits code without the `Stop` gate noticing, by running a
-shell command instead of Edit or Write.
+file, edits on the main branch, or edits code without the `Stop` gate or the commit gate
+noticing, by running a shell command instead of Edit or Write.
 
 From the same review. `README.md`, "What the hooks do not cover", lists the gap: `sed -i`,
 `echo > .env`, `tee` or any code change made from Bash gets past the main-branch,
 protected-paths and edit-marking hooks. `pre-bash-git.sh` already parses commands with a
 quote-aware reader; a sibling hook could refuse redirections and in-place edits aimed at
 protected paths or made on the main branch. It must still let a command through when it
-cannot read it (Architecture, Boundaries). See also "Two gaps left in the `Stop` gate".
+cannot read it (Architecture, Boundaries). See also "A gap left in the `Stop` gate".
+
+The commit gate (ADR-0010) has the same gap, accepted when it was built: an edit made from
+Bash adds no edit event, so a check or review that ran before it still counts. Diffing the
+worktree on each commit would close it, at the cost of a slower hook.
 
 Comparison of 2026-11-18: blocking hooks are what set this harness apart from the
 prompt-only ones, so this gap weakens its main claim. It may deserve a higher priority once
 the eval work above is done.
 
-## Two gaps left in the `Stop` gate
+## A gap left in the `Stop` gate
 
 **Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
 **Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** a session edits code in a
-separate repository by absolute path and ends its turn unchecked, or two sessions edit the same
-tree and one of them stops without its check.
+separate repository by absolute path and ends its turn unchecked.
 
-The review of the worktree fix (0.22.1) found two gaps it does not close. `stop-check-ran.sh`
-finds trees through `git worktree list`, so an edit by absolute path into a separate
-repository, not a worktree of this one, still gets past the gate. Closing it would need a
-per-session list of edited roots kept outside any one repository. And `yotamake-edited` holds
-one session id: when two sessions edit the same tree, the last writer wins and the other
-session's turn ends unchecked. Both gaps were there before the fix.
-
-## Test the `Stop` gate after a subagent's edit
-
-**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
-**Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** the next session where the
-plugin's hooks run and a subagent edits code (an autopilot run, for example).
-
-`stop-check-ran.sh` matches on `session_id`. The Claude Code docs suggest a subagent's hook
-calls carry the parent's id, so its edits should mark the parent session. ADR-0007's test
-could not check this: the plugin's hooks did not run in that cloud session. If the id
-differs, the gate misses a check after a subagent's edit; it never blocks wrongly. Record
-the result in ADR-0007's "Tested" section with a dated amendment.
+The review of the worktree fix (0.22.1) found that `stop-check-ran.sh` finds trees through
+`git worktree list`, so an edit by absolute path into a separate repository, not a worktree
+of this one, still gets past the gate. Closing it would need a per-session list of edited
+roots kept outside any one repository. A second gap it found, two sessions editing one tree,
+closed with the events log (ADR-0010): each event names its session.
 
 ## Two clashes `scripts/check` misses after a merge
 
@@ -282,6 +257,24 @@ Merging main into the autopilot branch showed both; each was fixed by hand.
   3 of 3 each, with each skill called exactly once per run.
 
 Both look fixed. Delete this entry if the full run agrees.
+
+## An eval case for the commit gate and the `Stop` gate
+
+**Priority: Low** · **Category:** Evals · **Status:** Blocked ·
+**Next review date:** 2026-12-18 · **Added:** 2026-11-18 · **Trigger to act:** "Eval sandbox denies `git`"
+is closed, or the next change to `steps.json`, `steps.mjs` or the gates.
+
+No eval case checks that the hooks hold Claude to the session's order
+([ADR-0010](./decisions/0010-commit-gate-by-step-table.md)). Cases 01, 02, 13, 15 and 20
+cover parts of it: each stops before the commit, so none reaches the commit gate.
+`scripts/test-hooks.sh` tests the gates with made-up events, not with a real session. A case
+could answer yes to the commit and check that Claude ran the check and both review skills
+before the commit went through, and that a trivial change carries `Review-skipped:`.
+
+Today no case has Claude commit: every case's graders want it to stop before the commit, and
+the commits in `scaffold.sh` files run outside Claude Code, where the hooks do not fire. So
+the gate refuses no current case. A new case that commits must run both review skills, be
+docs-only, or add the trailer, or the gate refuses it.
 
 ## Keep eval results over time
 

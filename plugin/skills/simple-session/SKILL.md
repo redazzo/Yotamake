@@ -232,7 +232,8 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
 - any side-fixes, each finding not acted on and where it went (a backlog entry, the ledger,
   or this report), and the findings you dropped as wrong, one line each;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with
-  any attribution lines the environment asks for).
+  `Review-skipped: trivial` if the review was skipped as trivial, then any attribution lines
+  the environment asks for).
 
 Then ask whether to commit and merge, or, if the project works through pull requests (step 8),
 whether to commit, push and open a pull request.

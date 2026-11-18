@@ -198,7 +198,7 @@ while IFS=$'\t' read -r dir sub skip msg; do
         echo "- scripts/check has not passed since the last edit: run it from $root and fix what fails." >&2 ;;
     esac
     [[ $missing == check ]] ||
-        echo "- The review has not run on this change: run the missing review skills (simple-session, \"Run the checks\"), fix what they find, then run scripts/check again. If the branch is trivial, or this is the release bump commit, add a trailer line to the commit message instead: 'Review-skipped: <reason>'." >&2
+        echo "- The review has not run on this change: run the missing review skills (simple-session, \"Review\"), fix what they find, then run scripts/check again. If the branch is trivial, or this is the release bump commit, add a trailer line to the commit message instead: 'Review-skipped: <reason>'." >&2
     exit 2
 done <<<"$calls"
 exit 0

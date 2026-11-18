@@ -161,22 +161,23 @@ printf 'touch "$(git rev-parse --git-path yotamake-check-passed)"\n' > "$g/scrip
 printf '.scratchpad/\n' > "$g/.gitignore"
 for f in src/a.js docs/x.md README.md CLAUDE.md .scratchpad/plan.md; do printf 'x\n' > "$g/$f"; done
 export CLAUDE_PROJECT_DIR=$g
-marker=$g/.git/yotamake-edited stamp=$g/.git/yotamake-check-passed
+events=$g/.git/yotamake-events stamp=$g/.git/yotamake-check-passed
+# code_edit <session>: the events log holds a code edit (not marked doc) by that session.
+code_edit() { grep '"event":"edit"' "$events" 2>/dev/null | grep -v '"doc":true' | grep -q "\"session\":\"$1\""; }
 expect 0 stop-check-ran.sh "$(stop s1)"                   # nothing edited: a question
 for f in docs/x.md README.md .scratchpad/plan.md; do
     expect 0 post-edit-mark.sh "$(edit s1 "$g/$f")"
 done
-[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc or ignored file was marked"; failed=1; }
 ln -s "$g" "$tmp/gate-link"
 expect 0 post-edit-mark.sh "$(edit s1 "$tmp/gate-link/docs/x.md")"   # a doc through a symlink
-[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc or ignored file was marked"; failed=1; }
+code_edit s1 && { echo "FAIL post-edit-mark.sh: a doc or ignored file was marked"; failed=1; }
 expect 0 post-edit-mark.sh "$(edit s1 "$g/CLAUDE.md")"   # CLAUDE.md is code
-[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: CLAUDE.md not marked"; failed=1; }
-rm -f "$marker"
+code_edit s1 || { echo "FAIL post-edit-mark.sh: CLAUDE.md not marked"; failed=1; }
+rm -f "$events"
 printf '{}\n' > "$g/src/n.ipynb"
 expect 0 post-edit-mark.sh "$(printf '{"session_id":"s1","tool_input":{"notebook_path":"%s"}}' "$g/src/n.ipynb")"
-[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: a notebook edit not marked"; failed=1; }
-rm -f "$marker"
+code_edit s1 || { echo "FAIL post-edit-mark.sh: a notebook edit not marked"; failed=1; }
+rm -f "$events"
 expect 0 post-edit-mark.sh "$(edit s1 "$g/src/a.js")"
 expect 2 stop-check-ran.sh "$(stop s1)"                   # code edited, no check yet
 expect 0 stop-check-ran.sh "$(stop s1 true)"              # already continuing: block once
@@ -186,27 +187,27 @@ expect 0 stop-check-ran.sh "$(stop s1)"                   # check passed after t
 sleep 0.05; expect 0 post-edit-mark.sh "$(edit s1 "$g/src/a.js")"
 expect 2 stop-check-ran.sh "$(stop s1)"                   # edited again after the pass
 # project.conf's docs globs replace the default rule (ADR-0008).
-rm -f "$marker"
+rm -f "$events"
 mkdir -p "$g/.claude/yotamake" "$g/guides/sub" && printf 'x\n' > "$g/guides/sub/g.md"
 printf 'x\n' > "$g/AGENTS.md"
 printf 'docs guides/*\ndocs *.md\ndocs !AGENTS.md\n' > "$g/.claude/yotamake/project.conf"
 for f in guides/sub/g.md README.md CLAUDE.md; do
     expect 0 post-edit-mark.sh "$(edit s1 "$g/$f")"
 done
-[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc by project.conf was marked"; failed=1; }
+code_edit s1 && { echo "FAIL post-edit-mark.sh: a doc by project.conf was marked"; failed=1; }
 expect 0 post-edit-mark.sh "$(edit s1 "$g/docs/x.md")"   # docs/ is not in this conf's globs
-[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: docs/x.md not marked by project.conf"; failed=1; }
-rm -f "$marker"
+code_edit s1 || { echo "FAIL post-edit-mark.sh: docs/x.md not marked by project.conf"; failed=1; }
+rm -f "$events"
 expect 0 post-edit-mark.sh "$(edit s1 "$g/AGENTS.md")"   # an exception wins
-[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: a ! exception not marked"; failed=1; }
-rm -f "$marker"
+code_edit s1 || { echo "FAIL post-edit-mark.sh: a ! exception not marked"; failed=1; }
+rm -f "$events"
 # The template's conf gives the same answers as the built-in default rule.
 cp "$hooks/../template/.claude/yotamake/project.conf" "$g/.claude/yotamake/project.conf"
 for f in docs/x.md README.md; do expect 0 post-edit-mark.sh "$(edit s1 "$g/$f")"; done
-[[ -f $marker ]] && { echo "FAIL post-edit-mark.sh: a doc by the template conf was marked"; failed=1; }
+code_edit s1 && { echo "FAIL post-edit-mark.sh: a doc by the template conf was marked"; failed=1; }
 expect 0 post-edit-mark.sh "$(edit s1 "$g/CLAUDE.md")"
-[[ $(cat "$marker" 2>/dev/null) == s1 ]] || { echo "FAIL post-edit-mark.sh: CLAUDE.md not marked by the template conf"; failed=1; }
-rm -f "$marker" "$g/.claude/yotamake/project.conf"
+code_edit s1 || { echo "FAIL post-edit-mark.sh: CLAUDE.md not marked by the template conf"; failed=1; }
+rm -f "$events" "$g/.claude/yotamake/project.conf"
 : > "$g/scripts/check"
 expect 0 stop-check-ran.sh "$(stop s1)"                   # an older scripts/check: no stamp
 expect 0 stop-check-ran.sh "$(stop s1)" CLAUDE_PROJECT_DIR="$tmp/none"   # not a repository
@@ -569,13 +570,13 @@ expect 2 pre-edit-protect.sh "$w/config/secrets/db.txt"         # slash pattern,
 expect 2 pre-edit-protect.sh "$(wt_call s1 "$w/config/secrets/db.txt")"
 expect 2 post-edit-check.sh "$(wt_call s1 "$w/src/a.bad")"     # the worktree's conf
 expect 0 post-edit-mark.sh "$(wt_call s1 "$w/src/a.bad")"
-expect 2 stop-check-ran.sh "$(wt_call s1)"                     # the worktree's marker
+expect 2 stop-check-ran.sh "$(wt_call s1)"                     # the worktree's edit
 sleep 0.05; (cd "$w" && bash scripts/check)
 expect 0 stop-check-ran.sh "$(wt_call s1)"                     # the worktree's stamp
 # From the main tree, an edit by absolute path into the worktree marks the worktree.
 main_stop() { printf '{"session_id":"%s","cwd":"%s","stop_hook_active":false}' "$1" "$m"; }
 sleep 0.05; expect 0 post-edit-mark.sh "$(edit s2 "$w/src/a.bad")"
-expect 2 stop-check-ran.sh "$(main_stop s2)"                   # the other tree's marker
+expect 2 stop-check-ran.sh "$(main_stop s2)"                   # the other tree's edit
 out=$(main_stop s2 | bash "$hooks/stop-check-ran.sh" 2>&1)
 grep -qF "$w" <<<"$out" || { echo "FAIL stop-check-ran.sh does not name the worktree: '$out'"; failed=1; }
 expect 0 stop-check-ran.sh "$(main_stop s3)"                   # another session's edit there

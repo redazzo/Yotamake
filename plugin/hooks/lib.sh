@@ -49,7 +49,6 @@ hook_root() {
 # gate_file <repo root> <name>: print the absolute path of <name> in the repository's git
 # directory (per worktree). The gate files:
 #   yotamake-check-passed  touched by the project's scripts/check when it passes
-#   yotamake-edited        holds the id of the last session that edited a code file
 #   yotamake-events        the step evaluator's events log (steps.mjs, ADR-0010)
 gate_file() {
     local p
