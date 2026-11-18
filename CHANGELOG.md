@@ -6,7 +6,7 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
-## Unreleased
+## 0.37.0 — 2026-11-18
 
 - A commit gate: the plugin's Bash hook refuses `git commit` until `scripts/check` has
   passed since the last edit and both `/simplify` and `/code-review` have run on the change.
