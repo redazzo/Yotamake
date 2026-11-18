@@ -104,10 +104,12 @@ plugin/
     pre-edit-main-branch.sh        blocks edits while the repository is on its main branch
     pre-bash-git.sh                blocks --no-verify, and git commit on the main branch, from Bash
     post-edit-check.sh             runs a fast per-file check after each edit
-    post-edit-mark.sh              notes that this session edited a code file
+    post-edit-mark.sh              logs each edit (code or doc) for the step evaluator
     stop-check-ran.sh              blocks the end of a turn once when scripts/check has not passed since
     session-upgrades.sh            at session start, tells Claude when the repo's harness is older than the plugin
     lib.sh                         shared by the hooks: reads the hook input and project.conf, finds the gate files
+    steps.json                     the steps each gated action needs, in order (ADR-0010)
+    steps.mjs                      the step evaluator: logs events, decides from steps.json, classifies docs
   output-styles/plain-english.md   short sentences, plain words (pick it with /output-style)
   reference/architecture-styles.md styles with the boundaries, patterns and gates each implies
   reference/module-design.md       deep and shallow modules, seams, the deletion test
@@ -179,15 +181,20 @@ loaded, and says so in one line. A teammate who never opens Claude Code there mu
 **Claude cannot end a turn with unchecked code.** When `scripts/check` passes (not with
 `--staged`), it touches `yotamake-check-passed` in the git directory. A run in which no check
 ran (an empty gate, as in a lite install before `/yotamake:setup`) writes no stamp and says
-so. When Claude edits a code file with Edit or Write, a hook writes the session id to
-`yotamake-edited` there. Docs and git-ignored files do not count. The hook reads which files
-are docs from the `docs` globs in `.claude/yotamake/project.conf`, a copy of the `Docs-only`
-line ([ADR-0008](./docs/decisions/0008-facts-hooks-read-in-project-conf.md)); without them it
-uses the default rule (files under `docs/`, and Markdown at the root other than
-`CLAUDE.md`). When Claude ends a turn after editing code in this session and the stamp is
-older than that edit, a `Stop` hook blocks once and tells it to run the check. A second stop goes through, so Claude can still stop to
-ask a question. A turn that edited no code, such as a question, is never blocked, and neither
-is a repository whose `scripts/check` does not write the stamp (one set up before 0.15.0).
+so. When Claude edits a file with Edit or Write, a hook appends an edit event to
+`yotamake-events` there: one JSON line per event, with the session, the HEAD and the stamp
+it saw. Git-ignored files are not logged, and a doc edit is marked as one. The hook reads
+which files are docs from the `docs` globs in `.claude/yotamake/project.conf`, a copy of the
+`Docs-only` line ([ADR-0008](./docs/decisions/0008-facts-hooks-read-in-project-conf.md));
+without them it uses the default rule (files under `docs/`, and Markdown at the root other
+than `CLAUDE.md`). When Claude ends a turn, a `Stop` hook asks the step evaluator
+(`plugin/hooks/steps.mjs`), which reads the `stop` row of `steps.json`
+([ADR-0010](./docs/decisions/0010-commit-gate-by-step-table.md)): if this session's last code
+edit came after the last passing check, the hook blocks once and tells Claude to run the
+check. A second stop goes through, so Claude can still stop to ask a question. A turn that
+edited no code, such as a question or a docs-only change, is never blocked, and neither is a
+repository whose `scripts/check` does not write the stamp (one set up before 0.15.0). When
+the evaluator cannot read its input, the log or git, the turn ends.
 
 **Stop points are enforced, not just asked for.** The skills stop before commit, version
 bump, merge and deploy. The repo's settings also put `git commit`, `merge`, `push`,

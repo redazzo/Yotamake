@@ -9,6 +9,9 @@ status: current
 - **Status:** Proposed. Under autopilot the user accepts it with the effort's report.
 - **Date:** 2026-11-18
 - **Work record:** none yet (effort "Commit gate on session steps")
+- **Amends:** [ADR-0008](./0008-facts-hooks-read-in-project-conf.md), item 4 ("Readers"):
+  `plugin/hooks/steps.mjs` is a second reader of `project.conf` inside the plugin, in Node.
+  It also reads the edited path itself, not with `tool_file_path`. See "Readers" below.
 - **Builds on:** [ADR-0003](./0003-stop-points-enforced-by-ask-rules.md) (the `ask` rule
   on `git commit` stays; this adds a refusal in front of it);
   [ADR-0008](./0008-facts-hooks-read-in-project-conf.md) (the gate reads `main-branch` and
@@ -70,7 +73,8 @@ Claude Code reports to it.
    the checkout they touched. An edit event uses the git dir of the edited file, as
    `gate_file` does; a Skill or prompt event, which has no path, uses the git dir of `cwd`.
 4. **Event sources.**
-   - `edit`: `PostToolUse` on the edit tools, for a file that is not docs.
+   - `edit`: `PostToolUse` on the edit tools. A doc edit is marked `doc` (the `docs` globs
+     in `project.conf`); git-ignored files are left out.
    - `review`: `PreToolUse` on `Skill` whose `skill` is exactly `simplify` or
      `code-review`, and `UserPromptExpansion` whose `command_name` is one of those. A
      plugin's `x:simplify` is a different skill and does not count.
@@ -85,8 +89,10 @@ Claude Code reports to it.
    reviewed. A change asked for in a later turn needs a new review, as `simple-session`
    step 6 says. The commit boundary means each autopilot session, which runs inside one
    parent turn, needs its own review.
-6. **The check rule.** The check must have passed after the last code edit. This is the
-   rule `stop-check-ran.sh` has today.
+6. **The check rule.** For a turn's end, the check must have passed after this session's
+   last code edit; this is the rule `stop-check-ran.sh` had before. For a commit, it must
+   have passed after the last edit of any kind, docs included, so a docs-only branch is
+   checked too (item 7).
 7. **Skips.** On a branch whose changes against the main branch are all docs (the `docs`
    globs in `project.conf`), the commit needs the check but no review. A commit message with
    a `Review-skipped: <reason>` trailer needs no review events either, so the skip is in
@@ -111,6 +117,13 @@ needs no exception.
   gate does not need it and does not build on it.
 - [ADR-0008](./0008-facts-hooks-read-in-project-conf.md): events are runtime state in the
   git dir, not facts. They do not go in `project.conf`.
+- **Readers (amends ADR-0008 item 4).** The evaluator reads `project.conf` (`docs`,
+  `main-branch`), the main branch and the edited path in Node, rather than having the bash
+  hooks resolve them with `lib.sh` and pass them in. That would cost one more Node start per
+  hook call, since `lib.sh`'s reader starts Node too, and more plumbing. So the plugin has
+  one reader per language: `read_fact` in `lib.sh` for bash hooks, `readFact` in
+  `steps.mjs` for the evaluator. `scripts/test-hooks.sh` checks that both read the same
+  file the same way. Chosen by the user on 2026-11-18.
 - [ADR-0007](./0007-autopilot-runs-sessions-in-subagents.md): its "Tested" section left
   open whether a subagent's hook calls carry the parent's `session_id`. The probe shows they
   do. The events log is keyed by worktree anyway, so the gate does not depend on it.

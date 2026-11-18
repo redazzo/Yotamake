@@ -141,7 +141,9 @@ not list stops before any edit and is raised with the user, whoever asked for it
   template installed by `install.sh`, whose files are either harness-owned (refreshed) or
   project-owned (copied once). Besides the plugin's hooks, the template's
   `.claude/settings.json` has project `SessionStart` hooks, one per harness-owned script in
-  `.claude/yotamake/` (ADR-0004), so they work without the plugin. Beside the plugin, a
+  `.claude/yotamake/` (ADR-0004), so they work without the plugin. The hooks that gate a
+  step ask one dependency-free Node evaluator, `plugin/hooks/steps.mjs`, which reads the
+  step order from `plugin/hooks/steps.json` (ADR-0010). Beside the plugin, a
   static landing site (hand-written HTML and CSS, no build step) that a GitHub Pages workflow
   publishes after CI passes.
 - **Modules:** `plugin/skills/` the method, one folder per skill; `plugin/hooks/` edit- and
@@ -155,15 +157,17 @@ not list stops before any edit and is raised with the user, whoever asked for it
   hook. Skills read project facts only from named `CLAUDE.md` sections. The installer never
   overwrites a project-owned file, and merges `.claude/settings.json` without removing
   anything. Hooks let the edit through (exit 0) when they cannot decide.
-- **Shared code:** `plugin/hooks/lib.sh` for the hooks (reading the tool call, and `read_fact` for
-  `project.conf`);
+- **Shared code:** `plugin/hooks/lib.sh` for the bash hooks (reading the tool call, and
+  `read_fact` for `project.conf`); `plugin/hooks/steps.mjs` for step events and decisions,
+  the docs classifier (`isDoc`) and its own `readFact` (ADR-0010);
   `plugin/reference/` for text several skills need;
   `plugin/skills/multi-session/templates/` for working-folder files (`spec` uses `spec.md`);
   `generate-records-index.mjs` exports the front-matter reader `lint-docs.mjs` uses;
   `plugin/evals/_fixture/` builds and installs eval repositories, and
   `plugin/evals/_graders/` holds the source copy of graders several cases share.
-- **Patterns:** hooks get the edited path with `tool_file_path` from `lib.sh`, and block with
-  exit 2 and a message on stderr. Per-repository hook settings live in `.claude/yotamake/*.conf`;
+- **Patterns:** bash hooks get the edited path with `tool_file_path` from `lib.sh`, and block
+  with exit 2 and a message on stderr. Session steps are events in `yotamake-events` in the
+  git dir, recorded and judged by `steps.mjs`; a new step rule goes in `steps.json`. Per-repository hook settings live in `.claude/yotamake/*.conf`;
   the project facts hooks read are in `project.conf`, a copy of `CLAUDE.md` lines (ADR-0008).
   Skills name the `CLAUDE.md` sections they read in bold and say what to do when one is
   missing or unfilled. A change to a project-owned template file gets an `upgrades.md` entry.

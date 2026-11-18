@@ -127,8 +127,8 @@
           <tr><td><code>pre-edit-main-branch</code></td><td>Blocks Edit and Write while the repository is on its main branch.</td></tr>
           <tr><td><code>pre-bash-git</code></td><td>Blocks <code>--no-verify</code>, and <code>git commit</code> on the main branch.</td></tr>
           <tr><td><code>post-edit-check</code></td><td>Runs a fast per-file check after each edit, from <code>post-edit-checks.conf</code>.</td></tr>
-          <tr><td><code>post-edit-mark</code></td><td>Notes that this session edited a code file. Docs do not count: the doc paths come from <code>project.conf</code>, else files under <code>docs/</code> and root Markdown other than <code>CLAUDE.md</code>.</td></tr>
-          <tr><td><code>stop-check-ran</code></td><td>Blocks the end of a turn once when code changed and <code>scripts/check</code> has not passed since. A run in which no check ran does not count as a pass. A second stop goes through, so Claude can still stop to ask a question.</td></tr>
+          <tr><td><code>post-edit-mark</code></td><td>Logs each edit for the step evaluator, and marks doc edits as docs: the doc paths come from <code>project.conf</code>, else files under <code>docs/</code> and root Markdown other than <code>CLAUDE.md</code>.</td></tr>
+          <tr><td><code>stop-check-ran</code></td><td>Blocks the end of a turn once when code changed and <code>scripts/check</code> has not passed since. The step evaluator decides, from the table in <code>steps.json</code>. A run in which no check ran does not count as a pass. A second stop goes through, so Claude can still stop to ask a question.</td></tr>
           <tr><td><code>session-upgrades</code></td><td>At session start, says when the repository's harness is older than the plugin.</td></tr>
         </tbody>
       </table>

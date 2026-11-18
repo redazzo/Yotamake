@@ -212,6 +212,120 @@ expect 0 stop-check-ran.sh "$(stop s1)"                   # an older scripts/che
 expect 0 stop-check-ran.sh "$(stop s1)" CLAUDE_PROJECT_DIR="$tmp/none"   # not a repository
 unset CLAUDE_PROJECT_DIR
 
+# --- steps.mjs: the step evaluator, fed event sequences (ADR-0010) ------------------
+# seq <name> <step>...: in a fresh repository on feat/x, with no events yet, run the steps
+# in order and check each decision. Session s1 throughout. Steps:
+#   edit[:path]         an Edit of path (default src/a.js)       rm:<path>  delete it by shell
+#   prompt | notify     a user prompt | a background agent's <task-notification> prompt
+#   review:<skill>      a Skill call                              typed:<skill>  a typed command
+#   check               scripts/check passes                      commit  commit everything
+#   msg:<text>          the commit message later decisions get    corrupt  a bad line in the log
+#   nobase              delete the main branch, so no merge base
+#   allow:<action>      the evaluator lets the action through
+#   refuse:<action>=<s> it names the missing steps <s> (a comma list)
+# A step ending in +agent comes from a subagent (agent_id set; A8).
+steps_mjs=$hooks/steps.mjs
+seq() {
+    local name=$1 r step agent extra out action want msg="" n=0 f; shift
+    r=$(mktemp -d "$tmp/seq.XXXX")
+    git init -q -b main "$r" && mkdir -p "$r/scripts"
+    printf 'touch "$(git rev-parse --git-path yotamake-check-passed)"\n' > "$r/scripts/check"
+    git -C "$r" add -A && git -C "$r" -c user.name=t -c user.email=t@t commit -q -m init
+    git -C "$r" switch -q -c feat/x
+    for step in "$@"; do
+        n=$((n + 1)) agent="" extra=""
+        [[ $step == *+agent ]] && { agent=a1; step=${step%+agent}; }
+        sj() { printf '{"session_id":"s1","cwd":"%s"%s%s}' "$r" \
+            "${agent:+,\"agent_id\":\"$agent\",\"agent_type\":\"general-purpose\"}" "$1"; }
+        case $step in
+            edit|edit:*) f=src/a.js; [[ $step == edit:* ]] && f=${step#edit:}
+                mkdir -p "$(dirname "$r/$f")" && echo "$n" >> "$r/$f"
+                sj ",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"$r/$f\"}" |
+                    bash "$hooks/post-edit-mark.sh" ;;
+            rm:*) rm "$r/${step#rm:}" ;;
+            prompt) sj ',"hook_event_name":"UserPromptSubmit","prompt":"go on"' | node "$steps_mjs" record prompt ;;
+            notify) sj ',"hook_event_name":"UserPromptSubmit","prompt":"<task-notification>done</task-notification>"' |
+                node "$steps_mjs" record prompt ;;
+            review:*) sj ",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"${step#review:}\"}" |
+                node "$steps_mjs" record review ;;
+            typed:*) sj ",\"hook_event_name\":\"UserPromptExpansion\",\"expansion_type\":\"slash_command\",\"command_name\":\"${step#typed:}\"" |
+                node "$steps_mjs" record review ;;
+            check) (cd "$r" && bash scripts/check) ;;
+            commit) git -C "$r" add -A && git -C "$r" -c user.name=t -c user.email=t@t commit -q -m "s$n" ;;
+            msg:*) msg=${step#msg:} ;;
+            corrupt) echo 'not json' >> "$(git -C "$r" rev-parse --absolute-git-dir)/yotamake-events" ;;
+            nobase) git -C "$r" branch -q -D main ;;
+            allow:*|refuse:*)
+                action=${step#*:} want=""
+                [[ $step == refuse:* ]] && { want=${action#*=}; action=${action%%=*}; }
+                out=$(sj ',"stop_hook_active":false' | node "$steps_mjs" decide "$action" --message "$msg")
+                [[ $? -eq 0 && "$(cut -f2 <<<"$out")" == "$want" && ( -n "$want" || -z "$out" ) ]] ||
+                    { echo "FAIL steps.mjs '$name' step $n ($step): got '$out'"; failed=1; } ;;
+            *) echo "FAIL seq '$name': unknown step $step"; failed=1 ;;
+        esac
+    done
+}
+seq "check after edit" edit refuse:commit=check,simplify,code-review refuse:stop=check \
+    check allow:stop refuse:commit=simplify,code-review review:simplify review:code-review allow:commit
+seq "edit after check" prompt edit review:simplify review:code-review check allow:commit \
+    edit refuse:commit=check refuse:stop=check check allow:stop allow:commit
+seq "fixes after the review count as reviewed" prompt edit review:simplify edit review:code-review edit \
+    check allow:commit
+seq "a new prompt then an edit needs a new review" prompt edit review:simplify review:code-review check \
+    prompt allow:commit edit check refuse:commit=simplify,code-review review:simplify typed:code-review allow:commit
+seq "a task notification is not a prompt" prompt edit review:simplify review:code-review notify edit check allow:commit
+seq "a commit resets the window" prompt edit review:simplify review:code-review check commit allow:commit \
+    edit check refuse:commit=simplify,code-review review:code-review review:simplify allow:commit
+seq "a review before the first edit does not count" prompt review:simplify review:code-review edit check \
+    refuse:commit=simplify,code-review
+seq "a plugin's x:simplify is another skill" prompt edit check review:x:simplify typed:x:code-review review:code-review \
+    refuse:commit=simplify
+seq "a docs edit needs the check, not the review" edit:docs/x.md edit:README.md allow:stop refuse:commit=check \
+    check allow:commit
+seq "a docs-only branch needs no review" prompt edit:docs/x.md edit check refuse:commit=simplify,code-review \
+    rm:src/a.js allow:commit
+seq "a Review-skipped trailer waives the review, not the check" prompt edit check refuse:commit=simplify,code-review \
+    'msg:chore(release): bump
+
+Review-skipped: release bump' allow:commit edit refuse:commit=check 'msg:x Review-skipped: no' \
+    refuse:commit=check,simplify,code-review 'msg:Review-skipped:' check refuse:commit=simplify,code-review
+seq "a subagent's edit and review count for the worktree" prompt edit+agent refuse:stop=check \
+    review:simplify+agent review:code-review check allow:stop allow:commit
+seq "no events: nothing to decide" allow:commit allow:stop
+seq "an unreadable log lets everything through" edit corrupt allow:commit allow:stop
+seq "no merge base lets the commit through" prompt edit check nobase allow:commit
+# Unreadable input: record and decide print nothing, exit 0 and write no log.
+s=$(mktemp -d "$tmp/seq.XXXX") && git init -q "$s" && mkdir "$s/scripts" &&
+    printf 'yotamake-check-passed\n' > "$s/scripts/check"
+for args in "record edit" "record review" "record prompt" "decide stop" "decide commit" "decide nothing" "nothing"; do
+    out=$(cd "$s" && printf 'not json' | node "$steps_mjs" $args 2>&1); st=$?
+    [[ $st -eq 0 && -z "$out" ]] || { echo "FAIL steps.mjs $args on bad input: status $st, output '$out'"; failed=1; }
+done
+[[ -e "$s/.git/yotamake-events" ]] && { echo "FAIL steps.mjs wrote events from bad input"; failed=1; }
+out=$(cd "$s" && printf '{"session_id":"s1","prompt":"x"}' | node "$steps_mjs" record prompt && cat .git/yotamake-events)
+grep -q '"event":"prompt"' <<<"$out" || { echo "FAIL steps.mjs record prompt without cwd: '$out'"; failed=1; }
+# The docs classifier: the default rule and project.conf globs.
+out=$(STEPS_MJS=$steps_mjs node --input-type=module -e '
+const { isDoc } = await import("file://" + process.env.STEPS_MJS);
+const g = ["guides/*", "*.md", "!AGENTS.md", "src/[ab].txt"];
+console.log([isDoc("docs/a/b.md"), isDoc("README.md"), isDoc("CLAUDE.md"), isDoc("sub/README.md"), isDoc("docs.md/x.js"),
+    isDoc("guides/x/y.js", g), isDoc("AGENTS.md", g), isDoc("src/b.txt", g), isDoc("src/c.txt", g), isDoc("x.md.js", g)].join(" "));
+' </dev/null)
+[[ $out == "true true false false false true false true false false" ]] ||
+    { echo "FAIL steps.mjs isDoc: '$out'"; failed=1; }
+# readFact in steps.mjs and read_fact in lib.sh read project.conf the same way (ADR-0008).
+f=$(mktemp -d "$tmp/facts.XXXX") && mkdir -p "$f/.claude/yotamake"
+printf 'docs guides/*  # a comment\ndocs *.md\nmain-branch trunk\ndocs too many words\n#docs hidden\n  docs   !AGENTS.md\n' \
+    > "$f/.claude/yotamake/project.conf"
+for k in docs main-branch absent; do
+    want=$(bash -c '. "$1/lib.sh"; read_fact "$2" "$3"' _ "$hooks" "$f" "$k" | paste -sd ' ' -)
+    got=$(STEPS_MJS=$steps_mjs node --input-type=module -e '
+const { readFact } = await import("file://" + process.env.STEPS_MJS);
+console.log((readFact(process.argv[1], process.argv[2]) ?? []).join(" "));
+' "$f" "$k" </dev/null)
+    [[ "$got" == "$want" ]] || { echo "FAIL readFact '$k': steps.mjs '$got', lib.sh '$want'"; failed=1; }
+done
+
 # --- set-hooks-path.sh: the template's SessionStart hook (ADR-0004) -------------
 shp="$hooks/../template/.claude/yotamake/set-hooks-path.sh"
 # hp_case <name> <want: set|unset|keep> <want output: notice|none> [setup commands...]
@@ -411,7 +525,7 @@ for (const m of miss) console.log("FAIL hooks.json: " + m[1] + " not registered 
 process.exit(miss.length ? 1 : 0);' "$hooks/hooks.json" || failed=1
 
 # --- Every hook lets the edit through when it cannot read the tool call ---------
-for hook in pre-edit-protect.sh pre-edit-main-branch.sh pre-bash-git.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do
+for hook in pre-edit-protect.sh pre-edit-main-branch.sh pre-bash-git.sh post-edit-check.sh post-edit-mark.sh stop-check-ran.sh; do  # steps.mjs: above
     echo 'not json' | bash "$hooks/$hook" >/dev/null 2>&1 ||
         { echo "FAIL $hook: unreadable input should exit 0"; failed=1; }
 done
