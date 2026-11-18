@@ -155,25 +155,18 @@ cutting anything.
 
 ## Enforce the session steps in order with hooks
 
-**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Priority: Low** · **Category:** Hooks · **Status:** Ready ·
 **Next review date:** 2027-02-18 · **Added:** 2026-11-16 · **Trigger to act:** a session skips or reorders a
 step that a hook could have caught, or a change must add wording to a `SKILL.md` at the
 250-line limit.
 
-Past misses were fixed by adding wording to skills, which makes the next miss more likely
-(`scripts/check` now caps a `SKILL.md` at 250 lines). Hooks could
-enforce the order instead. A per-session state file would hold the session's step (branched,
-edited, checked, reviewed, reported), and hooks would refuse a step that comes too early: for
-example, the commit stop would refuse while no review has run since the last edit.
-`stop-check-ran.sh` already does this for one step, the check. It needs an ADR first, since it
-adds per-session state and builds on the proposed
-[ADR-0006](./decisions/0006-commit-stop-by-project-hook.md). That ADR must also square
-refusing a step with the Boundary that hooks let the edit through when they cannot decide,
-as ADR-0006 does under "Failing open". Open question: how a hook can tell
-that `/simplify` and `/code-review` ran, from what it sees. Find that out before the ADR.
-
-Review of 2026-11-16: do this after the facts file, so the hooks have facts they can rely
-on. That is now built ([ADR-0008](./decisions/0008-facts-hooks-read-in-project-conf.md)).
+Work started on 2026-11-18, on branch `feat/commit-gate`. The design is
+[ADR-0010](./decisions/0010-commit-gate-by-step-table.md) (Proposed): a plugin hook refuses
+`git commit` until the check has passed since the last code edit and both review skills ran
+in the review window, read from one step table by one evaluator over a per-worktree events
+log. It stays inside the Boundary and does not need
+[ADR-0006](./decisions/0006-commit-stop-by-project-hook.md). Delete this entry when the
+gate lands.
 
 ## Gaps left in the git and protected-paths guards
 
