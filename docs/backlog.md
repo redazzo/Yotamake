@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-17
+updated: 2026-11-18
 owns: [open-work-register]
 ---
 
@@ -75,6 +75,10 @@ runs per case and on two models, and write a record with Δ and mean cost per ca
 arms. This is the first run for "Keep eval results over time" and "Re-check two fixes on the
 next full eval run".
 
+Comparison of 2026-11-18 (Yotamake against Superpowers, Spec Kit, BMAD and others): of
+those, only Yotamake has an eval suite comparing runs with and without it, so Δ is the
+claim the others cannot make. Until it is published, that strength is still a plan.
+
 ## LLM judges fail case 23 on text that meets them
 
 **Priority: Medium** · **Added:** 2026-11-15 · **Trigger to act:** case 23 scores below 1.00 on
@@ -135,6 +139,11 @@ Review of 2026-11-16: a one-line code fix runs the check, `/simplify`, `/code-re
 design-read agent and two or three permission prompts. A middle tier to try first: a small
 diff inside one module runs the check and `/code-review` only. Take the threshold from the
 cost numbers, not from a guess.
+
+Comparison of 2026-11-18: lighter harnesses such as Superpowers load a skill only when the
+task needs it, so a small fix costs little. Here every code change pays for the full
+session. This is the main cost of the harness's strength (enforcement), so measure it before
+cutting anything.
 
 ## Enforce the session steps in order with hooks
 
@@ -201,6 +210,10 @@ protected-paths and edit-marking hooks. `pre-bash-git.sh` already parses command
 quote-aware reader; a sibling hook could refuse redirections and in-place edits aimed at
 protected paths or made on the main branch. It must still let a command through when it
 cannot read it (Architecture, Boundaries). See also "Two gaps left in the `Stop` gate".
+
+Comparison of 2026-11-18: blocking hooks are what set this harness apart from the
+prompt-only ones, so this gap weakens its main claim. It may deserve a higher priority once
+the eval work above is done.
 
 ## Two gaps left in the `Stop` gate
 
@@ -362,6 +375,19 @@ Skills hand work to Claude Code's built-in agents, with the brief in the skill t
 (`multi-session` S0). Shipping definitions in `plugin/agents/` would let skills share a
 brief, but it changes the Architecture Style line.
 
+## A tasks step in `spec`
+
+**Priority: Low** · **Added:** 2026-11-18 · **Trigger to act:** a session built from a spec
+misses one of the spec's acceptance criteria, or a user asks for a task list before code.
+
+From the comparison of 2026-11-18. GitHub Spec Kit goes spec → plan → tasks: an ordered list
+of small tasks, each one checkable. Yotamake's `spec` writes scope and numbered acceptance
+criteria, then hands over straight to a session. An optional last step could list the
+ordered tasks, each naming the criterion (A1, A2, …) it meets, so the session works down the
+list and the report ticks them off. Keep it out of `multi-session`, whose `plan.md` already
+splits work into sessions, and keep it short ("Keep skills short"). `spec` and case 12 cover
+it.
+
 ## A quickstart guide
 
 **Priority: Low** · **Added:** 2026-11-10 · **Trigger to act:** a new user asks how to start,
@@ -398,6 +424,10 @@ points at `CLAUDE.md`, so other agents and people follow the same facts. Skills 
 `CLAUDE.md` sections. The skills, hooks and `ask` rules work only in Claude Code, so other
 agents would get the facts and `scripts/check` but none of the enforcement (review of
 2026-11-14).
+
+Comparison of 2026-11-18: Spec Kit and BMAD run on several agents; Yotamake runs only on
+Claude Code. That is its main limit on reach, and the reason a team with mixed tools would
+pick something else.
 
 ## A dedicated architecture design skill
 
