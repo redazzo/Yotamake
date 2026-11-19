@@ -28,6 +28,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const LOG = 'yotamake-events';
 const STAMP = 'yotamake-check-passed';
+// Prompts Claude Code sends that are not the user's: a background agent finishing, and a
+// subagent handing back its report.
+const MACHINE_PROMPTS = ['<task-notification>', '<agent-message '];
 // The default Docs-only rule (CLAUDE.md, Branching and releases).
 const DEFAULT_DOCS = ['docs/*', '*.md', '!CLAUDE.md'];
 // Past this size the log keeps only its newer half.
@@ -195,8 +198,10 @@ export function record(kind, input) {
     if (typeof skill !== 'string' || !reviewSkills(loadTable()).has(skill)) return;
     extra = { skill };
   } else if (kind === 'prompt') {
-    // A background agent finishing sends a prompt too; it is not the user's.
-    if (typeof input.prompt === 'string' && input.prompt.trimStart().startsWith('<task-notification>')) return;
+    // A background agent finishing, or handing back its report, sends a prompt too; it is
+    // not the user's. record-event.sh mirrors these prefixes.
+    const p = typeof input.prompt === 'string' ? input.prompt.trimStart() : '';
+    if (MACHINE_PROMPTS.some((m) => p.startsWith(m))) return;
     extra = {};
   } else return;
   const tree = hookTree(input);

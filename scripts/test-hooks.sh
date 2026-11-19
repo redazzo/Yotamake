@@ -218,6 +218,7 @@ unset CLAUDE_PROJECT_DIR
 # in order and check each decision. Session s1 throughout. Steps:
 #   edit[:path]         an Edit of path (default src/a.js)       rm:<path>  delete it by shell
 #   prompt | notify     a user prompt | a background agent's <task-notification> prompt
+#   handback            a subagent's <agent-message> hand-back prompt
 #   review:<skill>      a Skill call                              typed:<skill>  a typed command
 #   check               scripts/check passes                      commit  commit everything
 #   msg:<text>          the commit message later decisions get    corrupt  a bad line in the log
@@ -247,6 +248,8 @@ seq() {
             prompt) sj ',"hook_event_name":"UserPromptSubmit","prompt":"go on"' | bash "$hooks/record-event.sh" prompt ;;
             notify) sj ',"hook_event_name":"UserPromptSubmit","prompt":"<task-notification>done</task-notification>"' |
                 bash "$hooks/record-event.sh" prompt ;;
+            handback) sj ',"hook_event_name":"UserPromptSubmit","prompt":"<agent-message from=\"a1\">\n[Subagent hand-back] done\n</agent-message>"' |
+                bash "$hooks/record-event.sh" prompt ;;
             review:*) sj ",\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"${step#review:}\"}" |
                 bash "$hooks/record-event.sh" review ;;
             typed:*) sj ",\"hook_event_name\":\"UserPromptExpansion\",\"expansion_type\":\"slash_command\",\"command_name\":\"${step#typed:}\"" |
@@ -275,6 +278,7 @@ seq "fixes after the review count as reviewed" prompt edit review:simplify edit 
 seq "a new prompt then an edit needs a new review" prompt edit review:simplify review:code-review check \
     prompt allow:commit edit check refuse:commit=simplify,code-review review:simplify typed:code-review allow:commit
 seq "a task notification is not a prompt" prompt edit review:simplify review:code-review notify edit check allow:commit
+seq "a subagent hand-back is not a prompt" prompt edit review:simplify review:code-review handback edit check allow:commit
 seq "a commit resets the window" prompt edit review:simplify review:code-review check commit allow:commit \
     edit check refuse:commit=simplify,code-review review:code-review review:simplify allow:commit
 seq "a review before the first edit does not count" prompt review:simplify review:code-review edit check \
