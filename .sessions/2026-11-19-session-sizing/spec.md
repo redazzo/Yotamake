@@ -1,6 +1,6 @@
 # Spec — Session sizing by review, revert and decisions
 
-Agreed <yyyy-mm-dd, on approval>. What must be true when this work is done. One page at most.
+Agreed 2026-11-19. What must be true when this work is done. One page at most.
 
 ## Problem
 

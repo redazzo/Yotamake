@@ -32,9 +32,9 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 
 ---
 
-## S0 — Analysis and planning — `in progress`
+## S0 — Analysis and planning — `done`
 
-## S1 — ADR for the session definition (F1, F14; A1, A5) — `todo`
+## S1 — ADR for the session definition (F1, F14; A1, A5) — `in progress`
 
 Branch: the assigned branch.
 Needs: none

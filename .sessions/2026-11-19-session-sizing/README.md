@@ -7,9 +7,10 @@ add a stop partway through when a session outgrows the limit.
 
 **Setup:** Committed: this folder is committed; all sessions are commits on branch
 `ccr-670642ff-1n2a64` (assigned by the cloud environment). Push after each session.
+Autopilot: on (2026-11-19), mother branch `ccr-670642ff-1n2a64`.
 It carries the work across context clears. Workflow: the `multi-session` skill.
 
-The user resumes with: **"Read .sessions/2026-11-19-session-sizing/README.md and start the next session."**
+The user resumes with: **"Read .sessions/2026-11-19-session-sizing/README.md and continue autopilot."**
 
 ## Files
 
