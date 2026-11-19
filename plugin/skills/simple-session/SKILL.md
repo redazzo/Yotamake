@@ -81,8 +81,8 @@ things the code or CLAUDE.md already answer.
 
 Look for a spec from `/yotamake:spec`: a `spec-*.md` file in `.scratchpad/` or `.sessions/`.
 If one matches this change, read it now; its acceptance criteria (A1, A2, …) are what done
-means. If more than one might match, ask which. If you offer `multi-session`, say that the
-spec moves into its folder.
+means, and you work down its **Tasks**, if any. If more than one might match, ask which. If
+you offer `multi-session`, say that the spec moves into its folder.
 
 ## 2. Branch
 
@@ -229,8 +229,8 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
   nothing existing fit (or "nothing new");
 - which docs you updated, or why none needed it;
 - unless trivial, step 1's estimate beside the real diff size (files and changed lines);
-- with a spec: each criterion and how it was checked (test name or manual step), and
-  whether to delete the spec file once this is merged;
+- with a spec: each criterion and how it was checked (its test, command or manual step), each
+  task ticked off, and whether to delete the spec file once this is merged;
 - with `Test-first: yes`, the test you saw fail before the change;
 - for a bug fix, what `debugging`, "Report", asks for;
 - the check results (one line each);

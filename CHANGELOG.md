@@ -6,6 +6,12 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## 0.39.0 — 2026-11-20
+
+- `spec`: each acceptance criterion names a check that fails until it is met. An optional
+  ordered **Tasks** list follows, which `simple-session` works down and `multi-session` moves
+  into `plan.md`.
+
 ## 0.38.0 — 2026-11-19
 
 - `CLAUDE.md` gains a `**Session size:**` line in **Branching and releases**: the largest diff

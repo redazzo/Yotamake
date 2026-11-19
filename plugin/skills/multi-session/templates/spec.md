@@ -16,11 +16,12 @@ Agreed <yyyy-mm-dd>. What must be true when this work is done. One page at most.
 
 ## Acceptance criteria
 
-Each one can be checked by a test or by one manual step. Plan tasks, tests and the report
-cite the IDs.
+Tasks, tests and the report cite the IDs.
 
-- **A1** — When <trigger or state>, <the system> <does what>.
-- **A2** — If <bad input or failure>, <the system> <does what>.
+- **A1** — When <trigger or state>, <the system> <does what>. _Check:_ <test or command>.
+  <!-- If the check reads a value: _Now:_ <the value before the change>. -->
+- **A2** — If <bad input or failure>, <the system> <does what>. _Check:_ <test or command,
+  or one manual step and why no command can see it>.
 
 ## Terms
 

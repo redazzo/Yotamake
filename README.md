@@ -336,8 +336,9 @@ are numbered: S0 analyses the work and writes the plan, and the work starts at S
 
 **Specs.** For a new feature, or a change where "done" is unclear, run `/yotamake:spec`
 first ([`spec`](./plugin/skills/spec/SKILL.md)). It agrees the scope and numbered acceptance
-criteria in one short file before any code, then hands over to a session. Fixes, renames and
-refactors skip it.
+criteria in one short file before any code. Each criterion names a check that fails until it
+is met, and an ordered task list is optional. Then it hands over to a session. Fixes, renames
+and refactors skip it.
 
 **Architecture review.** The checks above ask whether a change fits the design. To ask
 whether the design itself is good, run `/yotamake:improve-architecture`

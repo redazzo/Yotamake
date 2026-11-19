@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-19
+updated: 2026-11-20
 owns: [open-work-register]
 ---
 
@@ -234,9 +234,16 @@ Found in the session sizing rework, in a cloud session whose environment adds a 
 push" stop hook. The commit gate's review window starts at the last user prompt before the
 last code edit (ADR-0010, item 5). After `/simplify` ran, the main conversation's turn ended
 while background reviewers were running; that stop hook and a task notification came in;
-the fixes made afterwards then needed `/simplify` again. The cause is not confirmed: only
-`UserPromptSubmit` records a `prompt` event (`plugin/hooks/hooks.json`), so first check what
-these messages write to `yotamake-events`. Running reviewers in the foreground avoided it.
+the fixes made afterwards then needed `/simplify` again. The cause: `UserPromptSubmit`
+records a `prompt` event (`plugin/hooks/hooks.json`) for each background subagent's hand-back
+message too, not only for the user's own messages. Running reviewers in the foreground
+avoided it.
+
+Seen again on 2026-11-20 (the `spec` checks-and-tasks branch), locally: five hand-backs
+wrote five `prompt` events to `yotamake-events`. A one-word fix after the design
+read's hand-back restarted the window, and the commit gate asked for `/simplify` and
+`/code-review` again. A fix could record `prompt` only for the user's own messages, or
+leave out prompts that carry a subagent hand-back.
 
 ## Two clashes `scripts/check` misses after a merge
 
@@ -430,20 +437,6 @@ Skills hand work to Claude Code's built-in agents, with the brief in the skill t
 (`multi-session` S0). Shipping definitions in `plugin/agents/` would let skills share a
 brief, but it changes the Architecture Style line.
 
-## A tasks step in `spec`
-
-**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
-**Next review date:** 2027-02-18 · **Added:** 2026-11-18 · **Trigger to act:** a session built from a spec
-misses one of the spec's acceptance criteria, or a user asks for a task list before code.
-
-From the comparison of 2026-11-18. GitHub Spec Kit goes spec → plan → tasks: an ordered list
-of small tasks, each one checkable. Yotamake's `spec` writes scope and numbered acceptance
-criteria, then hands over straight to a session. An optional last step could list the
-ordered tasks, each naming the criterion (A1, A2, …) it meets, so the session works down the
-list and the report ticks them off. Keep it out of `multi-session`, whose `plan.md` already
-splits work into sessions, and keep it short (`scripts/check` notes a `SKILL.md` past 250
-lines and fails one past 300). `spec` and case 12 cover it.
-
 ## A feature folder with a feedback log
 
 **Priority: Low** · **Category:** Skills · **Status:** Waiting ·
@@ -581,10 +574,6 @@ take in our own plain words.
   pstack's `reflect` questions: will it still be true in six months, would it change what a
   future agent does, and could a check enforce it instead of text. Skip its four-agent
   transcript review. Trigger: close-out entries keep repeating the same lessons.
-- **State "done" as a test that can fail.** In `spec` and the first session of a
-  `multi-session` effort, write the done condition so a command can fail it, and capture the
-  value before the change, so the check reads old against new. From `figure-it-out`.
-  Trigger: a spec's criteria turn out untestable.
 - **Eval fixture leaks.** What is still open: the sandbox path `/tmp/claude-eval-*` that the
   agent can see (outside our control); the author and branch literals repeated in each
   `scaffold.sh` (one shared `_fixture/env.sh` would hold them); and case 15's

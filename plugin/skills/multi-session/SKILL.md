@@ -72,7 +72,8 @@ session, offer to resume that effort instead of starting a new one.
    `spec.md` only when the effort builds a new feature or changes behaviour users see; a
    review, a migration or a refactor leaves it out. If the user already wrote one with
    `/yotamake:spec` (a `spec-*.md` file in `.scratchpad/` or `.sessions/`), move it into the
-   folder as `spec.md` instead, and move its open questions into `decisions.md`. Always copy
+   folder as `spec.md` instead, move its open questions into `decisions.md`, and move its
+   **Tasks**, if any, into `plan.md`. Always copy
    `docs.md`, the docs ledger (see the rules below); it starts with no rows. Leave out
    `report.md`: only autopilot uses it, at the end.
 2. Do the analysis once, in the first session, S0. It plans the work and changes no code;
