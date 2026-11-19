@@ -532,15 +532,17 @@ evidence and weak at enforcement, the opposite of this harness. The review read 
 dozen of its skills; none of its text was run here. pstack is MIT-licensed. Rewrite what we
 take in our own plain words.
 
-- **A rule table with its enforcer.** Keep a table in `CLAUDE.md` pairing each rule with
-  what enforces it (hook, check, type, or nothing). A rule with no enforcer is a repeat
-  waiting to happen. Trigger: a Claude mistake is corrected twice, or a new step goes into
-  the commit gate's `steps.json` (ADR-0010). From pstack's `correct`.
+- **Keep the rule table in step.** `docs/reference/rules-and-enforcers.md` (added
+  2026-11-20) is kept current by text alone, and says so in its own row. `scripts/consistency.mjs`
+  could print a note when a branch changes `CLAUDE.md` or `plugin/hooks/steps.json` but not
+  the table, like its site-pages note, and fail when a `Check (name)` cell names no check.
+  Found by the review of that branch. Trigger: the table is found wrong in use, or a check
+  is renamed.
 - **A `/yotamake:correct` skill for target repos.** Find the mistakes agents keep making
   there, fix each at the highest level that works (design, then types, then a lint whose
   error names the fix, then a test, then docs), and prove each new check fails on a real
-  past mistake. Trigger: the rule table above proves useful, or a user asks. Needs its own
-  `multi-session` effort.
+  past mistake. Trigger: the rule table (`reference/rules-and-enforcers.md`) proves
+  useful, or a user asks. Needs its own `multi-session` effort.
 - **Label claims in the report.** Mark each claim in a session report as measured, inferred
   or guess, and never hand the user a check Claude could run itself. Proof by running a
   command for each review finding is too costly for every session; offer it as an opt-in

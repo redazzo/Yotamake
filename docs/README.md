@@ -43,6 +43,7 @@ Yotamake" section says how it is published and kept in step.
 | Document | Owns |
 |---|---|
 | [reference/glossary.md](./reference/glossary.md) | Domain language: the harness's own words and what each means |
+| [reference/rules-and-enforcers.md](./reference/rules-and-enforcers.md) | Each rule in `CLAUDE.md` and what enforces it |
 | [CHANGELOG.md](../CHANGELOG.md) | Release history: what changed in each version |
 
 ## Guides

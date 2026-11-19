@@ -120,6 +120,9 @@ must be raised and confirmed first.
 to it rather than restate it. `README.md` owns the overview of the harness. Each skill's
 `SKILL.md` owns its own rules, and the README links to it rather than restating them.
 
+**Rules and enforcers.** [docs/reference/rules-and-enforcers.md](./docs/reference/rules-and-enforcers.md)
+pairs each rule here with what enforces it; a new or changed rule updates its row.
+
 **Site pages.** `site/` owns nothing, but it sums up the harness: a skill's purpose, the
 session flow, the hooks, the install steps. A branch that changes one of these updates the
 page that sums it up. When `scripts/check` names site pages, read each one, and say in the
