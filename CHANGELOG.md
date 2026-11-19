@@ -6,6 +6,11 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## 0.39.1 — 2026-11-20
+
+- The commit gate no longer counts a subagent's hand-back message as a user prompt, so a
+  fix made after a background reviewer reports no longer asks for the review again.
+
 ## 0.39.0 — 2026-11-20
 
 - `spec`: each acceptance criterion names a check that fails until it is met. An optional

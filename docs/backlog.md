@@ -224,27 +224,6 @@ of this one, still gets past the gate. Closing it would need a per-session list 
 roots kept outside any one repository. A second gap it found, two sessions editing one tree,
 closed with the events log (ADR-0010): each event names its session.
 
-## The review window restarted during a cloud autopilot run
-
-**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
-**Next review date:** 2027-02-19 · **Added:** 2026-11-19 · **Trigger to act:** the commit gate again asks
-for a second review when no user prompt came after the review.
-
-Found in the session sizing rework, in a cloud session whose environment adds a "commit and
-push" stop hook. The commit gate's review window starts at the last user prompt before the
-last code edit (ADR-0010, item 5). After `/simplify` ran, the main conversation's turn ended
-while background reviewers were running; that stop hook and a task notification came in;
-the fixes made afterwards then needed `/simplify` again. The cause: `UserPromptSubmit`
-records a `prompt` event (`plugin/hooks/hooks.json`) for each background subagent's hand-back
-message too, not only for the user's own messages. Running reviewers in the foreground
-avoided it.
-
-Seen again on 2026-11-20 (the `spec` checks-and-tasks branch), locally: five hand-backs
-wrote five `prompt` events to `yotamake-events`. A one-word fix after the design
-read's hand-back restarted the window, and the commit gate asked for `/simplify` and
-`/code-review` again. A fix could record `prompt` only for the user's own messages, or
-leave out prompts that carry a subagent hand-back.
-
 ## Two clashes `scripts/check` misses after a merge
 
 **Priority: Low** · **Category:** Tooling · **Status:** Waiting ·

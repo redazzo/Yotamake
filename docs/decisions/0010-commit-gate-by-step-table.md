@@ -6,7 +6,7 @@ status: current
 
 # ADR-0010: A plugin hook refuses `git commit` until the check and the review are done, by one step table
 
-- **Status:** Accepted (2026-11-18)
+- **Status:** Accepted (2026-11-18), amended 2026-11-20
 - **Date:** 2026-11-18
 - **Work record:** [Commit gate on session steps](../records/2026/2026-11-18-commit-gate.md)
 - **Amends:** [ADR-0008](./0008-facts-hooks-read-in-project-conf.md), item 4 ("Readers"):
@@ -181,3 +181,18 @@ needs no exception.
 - `plugin/reference/integrate.md` (the release bump commit)
 - `plugin/skills/simple-session/SKILL.md`, step 6
 - The backlog entry "Enforce the session steps in order with hooks", which this work closed
+
+## Amendment (2026-11-20): a subagent's hand-back is not a prompt
+
+Item 4's `prompt` source skipped only prompts that start with `<task-notification>`. A
+subagent's report also reaches the main conversation as a prompt, starting
+`<agent-message from="…">`, and `UserPromptSubmit` fires for it with no field that says it
+is not the user's. Each hand-back then restarted the review window (item 5), so a fix made
+after a reviewer reported needed the review again. Item 4 now reads: `UserPromptSubmit`,
+skipping prompts that start with `<task-notification>` or `<agent-message `. The list lives
+in `MACHINE_PROMPTS` in `steps.mjs`; `record-event.sh` mirrors it. A prompt of a kind not
+yet listed still counts as the user's, so a gap costs an extra review, never a missed one.
+If the list keeps growing, the general route is the transcript: each entry there has an
+`origin.kind` (`human`, `task-notification`, `peer`) and the `prompt_id` the hook gets. It
+was not taken because that format is undocumented, may not be written yet when the hook
+fires, and would mean reading a file on every prompt.
