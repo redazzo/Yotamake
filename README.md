@@ -409,6 +409,7 @@ once. After that the linter fails on new problems, and on fixed ones still liste
 | 21-debugging | `simple-session`, `debugging` | for a crash that shows in one helper but starts in another, writes a failing test first, fixes the helper that makes the bad value rather than guarding where it throws, names the root cause, asks before committing |
 | 22-multi-session-autopilot-offer | `multi-session` | ends S0 by saying approval starts autopilot and how to turn it off, lists the open decisions with their recommendations, gives the resume line, and starts no session before the approval |
 | 23-improve-architecture | `improve-architecture` | proposes deleting or merging a pass-through module and rates it, notes the Modules line does not list it, edits nothing, names a top pick and asks which to take on |
+| 24-should-fit | `simple-session`, `multi-session` | for a schema column plus the code that uses it (too big under the old fixed tests), states a size estimate and does it as one session without offering `multi-session`; runs `scripts/check`, does not commit |
 
 **Skills** lists every skill whose text a case exercises. On a branch that changes the
 plugin, `scripts/check` uses it to name the cases worth running: those that list a changed

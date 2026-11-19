@@ -80,3 +80,22 @@
 - Checks: all PASS. Size: about 6 files, +45/−20 (no estimate written first).
 - Surprising: a quoted step name split across blockquote lines fails `consistency`.
 - Next: S5.
+
+## 2026-11-19 — S5: eval case for a change that should fit (autopilot)
+
+- New case `plugin/evals/24-should-fit/`: a nullable `nickname` column plus the `greetUser`
+  code and doc that use it (the old "schema and code" test called this too big). Graders:
+  skill fired, never calls multi-session, runs as one session (LLM, own replies only), states
+  an estimate (LLM), schema, code and doc updated (LLM), plus the three shared graders. README
+  row. Case 03 unchanged: it still trips "separate changes that could each ship".
+- Review. `/simplify`: narrowed the LLM grader so it does not double the free skill check.
+  Skipped: dropping the "old tests" note (it says why the case exists); `sed` for the node
+  edit (in-place `sed` differs between Linux and macOS). `/code-review`: the signal "parts
+  that could ship on their own" could fairly fire on a column plus its code, so it now reads
+  "bundles separate changes that could each ship, and be reviewed, alone" in the skill,
+  ADR-0011 (still Proposed) and the spec; the prompt says nothing is deployed; the grader
+  judges only the assistant's replies; the test requirement is out and a doc update is in;
+  the scaffold commits with the gate on. Design read: no conflicts.
+- Checks: all PASS; scaffold run by hand. Estimate about 11 files, +80; real 13 files, +115.
+- Evals to run if wanted (cost money): 03-too-big, 24-should-fit.
+- Next: S6.

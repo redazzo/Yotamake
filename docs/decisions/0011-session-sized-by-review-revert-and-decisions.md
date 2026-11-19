@@ -69,7 +69,7 @@ judgment against a rough estimate, not a measurement.
    it is too big, but fitting does not make it small enough.
 2. **Signals, not fixed tests.** A change is too big for one session when any of these hold:
    - its estimated diff is over the project's limit;
-   - it has parts that could ship on their own;
+   - it bundles separate changes that could each ship, and be reviewed, alone;
    - a decision can only be made after part of the work is done;
    - it will span days, people or container resets;
    - it has a step that cannot be undone.

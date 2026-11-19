@@ -36,6 +36,8 @@ does it), `none` (checked; no doc needs it, and why).
 | S4 | Pointers to "Check the size" (`harness-upgrades.md`, `spec`, `improve-architecture`) still read true | — | none |
 | S4 | ADR-0007's pause on "cannot finish within its plan" now has named triggers and a split path; ADR-0011 already says so ("Builds on") | `docs/decisions/0011-…` | none |
 | S4 | README skill tree still says `multi-session` is "work across several contexts" (`README.md:129`) | `README.md` | open (S6) |
+| S5 | New eval case 24-should-fit: a schema column plus the code that uses it runs as one session, with an estimate | `README.md` (Evals table) | done |
+| S5 | Case 03 still trips the new signals (separately shippable API, CLI and database); its graders quote no old test | `plugin/evals/03-too-big/` | none |
 
 ## Renames and removals
 

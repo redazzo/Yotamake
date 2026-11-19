@@ -33,8 +33,8 @@ what can be reverted on its own, and where the user must decide.
   and reverted on its own, with its decisions settled before it starts, and names "fits in one
   context" as a backstop. The glossary, `multi-session`, its `plan.md` template, and the three
   `CLAUDE.md` copies (repository, template, eval fixture) use the same wording.
-- **A2** — "Check the size" lists these signals: estimated diff over the limit; parts that
-  could ship on their own; a decision that can only be made after part of the work; work that
+- **A2** — "Check the size" lists these signals: estimated diff over the limit; separate changes that
+  could each ship, and be reviewed, alone; a decision that can only be made after part of the work; work that
   will span days, people or container resets; a step that cannot be undone. It no longer
   calls a change too big only because it touches a schema and code, adds more than one
   interface, or touches more than one package.

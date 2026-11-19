@@ -117,7 +117,7 @@ User involvement: approve the commit.
 
 ✂ **Clear context.**
 
-## S5 — Eval case for a change that should fit (F13; A8) — `todo`
+## S5 — Eval case for a change that should fit (F13; A8) — `done`
 
 Branch: the assigned branch.
 Needs: S3
