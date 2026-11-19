@@ -6,7 +6,7 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
-## Unreleased
+## 0.38.0 — 2026-11-19
 
 - `CLAUDE.md` gains a `**Session size:**` line in **Branching and releases**: the largest diff
   one session takes (default about 400 changed lines or 15 files). "How to work here" now
