@@ -9,7 +9,7 @@ status: current
 - **Status:** Proposed. Written in effort "Session sizing" for the user to accept when the
   effort ends.
 - **Date:** 2026-11-19
-- **Work record:** none yet (effort "Session sizing")
+- **Work record:** [Session sizing by review, revert and decisions](../records/2026/2026-11-19-session-sizing.md)
 - **Builds on:** [ADR-0002](./0002-project-facts-in-named-claude-md-sections.md), for the
   limit as a fact in a named `CLAUDE.md` line;
   [ADR-0007](./0007-autopilot-runs-sessions-in-subagents.md), whose pause on "a session that

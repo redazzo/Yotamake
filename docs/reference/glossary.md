@@ -43,7 +43,7 @@ where the thing is that file or folder.
 ## Working
 
 - **Session:** one change on one branch with one merge, small enough to review as one diff
-  and revert on its own. Every change to code, tests or docs runs as one.
+  and revert on its own, with its decisions settled first. Every change to code, tests or docs runs as one.
   `simple-session`, "Check the size", owns the rule. _Avoid:_ task, job.
 - **Multi-session effort:** work too big for one session, run as numbered sessions that share
   a working folder. _Avoid:_ project, epic.

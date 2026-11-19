@@ -114,3 +114,11 @@
   must be accepted before merge.
 - Checks: all PASS. Estimate about 7 files, +70/−40; real about 7 files, +70/−25.
 - Next: close-out.
+
+## 2026-11-19 — Close-out (autopilot)
+
+- Work record `docs/records/2026/2026-11-19-session-sizing.md`, records index, ADR-0011 links
+  it (still Proposed); glossary wording matched to A1. Old-wording sweep found nothing stale.
+  Ledger: all rows done or none, except ADR-0011 acceptance (open, for the user).
+- A1–A6, A8 (written, not run), A9 met; A7 partly (general pause trigger kept).
+- Checks: all PASS. Review skipped: docs only. `report.md` written.

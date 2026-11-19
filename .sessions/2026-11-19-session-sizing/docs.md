@@ -12,7 +12,7 @@ does it), `none` (checked; no doc needs it, and why).
 |---|---|---|---|
 | S1 | New session definition decided: review, revert, decisions; context as backstop; signals; limit as project fact; mid-session stop; ADR first | `docs/decisions/0011-session-sized-by-review-revert-and-decisions.md` (Proposed; user accepts at the end) | done |
 | S1 | ADR index gains 0011 | `docs/decisions/README.md` | done |
-| S1 | ADR-0011 status Proposed → Accepted once the user accepts it | `docs/decisions/0011-…` and `docs/decisions/README.md` | open (close-out) |
+| S1 | ADR-0011 status Proposed → Accepted once the user accepts it | `docs/decisions/0011-…` and `docs/decisions/README.md` | open: waits for the user's answer with the report (autopilot keeps ADRs Proposed); the main conversation sets Accepted on yes |
 | S2 | New `**Session size:**` line (default about 400 changed lines or 15 files) in **Branching and releases**; "How to work here" points to `simple-session`, "Check the size" (D7) | `plugin/template/CLAUDE.md`, `CLAUDE.md`, `plugin/evals/_fixture/files/CLAUDE.md` | done |
 | S2 | Older installs get the line and the wording | `plugin/reference/upgrades.md` (0.38.0 entry) | done |
 | S2 | Installer test checks the installed line | `scripts/test-install.sh` | done |
@@ -40,8 +40,11 @@ does it), `none` (checked; no doc needs it, and why).
 | S5 | Case 03 still trips the new signals (separately shippable API, CLI and database); its graders quote no old test | `plugin/evals/03-too-big/` | none |
 | S6 | README "Sessions" sums up the new definition and the size check in two sentences, names the `Session size` line and links to `simple-session`, "Check the size" and ADR-0011; skill tree line for `multi-session` | `README.md` | done |
 | S6 | Site: how-it-works sums up the size check in one line with a link (the five old tests are gone), adds the stop partway and the estimate in the report; skills and get-started say "too big for one session" | `site/how-it-works.html`, `site/skills.html`, `site/get-started.html` | done |
-| S6 | Backlog: "The size check can misjudge a change" updated (acted on; keep collecting cases from the estimate in each report); new "Size warning hook" (D3), "A middle tier between the two session skills" (D0), "Stop-hook messages restart the review window" (S3) | `docs/backlog.md` | done |
+| S6 | Backlog: "The size check can misjudge a change" updated (acted on; keep collecting cases from the estimate in each report); new "Size warning hook" (D3), "A middle tier between the two session skills" (D0), "The review window restarted during a cloud autopilot run" (S3) | `docs/backlog.md` | done |
 | S6 | Changelog already has one line per user-facing change from S2 to S4; S5 is evals-only and the changelog lists no evals | `CHANGELOG.md` | none |
+| Close-out | Every `done` row re-read against the final code; old wording grepped in `docs/`, CLAUDE.md, README.md and `site/` (no stale hits outside upgrade, changelog, ADR and backlog history). Glossary "Session" adds "with its decisions settled first" (A1) | `docs/reference/glossary.md` | done |
+| Close-out | Work record; ADR-0011's "Work record" line links it (as ADR-0010 did while Proposed); records index regenerated | `docs/records/2026/2026-11-19-session-sizing.md`, `docs/decisions/0011-…`, `docs/records/README.md` | done |
+| Close-out | Backlog: all four follow-ups present ("The size check can misjudge a change", "Size warning hook", "A middle tier between the two session skills", "The review window restarted during a cloud autopilot run"); every finding F1–F14 was acted on | `docs/backlog.md` | none |
 
 ## Renames and removals
 
@@ -52,8 +55,8 @@ Old names that docs may still use. Close-out greps `docs/` and CLAUDE.md for eac
 
 ## For close-out
 
-- **Record:** —
+- **Record:** written in close-out: `docs/records/2026/2026-11-19-session-sizing.md`.
 - **Backlog:** (all three written in S6) the commit gate's review window restarts at each stop-hook message, which counts as a user prompt (S3; trigger: it forces a re-review again). middle tier between simple-session and multi-session (D0). Size warning hook (D3): a non-blocking PostToolUse warning when the diff passes the
   `Session size` limit; trigger: reports show sessions that passed the limit without the
   skill's "Stop partway" firing (a new kind of rule under ADR-0010).
-- **ADR candidates:** the session definition (S1, D1).
+- **ADR candidates:** the session definition (S1, D1): ADR-0011, written in S1, stays Proposed for the user.
