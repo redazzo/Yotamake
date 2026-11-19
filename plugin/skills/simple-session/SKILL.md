@@ -59,15 +59,16 @@ When there is such a line, or the plugin is not loaded, read
 
 ## 1. Check the size — before branching
 
-Do this before any branch, edit or install. Unless the change is trivial or docs-only, first
-estimate its files and changed lines, in one line. It is **too big for one session** if any hold:
+Do this before any branch, edit or install for the request. Unless the change is trivial,
+first write a one-line estimate, e.g. "Estimate: 5 files, about 150 changed lines." The
+change is **too big for one session** if any of these hold:
 
 - the estimate is over the `Session size` line (a judgment; if it is missing or unfilled,
   about 400 changed lines or 15 files, not counting lockfiles and generated files);
 - it bundles separate changes that could each ship, and be reviewed, alone;
 - a decision can only be made after part of the work is done;
-- it will span days, people or container resets;
-- it has a step that cannot be undone;
+- it will span days or people;
+- it has a step that cannot be undone, beside work that could ship separately;
 - as a backstop, it clearly will not fit in one context.
 
 Schema plus code, several interfaces or several packages are not too big by themselves. Nor
@@ -76,10 +77,12 @@ holds, do not branch or edit: name it, offer `multi-session`, and stop. Otherwis
 estimate and carry on.
 
 If the request is ambiguous in a way that changes what you build, ask now. Do not ask about
-things the code or CLAUDE.md already answer. A `spec-*.md` file in `.scratchpad/` or
-`.sessions/` that matches this change is a spec from `/yotamake:spec`: read it now; its
-criteria (A1, A2, …) are what done means. If several might match, ask which. If you offer
-`multi-session`, say that the spec moves into its folder.
+things the code or CLAUDE.md already answer.
+
+Look for a spec from `/yotamake:spec`: a `spec-*.md` file in `.scratchpad/` or `.sessions/`.
+If one matches this change, read it now; its acceptance criteria (A1, A2, …) are what done
+means. If more than one might match, ask which. If you offer `multi-session`, say that the
+spec moves into its folder.
 
 ## 2. Branch
 
@@ -225,7 +228,7 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
   "nothing"), and "New, because:" each new function, type, module or dependency and why
   nothing existing fit (or "nothing new");
 - which docs you updated, or why none needed it;
-- unless trivial or docs-only, step 1's estimate beside the real diff size (files and changed lines);
+- unless trivial, step 1's estimate beside the real diff size (files and changed lines);
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
 - with `Test-first: yes`, the test you saw fail before the change;

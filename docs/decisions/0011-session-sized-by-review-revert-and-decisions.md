@@ -123,3 +123,15 @@ judgment against a rough estimate, not a measurement.
 - `plugin/skills/multi-session/SKILL.md`, `plugin/reference/autopilot.md`
 - `docs/reference/glossary.md`, "Session"
 - [Backlog](../backlog.md), "The size check can misjudge a change"
+
+## Amendment (2026-11-19): two signals narrowed, and the estimate for docs-only changes
+
+Raised in review, before release. Decisions 2 and 3 change as below; the rest stands.
+
+- "It has a step that cannot be undone" becomes "a step that cannot be undone, beside work
+  that could ship separately". A small irreversible change, such as a one-line destructive migration, can stay one
+  session. `multi-session` already gives such a step a session of its own.
+- "It will span days, people or container resets" becomes "days or people". Any cloud
+  session can lose its container, so that part read as always true there.
+- Decision 3, made plain: the estimate, and so the limit, apply to docs-only changes too.
+  Only trivial changes skip them: a large docs diff is as hard to review as code.

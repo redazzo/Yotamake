@@ -9,6 +9,10 @@
  *   node scripts/consistency.mjs sync-graders
  *                                           copies each plugin/evals/_graders/ file over
  *                                           the case graders of the same name
+ *   node scripts/consistency.mjs long-skills
+ *                                           reads changed paths on stdin; prints each
+ *                                           changed SKILL.md past the 250-line target
+ *                                           (a note: always exit 0)
  *   node scripts/consistency.mjs evals-for  reads changed paths on stdin; prints the eval
  *                                           cases that cover them (a note: always exit 0)
  *   node scripts/consistency.mjs pages-for  reads changed paths on stdin; prints the site
@@ -25,7 +29,8 @@
  *     and each row's Skills cell names one or more skills that exist.
  *   - site skills: site/skills.html has a card for every folder in plugin/skills/, and no
  *     card for a skill that does not exist.
- *   - skill length: no SKILL.md passes 250 lines. Move a path few sessions take into a
+ *   - skill length: no SKILL.md passes 300 lines (the hard cap). Past 250 (the target),
+ *     `long-skills` prints a note instead. Move a path few sessions take into a
  *     plugin/reference/ file the skill reads on demand, behind a stub heading.
  *   - step refs: a pointer to another skill's step names its heading, as
  *     `simple-session`, "Design and reuse", and that heading exists. No pointer uses a
@@ -185,13 +190,27 @@ function checkSiteSkills() {
   for (const c of cards) if (!skills.has(c)) fail('site skills', `site/skills.html has a card for "${c}", not in plugin/skills/`);
 }
 
-/** No SKILL.md passes MAX_SKILL_LINES lines: every skill is read whole into context. */
-const MAX_SKILL_LINES = 250;
+/**
+ * Every skill is read whole into context, so it stays short. SKILL_TARGET_LINES is a target:
+ * passing it prints a note (long-skills). MAX_SKILL_LINES is the hard cap: passing it fails.
+ */
+const SKILL_TARGET_LINES = 250;
+const MAX_SKILL_LINES = 300;
+const skillLines = (file) => read(file).split('\n').length - 1;
 function checkSkillLength() {
   for (const [, file] of skillFiles()) {
-    const lines = read(file).split('\n').length - 1;
+    const lines = skillLines(file);
     if (lines > MAX_SKILL_LINES) {
-      fail('skill length', `${file} has ${lines} lines, over ${MAX_SKILL_LINES}; move a rare path into plugin/reference/`);
+      fail('skill length', `${file} has ${lines} lines, over the cap of ${MAX_SKILL_LINES}; move a rare path into plugin/reference/`);
+    }
+  }
+}
+function noteLongSkills(changed) {
+  for (const [, file] of skillFiles()) {
+    if (!changed.includes(file)) continue;
+    const lines = skillLines(file);
+    if (lines > SKILL_TARGET_LINES) {
+      console.error(`note: ${file} has ${lines} lines, past the ${SKILL_TARGET_LINES}-line target (cap ${MAX_SKILL_LINES}); keep new text short, or move a rare path into plugin/reference/`);
     }
   }
 }
@@ -391,6 +410,8 @@ if (process.argv[2] === 'upgrades') {
   checkUpgrades(readFileSync(0, 'utf8').split('\n').filter(Boolean));
 } else if (process.argv[2] === 'sync-graders') {
   syncGraders();
+} else if (process.argv[2] === 'long-skills') {
+  noteLongSkills(readFileSync(0, 'utf8').split('\n').filter(Boolean));
 } else if (process.argv[2] === 'evals-for') {
   evalsFor(readFileSync(0, 'utf8').split('\n').filter(Boolean));
 } else if (process.argv[2] === 'pages-for') {

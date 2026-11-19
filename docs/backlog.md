@@ -358,7 +358,7 @@ plus other code, and so on) are gone. A session is now sized by review, revert a
 decisions, against the `Session size` line
 ([ADR-0011](./decisions/0011-session-sized-by-review-revert-and-decisions.md)). The signals
 are still a judgment. A session report now gives the estimate beside the real size (not for
-trivial or docs-only changes). Keep collecting misjudged cases, and tune the default limit or
+trivial changes). Keep collecting misjudged cases, and tune the default limit or
 the signals from them. Case 03 covers the too-big path, and case 24 a change the old tests wrongly called too big.
 
 ## Size warning hook
@@ -441,8 +441,8 @@ of small tasks, each one checkable. Yotamake's `spec` writes scope and numbered 
 criteria, then hands over straight to a session. An optional last step could list the
 ordered tasks, each naming the criterion (A1, A2, …) it meets, so the session works down the
 list and the report ticks them off. Keep it out of `multi-session`, whose `plan.md` already
-splits work into sessions, and keep it short (`scripts/check` caps a `SKILL.md` at 250 lines). `spec` and case 12 cover
-it.
+splits work into sessions, and keep it short (`scripts/check` notes a `SKILL.md` past 250
+lines and fails one past 300). `spec` and case 12 cover it.
 
 ## A feature folder with a feedback log
 
@@ -489,7 +489,7 @@ choice.
 repository's `CLAUDE.md` passes 12 KB again, or a session misses a rule because `CLAUDE.md`
 is too long to follow.
 
-`scripts/consistency.mjs` caps a `SKILL.md` at 250 lines (`MAX_SKILL_LINES`), but nothing caps
+`scripts/consistency.mjs` caps a `SKILL.md` at 300 lines, with a 250-line target, but nothing caps
 `CLAUDE.md`, which is read whole at every start. A trim on 2026-11-18 took it from 11.9 KB to
 11.0 KB by moving three rules `scripts/check` enforces into
 [guides/changing-the-harness.md](./guides/changing-the-harness.md). The rest is needed on most
@@ -551,7 +551,7 @@ small interface) is a second source for the same idea.
 
 **Priority: Low** · **Category:** Skills · **Status:** Waiting ·
 **Next review date:** 2027-02-18 · **Added:** 2026-11-16 · **Trigger to act:** each item names its own. Do not take them
-together: the 250-line cap on a `SKILL.md` and "Session overhead on small changes" say new
+together: the 250-line target on a `SKILL.md` and "Session overhead on small changes" say new
 text has a cost.
 
 From a review of [pstack](https://github.com/cursor/plugins/tree/main/pstack) (Cursor's
