@@ -60,7 +60,8 @@ Make the smallest change that fixes the cause. Remove the temporary prints. Run 
 and see it pass, then go back to the session. Its checks run the rest of the tests.
 
 If the cause, or the same mistake elsewhere, lies outside the branch's concern, the session's
-one-concern rule applies (`simple-session`, "Do the work").
+one-concern rule applies (`simple-session`, "Do the work"). So does its stop partway, if the
+fix grows past the session's size.
 
 ## 5. Report
 

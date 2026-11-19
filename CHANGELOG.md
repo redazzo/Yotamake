@@ -12,6 +12,11 @@ how a release closes it.
   one session takes (default about 400 changed lines or 15 files). "How to work here" now
   points to `simple-session`, "Check the size", instead of "one branch and one context".
   Older installs get both from the upgrade entry.
+- `simple-session`, "Check the size", sizes a session by review, revert and settled
+  decisions, against the `Session size` limit and a few signals. Schema plus code, several
+  interfaces, several packages or an ADR are no longer too big by themselves (an ADR is written
+  first). A session stops partway when it outgrows the limit, and its report gives the
+  estimate beside the real size.
 
 ## 0.37.1 — 2026-11-18
 

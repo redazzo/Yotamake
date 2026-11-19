@@ -22,6 +22,12 @@ does it), `none` (checked; no doc needs it, and why).
 | S2 | Template "Work that spans several contexts" convention still sizes by context | `plugin/template/CLAUDE.md` | open (S4, task 4a) |
 | S2 | `/yotamake:setup` keeps the line's default unless the user names another | `plugin/skills/setup/SKILL.md` | done |
 | S2 | Changelog line for the new line and wording | `CHANGELOG.md` (`## Unreleased`) | done |
+| S3 | Session definition (review, revert, decisions; context as backstop) at the top and in the description; "Check the size" rewritten: one-line estimate, `Session size` limit with its default, A2 signals, ADR first; "Stop partway" in "Do the work"; estimate beside real size in the report | `plugin/skills/simple-session/SKILL.md` | done |
+| S3 | Glossary "Session" uses the new definition and points to the skill | `docs/reference/glossary.md` | done |
+| S3 | Lite-install docs path moved out of `simple-session` to stay under the 250-line cap | `plugin/reference/missing-setup.md` | done |
+| S3 | Changelog line for the new size check and the stop partway | `CHANGELOG.md` (`## Unreleased`) | done |
+| S3 | README and site still state the old definition and the five fixed tests | `README.md`, `site/how-it-works.html`, `site/skills.html`, `site/get-started.html` | open (S6) |
+| S3 | `multi-session` and autopilot still size by context and pause on "cannot finish within its plan"; they should point at "Check the size" and the stop partway | `plugin/skills/multi-session/SKILL.md`, `plugin/reference/autopilot.md` | open (S4) |
 
 ## Renames and removals
 
@@ -33,5 +39,7 @@ Old names that docs may still use. Close-out greps `docs/` and CLAUDE.md for eac
 ## For close-out
 
 - **Record:** —
-- **Backlog:** middle tier between simple-session and multi-session (D0).
+- **Backlog:** the commit gate's review window restarts at each stop-hook message, which counts as a user prompt (S3; trigger: it forces a re-review again). middle tier between simple-session and multi-session (D0). Size warning hook (D3): a non-blocking PostToolUse warning when the diff passes the
+  `Session size` limit; trigger: reports show sessions that passed the limit without the
+  skill's "Stop partway" firing (a new kind of rule under ADR-0010).
 - **ADR candidates:** the session definition (S1, D1).

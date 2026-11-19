@@ -75,7 +75,7 @@ User involvement: approve the commit.
 
 ✂ **Clear context.**
 
-## S3 — Rewrite "Check the size" and add the mid-session stop (F1–F6, F11; A1–A3, A5, A6) — `todo`
+## S3 — Rewrite "Check the size" and add the mid-session stop (F1–F6, F11; A1–A3, A5, A6) — `done`
 
 Branch: the assigned branch.
 Needs: S2

@@ -35,3 +35,27 @@
   Proposed; glossary is S3's.
 - Checks: all PASS (`s2-checks.log`). `scripts/check` names eval cases 01–23; not run (cost).
 - Next: S3.
+
+## 2026-11-19 — S3: rewrite "Check the size", stop partway (autopilot)
+
+- D3, D5 assumed. `simple-session`: new definition and description; "Check the size" states
+  an estimate (not for trivial or docs-only), the `Session size` limit with its stated
+  default, the signals, context as backstop; an ADR lands first as its own commit; "Stop
+  partway" (also in `debugging`, which now points to it; inside an effort it stops and asks,
+  or `PAUSE`); report line with estimate beside real size. Glossary "Session" points to the
+  skill. Lite-install path moved to `missing-setup.md`. Changelog line.
+- Review. `/simplify` (twice): estimate skipped for trivial changes; stop partway reuses step
+  1's signals and measures once; shorter glossary and changelog; a needless re-wrap undone.
+  Skipped: re-splitting the spec paragraph (line cap); dropping "container resets" or "a
+  judgment" or the "not too big by themselves" sentence (A1/A2, and the limit is soft).
+  `/code-review`: stop partway inside an effort and in bug fixes; step 4's ADR line matched to
+  "ADR first"; default also for an unfilled line; `missing-setup.md` intro covers lite. Design
+  read: pointing to the template for the default clashed with ADR-0002 and ADR-0011 §4, so
+  the skill states the number again (undoing a `/simplify` suggestion).
+  Left: autopilot's pause wording (S4); README and site (S6).
+- Checks: all PASS. The S3 agent wrote no estimate before starting; real diff about 6 files,
+  +65/−45. `simple-session` is exactly 250 lines: S4 must not add to it.
+- Surprising: the commit gate's review window restarts at each "user prompt", and the stop
+  hook's "please commit" messages count as prompts, so fixes made after one need the review
+  again. Backlog candidate.
+- Next: S4.
