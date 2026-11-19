@@ -6,8 +6,7 @@ status: current
 
 # ADR-0011: A session is sized by review, revert and decisions, with context as a backstop
 
-- **Status:** Proposed. Written in effort "Session sizing" for the user to accept when the
-  effort ends.
+- **Status:** Accepted (2026-11-19), at the end of effort "Session sizing".
 - **Date:** 2026-11-19
 - **Work record:** [Session sizing by review, revert and decisions](../records/2026/2026-11-19-session-sizing.md)
 - **Builds on:** [ADR-0002](./0002-project-facts-in-named-claude-md-sections.md), for the
@@ -85,7 +84,8 @@ judgment against a rough estimate, not a measurement.
    set in the skill and the template, not here.
 5. **A stop partway through.** While working, if the diff passes the limit, or a decision
    appears that depends on the work's results, the session stops and offers `multi-session`,
-   with the work so far as S1. Autopilot's pause names the same triggers.
+   with the work so far as S1. Autopilot's pause names the same triggers, beside its general
+   pause on a session that cannot finish within its plan.
 6. **ADR first.** A change that needs an ADR writes the ADR first, as its own session (or its
    own commit on an assigned branch). Needing an ADR no longer sends work to `multi-session`
    by itself.

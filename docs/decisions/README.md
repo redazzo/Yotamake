@@ -32,7 +32,7 @@ dated amendment section at the end.
 | [0008](./0008-facts-hooks-read-in-project-conf.md) | Hooks and scripts read their project facts from `.claude/yotamake/project.conf` | Accepted |
 | [0009](./0009-autopilot-is-the-default.md) | Autopilot is the default for a multi-session effort once S0 is approved | Accepted |
 | [0010](./0010-commit-gate-by-step-table.md) | A plugin hook refuses `git commit` until the check and the review are done, by one step table | Accepted |
-| [0011](./0011-session-sized-by-review-revert-and-decisions.md) | A session is sized by review, revert and decisions, with context as a backstop | Proposed |
+| [0011](./0011-session-sized-by-review-revert-and-decisions.md) | A session is sized by review, revert and decisions, with context as a backstop | Accepted |
 
 ## Template
 

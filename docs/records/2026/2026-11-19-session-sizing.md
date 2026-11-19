@@ -48,7 +48,7 @@ D0 and D6 are the user's answers. Under autopilot, D1–D5 and D7 took the recom
 - **No middle tier (D0, user).** A lighter tier between the two session skills (one branch,
   a step list, a commit per step, no folder) was left out; it is a backlog entry.
 - **Autopilot for S1–S6 (D6, user).**
-- **An ADR for the definition (D1, assumed).** ADR-0011, Proposed. The definition sits in
+- **An ADR for the definition (D1, assumed).** ADR-0011, Proposed in S1 and accepted by the user at the end. The definition sits in
   about ten files and gates a skill. ADR-0007 still holds; ADR-0011 builds on it.
 - **The limit as a bold `**Session size:**` line in Branching and releases (D2, assumed)**,
   like `**Test-first:**`. Rejected: a new `##` section; `project.conf` (no hook reads it).
@@ -69,7 +69,8 @@ D0 and D6 are the user's answers. Under autopilot, D1–D5 and D7 took the recom
 
 - A7 asked autopilot's pause rule to name the new triggers *instead of* "cannot finish within
   its plan". S4 added `PAUSE: size` with the named triggers and kept the old phrase as a
-  general trigger beside it.
+  general trigger beside it. The user chose to keep it, as a catch-all (2026-11-19), and
+  accepted ADR-0011 the same day.
 - A1's "same wording" in the three `CLAUDE.md` copies became a pointer to the skill (D7).
   The glossary states the definition in short and points to the skill (close-out added
   "with its decisions settled first").
