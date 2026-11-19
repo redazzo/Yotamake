@@ -137,7 +137,7 @@ to it rather than restate it.
 no recurring caller is a script run locally, not a permanent endpoint. The test is "who calls
 this next month?" An endpoint for a single use is permanent attack surface.
 
-**Work that spans several contexts** runs as numbered sessions with a working folder that
+**Work too big for one session** runs as numbered sessions with a working folder that
 survives `/clear`: git-ignored under `.scratchpad/`, or committed under `.sessions/` in an
 ephemeral environment. See the `yotamake:multi-session` skill.
 

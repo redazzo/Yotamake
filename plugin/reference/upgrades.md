@@ -23,14 +23,16 @@ project-owned template file.
 ## 0.38.0 — Session size line and session definition
 
 - **Check:** `CLAUDE.md`, **Branching and releases**, has a line starting
-  `**Session size:**`, and "How to work here" no longer says "will not fit one branch and one
-  context".
+  `**Session size:**`; "How to work here" no longer says "will not fit one branch and one
+  context"; and **Conventions** no longer says "Work that spans several contexts".
 - **Apply:**
   - Add that line from the plugin's `template/CLAUDE.md`, before the `Version bump` line or at
     the end of the section. Propose the template's default, and ask whether the project's
     reviews call for another limit.
   - In "How to work here", replace "If the change will not fit one branch and one context"
     with the template's pointer to `simple-session`, "Check the size".
+  - In **Conventions**, replace "**Work that spans several contexts**" with "**Work too big
+    for one session**".
 
 ## 0.35.0 — Hooks read the main branch and doc paths from project.conf
 

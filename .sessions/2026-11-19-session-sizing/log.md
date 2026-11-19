@@ -59,3 +59,24 @@
   hook's "please commit" messages count as prompts, so fixes made after one need the review
   again. Backlog candidate.
 - Next: S4.
+
+## 2026-11-19 — S4: multi-session sizing and autopilot pauses (autopilot)
+
+- `multi-session`: description and definition point to `simple-session`, "Check the size";
+  S0 step 4 sizes sessions by it (an irreversible step gets its own session; a signal the
+  plan accounts for does not stop a session later); a new rule in "Rules for every session"
+  splits a session that stops partway, once the user says yes. `plan.md` template points to
+  the check. `autopilot.md`: `PAUSE: size — <reason>` beside the kept "cannot finish within
+  its plan"; on a split the main conversation edits `plan.md` and tells the agent to stop and
+  report. Template **Conventions** "Work too big for one session", with an upgrade step in
+  the 0.38.0 entry. Changelog line.
+- Review. Before it: cut two restatements of the definition in `multi-session`. `/simplify`:
+  split rule moved from autopilot to `multi-session` (step-through needs it too); `PAUSE:
+  size` marker; shorter description and plan template; dropped a duplicate sentence. Skipped:
+  naming the **Session size** line in step 4 (pointer enough). `/code-review`: agent stops
+  and reports after a split; split updates later `Needs:` and moves criteria; split waits for
+  the user's yes; irreversible step and planned signals; kept the general pause trigger;
+  clarified a parenthetical. Design read: no conflicts; two re-wraps.
+- Checks: all PASS. Size: about 6 files, +45/−20 (no estimate written first).
+- Surprising: a quoted step name split across blockquote lines fails `consistency`.
+- Next: S5.

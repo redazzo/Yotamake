@@ -96,7 +96,7 @@ User involvement: approve the commit.
 
 ✂ **Clear context.**
 
-## S4 — multi-session S0 sizing and autopilot pauses (F5, F7, F11; A1, A7) — `todo`
+## S4 — multi-session S0 sizing and autopilot pauses (F5, F7, F11; A1, A7) — `done`
 
 Branch: the assigned branch.
 Needs: S3
