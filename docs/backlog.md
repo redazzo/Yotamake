@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-18
+updated: 2026-11-19
 owns: [open-work-register]
 ---
 
@@ -224,6 +224,20 @@ of this one, still gets past the gate. Closing it would need a per-session list 
 roots kept outside any one repository. A second gap it found, two sessions editing one tree,
 closed with the events log (ADR-0010): each event names its session.
 
+## The review window restarted during a cloud autopilot run
+
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-19 · **Added:** 2026-11-19 · **Trigger to act:** the commit gate again asks
+for a second review when no user prompt came after the review.
+
+Found in the session sizing rework, in a cloud session whose environment adds a "commit and
+push" stop hook. The commit gate's review window starts at the last user prompt before the
+last code edit (ADR-0010, item 5). After `/simplify` ran, the main conversation's turn ended
+while background reviewers were running; that stop hook and a task notification came in;
+the fixes made afterwards then needed `/simplify` again. The cause is not confirmed: only
+`UserPromptSubmit` records a `prompt` event (`plugin/hooks/hooks.json`), so first check what
+these messages write to `yotamake-events`. Running reviewers in the foreground avoided it.
+
 ## Two clashes `scripts/check` misses after a merge
 
 **Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
@@ -335,12 +349,39 @@ for each new script.
 ## The size check can misjudge a change
 
 **Priority: Low** · **Category:** Skills · **Status:** Waiting ·
-**Next review date:** 2027-02-18 · **Added:** 2026-11-14 · **Trigger to act:** a user or an eval run reports a
-change wrongly called too big for one session, or one that should have been.
+**Next review date:** 2027-02-19 · **Added:** 2026-11-14 · **Trigger to act:** a user, an eval run or a
+session report shows a change wrongly called too big for one session, or one that should
+have been, or an estimate far from the real size.
 
-From the same review. `simple-session`, "Check the size", uses fixed tests (more than one new
-interface, a schema change plus other code, and so on). They are easy to apply but blunt.
-Collect the misjudged cases before changing the tests; case 03 covers the too-big path.
+From the same review. The fixed tests it named (more than one new interface, a schema change
+plus other code, and so on) are gone. A session is now sized by review, revert and
+decisions, against the `Session size` line
+([ADR-0011](./decisions/0011-session-sized-by-review-revert-and-decisions.md)). The signals
+are still a judgment. A session report now gives the estimate beside the real size (not for
+trivial or docs-only changes). Keep collecting misjudged cases, and tune the default limit or
+the signals from them. Case 03 covers the too-big path, and case 24 a change the old tests wrongly called too big.
+
+## Size warning hook
+
+**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
+**Next review date:** 2027-02-19 · **Added:** 2026-11-19 · **Trigger to act:** session reports show
+sessions that passed the `Session size` limit without `simple-session`'s "Stop partway"
+firing.
+
+The size check and the stop partway are skill text only (ADR-0011). A non-blocking
+`PostToolUse` hook could warn once when the diff passes the limit. It would be a new kind of
+rule for the step evaluator (ADR-0010), and it would need the limit in `project.conf`, so
+wait until reports show the skill text is not enough.
+
+## A middle tier between the two session skills
+
+**Priority: Low** · **Category:** Skills · **Status:** Waiting ·
+**Next review date:** 2027-02-19 · **Added:** 2026-11-19 · **Trigger to act:** users or reports show
+`multi-session` used for work a little over the limit that needs no plan or folder.
+
+Left out of the session sizing rework (ADR-0011). One branch, a step list and a commit per
+step, with no working folder. It differs from the lighter review tier in "Session overhead on
+small changes", which is about cost, not size.
 
 ## Autopilot context growth
 

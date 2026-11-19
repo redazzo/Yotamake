@@ -99,3 +99,18 @@
 - Checks: all PASS; scaffold run by hand. Estimate about 11 files, +80; real 13 files, +115.
 - Evals to run if wanted (cost money): 03-too-big, 24-should-fit.
 - Next: S6.
+
+## 2026-11-19 — S6: README, site, backlog, changelog (autopilot)
+
+- README "Sessions" and skill tree; `site/how-it-works.html` (old five tests gone, links
+  out), `skills.html`, `get-started.html` (`index.html` read, no change). Backlog: "The size
+  check can misjudge a change" updated; new "Size warning hook" (D3), "A middle tier between
+  the two session skills" (D0), "The review window restarted during a cloud autopilot run".
+  Changelog already complete.
+- Review. `/simplify`: README and site summaries shortened to one clause plus link; dropped a
+  GitHub heading anchor; backlog cites ADR-0011, not a version. `/code-review`: estimate
+  claims qualified (not for trivial or docs-only); the review-window entry no longer claims
+  an unconfirmed cause. Design read: no conflicts; README and backlog cite ADR-0011, which
+  must be accepted before merge.
+- Checks: all PASS. Estimate about 7 files, +70/−40; real about 7 files, +70/−25.
+- Next: close-out.

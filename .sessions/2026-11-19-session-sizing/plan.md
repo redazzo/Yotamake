@@ -135,7 +135,7 @@ User involvement: approve the commit; decide later whether to run cases 03 and 2
 
 ✂ **Clear context.**
 
-## S6 — README, site, backlog, changelog (F7, F8; A9) — `todo`
+## S6 — README, site, backlog, changelog (F7, F8; A9) — `done`
 
 Branch: the assigned branch.
 Needs: S4, S5

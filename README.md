@@ -126,7 +126,7 @@ plugin/
   .claude-plugin/plugin.json
   skills/
     simple-session/   one change: size check, branch, work, docs, scripts/check, stop and ask
-    multi-session/    work across several contexts, with a working folder that survives /clear
+    multi-session/    work too big for one session, with a working folder that survives /clear
     debugging/        a bug fix inside a session: reproduce, failing test, root cause, fix
     write-doc/        pick the doc kind, write it from its template, link it, lint it
     spec/             agree scope and acceptance criteria before code  (manual: /yotamake:spec)
@@ -319,13 +319,16 @@ rules are separate, and `git -C . commit` still asked in a test (one run, Claude
 
 This section is an overview. Each skill's `SKILL.md` holds its rules and is the one to change.
 
-A session is one branch and one merge that fits in one context
-([`simple-session`](./plugin/skills/simple-session/SKILL.md)). It checks the size first, and
-with `Test-first: yes` in `CLAUDE.md` it writes a failing test before a change in behaviour. A
-bug fix follows [`debugging`](./plugin/skills/debugging/SKILL.md): reproduce it, write a
-failing test, find and name the root cause, then fix it. A change too big for one session becomes a
-[`multi-session`](./plugin/skills/multi-session/SKILL.md) effort, with a working folder that
-survives `/clear`: git-ignored at `.scratchpad/<date>-<slug>/`, or committed at
+A session is one change: one branch, one merge, one diff you can review and revert alone,
+with its decisions settled first
+([`simple-session`](./plugin/skills/simple-session/SKILL.md);
+[ADR-0011](./docs/decisions/0011-session-sized-by-review-revert-and-decisions.md)). It checks
+the size first, against the `Session size` line in `CLAUDE.md` (`simple-session`, "Check the
+size"). With `Test-first: yes` in `CLAUDE.md` it writes a failing test before a change in
+behaviour. A bug fix follows [`debugging`](./plugin/skills/debugging/SKILL.md): reproduce
+it, write a failing test, find and name the root cause, then fix it. A change too big for
+one session becomes a [`multi-session`](./plugin/skills/multi-session/SKILL.md) effort, with
+a working folder that survives `/clear`: git-ignored at `.scratchpad/<date>-<slug>/`, or committed at
 `.sessions/<date>-<slug>/` in an ephemeral environment or on an assigned branch. Its sessions
 are numbered: S0 analyses the work and writes the plan, and the work starts at S1. You
 `/clear` between sessions and resume with:

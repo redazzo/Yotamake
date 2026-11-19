@@ -111,7 +111,7 @@ claude plugin install yotamake@yotamake</code></pre></div>
     <p>It cuts a branch, makes the change, updates the doc that owns it, runs <code>scripts/check</code> and a review, and then asks whether to commit and merge. See <a href="how-it-works.html#session">a session, step by step</a>.</p>
     <p>For a new feature where "done" is unclear, agree the scope first:</p>
     <div class="code"><pre><code>/yotamake:spec</code></pre></div>
-    <p>For work too big for one context, Claude offers a <code>multi-session</code> plan. It writes the plan to a working folder that survives <code>/clear</code>. Once you approve the plan, autopilot runs the remaining sessions on their own. It ends with one report and asks once before merging.</p>
+    <p>For work too big for one session, Claude offers a <code>multi-session</code> plan. It writes the plan to a working folder that survives <code>/clear</code>. Once you approve the plan, autopilot runs the remaining sessions on their own. It ends with one report and asks once before merging.</p>
     <p>To read each session yourself, say "approve, step through". Between sessions you clear the context and resume with:</p>
     <div class="code"><pre><code><span class="p">&gt; </span>Read .scratchpad/&lt;folder&gt;/README.md and start the next session.</code></pre></div>
 

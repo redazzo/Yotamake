@@ -17,7 +17,7 @@ does it), `none` (checked; no doc needs it, and why).
 | S2 | Older installs get the line and the wording | `plugin/reference/upgrades.md` (0.38.0 entry) | done |
 | S2 | Installer test checks the installed line | `scripts/test-install.sh` | done |
 | S2 | Site lists what **Branching and releases** holds | `site/get-started.html` | done |
-| S2 | README names the `Session size` line where it names `Worktree setup` and `Docs-only` | `README.md` | open (S6) |
+| S2 | README names the `Session size` line where it names `Worktree setup` and `Docs-only` | `README.md` | done (S6: named in "Sessions", where the size check is summed up) |
 | S2 | Doctor: no change; the filled default has no `FILL IN`. A repository whose version is older than 0.38.0 and lacks the line fails step 2 (pending upgrade), as for any pending entry | `plugin/skills/doctor/SKILL.md` | none |
 | S2 | Template "Work that spans several contexts" convention still sizes by context | `plugin/template/CLAUDE.md` | done (S4) |
 | S2 | `/yotamake:setup` keeps the line's default unless the user names another | `plugin/skills/setup/SKILL.md` | done |
@@ -26,7 +26,7 @@ does it), `none` (checked; no doc needs it, and why).
 | S3 | Glossary "Session" uses the new definition and points to the skill | `docs/reference/glossary.md` | done |
 | S3 | Lite-install docs path moved out of `simple-session` to stay under the 250-line cap | `plugin/reference/missing-setup.md` | done |
 | S3 | Changelog line for the new size check and the stop partway | `CHANGELOG.md` (`## Unreleased`) | done |
-| S3 | README and site still state the old definition and the five fixed tests | `README.md`, `site/how-it-works.html`, `site/skills.html`, `site/get-started.html` | open (S6) |
+| S3 | README and site still state the old definition and the five fixed tests | `README.md`, `site/how-it-works.html`, `site/skills.html`, `site/get-started.html` | done (S6) |
 | S3 | `multi-session` and autopilot still size by context and pause on "cannot finish within its plan"; they should point at "Check the size" and the stop partway | `plugin/skills/multi-session/SKILL.md`, `plugin/reference/autopilot.md` | done (S4) |
 | S4 | `multi-session`: description and definition use the new session definition; S0 step 4 sizes sessions by `simple-session`, "Check the size", not by context | `plugin/skills/multi-session/SKILL.md` | done |
 | S4 | `plan.md` template's opening line uses the new definition | `plugin/skills/multi-session/templates/plan.md` | done |
@@ -35,9 +35,13 @@ does it), `none` (checked; no doc needs it, and why).
 | S4 | Changelog line for multi-session sizing and autopilot pauses | `CHANGELOG.md` (`## Unreleased`) | done |
 | S4 | Pointers to "Check the size" (`harness-upgrades.md`, `spec`, `improve-architecture`) still read true | — | none |
 | S4 | ADR-0007's pause on "cannot finish within its plan" now has named triggers and a split path; ADR-0011 already says so ("Builds on") | `docs/decisions/0011-…` | none |
-| S4 | README skill tree still says `multi-session` is "work across several contexts" (`README.md:129`) | `README.md` | open (S6) |
+| S4 | README skill tree still says `multi-session` is "work across several contexts" (`README.md:129`) | `README.md` | done (S6) |
 | S5 | New eval case 24-should-fit: a schema column plus the code that uses it runs as one session, with an estimate | `README.md` (Evals table) | done |
 | S5 | Case 03 still trips the new signals (separately shippable API, CLI and database); its graders quote no old test | `plugin/evals/03-too-big/` | none |
+| S6 | README "Sessions" sums up the new definition and the size check in two sentences, names the `Session size` line and links to `simple-session`, "Check the size" and ADR-0011; skill tree line for `multi-session` | `README.md` | done |
+| S6 | Site: how-it-works sums up the size check in one line with a link (the five old tests are gone), adds the stop partway and the estimate in the report; skills and get-started say "too big for one session" | `site/how-it-works.html`, `site/skills.html`, `site/get-started.html` | done |
+| S6 | Backlog: "The size check can misjudge a change" updated (acted on; keep collecting cases from the estimate in each report); new "Size warning hook" (D3), "A middle tier between the two session skills" (D0), "Stop-hook messages restart the review window" (S3) | `docs/backlog.md` | done |
+| S6 | Changelog already has one line per user-facing change from S2 to S4; S5 is evals-only and the changelog lists no evals | `CHANGELOG.md` | none |
 
 ## Renames and removals
 
@@ -49,7 +53,7 @@ Old names that docs may still use. Close-out greps `docs/` and CLAUDE.md for eac
 ## For close-out
 
 - **Record:** —
-- **Backlog:** the commit gate's review window restarts at each stop-hook message, which counts as a user prompt (S3; trigger: it forces a re-review again). middle tier between simple-session and multi-session (D0). Size warning hook (D3): a non-blocking PostToolUse warning when the diff passes the
+- **Backlog:** (all three written in S6) the commit gate's review window restarts at each stop-hook message, which counts as a user prompt (S3; trigger: it forces a re-review again). middle tier between simple-session and multi-session (D0). Size warning hook (D3): a non-blocking PostToolUse warning when the diff passes the
   `Session size` limit; trigger: reports show sessions that passed the limit without the
   skill's "Stop partway" firing (a new kind of rule under ADR-0010).
 - **ADR candidates:** the session definition (S1, D1).
