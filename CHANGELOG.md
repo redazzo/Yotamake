@@ -6,6 +6,13 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## Unreleased
+
+- `CLAUDE.md` gains a `**Session size:**` line in **Branching and releases**: the largest diff
+  one session takes (default about 400 changed lines or 15 files). "How to work here" now
+  points to `simple-session`, "Check the size", instead of "one branch and one context".
+  Older installs get both from the upgrade entry.
+
 ## 0.37.1 — 2026-11-18
 
 - `multi-session`: S0, the planning session, is now defined, and `plan.md` lists it. It

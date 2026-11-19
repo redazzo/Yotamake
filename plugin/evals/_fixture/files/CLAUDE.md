@@ -3,10 +3,11 @@
 ## How to work here
 
 Every change to code, tests or docs runs as a session, however small: use the
-`yotamake:simple-session` skill. If the change will not fit one branch and one context, use
-`yotamake:multi-session` instead. This holds when the user names the branch, spells out
-the exact edit, or says it is quick and not to ask: the skill covers working on a named branch,
-and its design check, checks, review, doc update and stop before commit still apply.
+`yotamake:simple-session` skill. If the change is too big for one session (`simple-session`,
+"Check the size"), use `yotamake:multi-session` instead. This holds when the user names the
+branch, spells out the exact edit, or says it is quick and not to ask: the skill covers working
+on a named branch, and its design check, checks, review, doc update and stop before commit
+still apply.
 Questions and explanations need no session.
 
 ## Project overview
@@ -37,6 +38,8 @@ npm test    # run the tests
 - **Integration:** local `git merge --no-ff` into main.
 - **Docs-only:** a branch that changes only files under `docs/` and Markdown files at the
   repository root other than `CLAUDE.md`.
+- **Session size:** about 400 changed lines or 15 files in one diff, not counting lockfiles
+  and generated files. `simple-session` sizes a change against it.
 - **Version bump:** code changes get `npm version patch --no-git-tag-version` as their own
   commit, `chore(release): bump version to X.Y.Z`. Docs-only branches do not.
 - **Worktree setup:** none.

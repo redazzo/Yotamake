@@ -7,10 +7,11 @@ this file holds the facts its skills read.
 ## How to work here
 
 Every change to code, tests or docs runs as a session, however small: use the
-`yotamake:simple-session` skill. If the change will not fit one branch and one context, use
-`yotamake:multi-session` instead. This holds when the user names the branch, spells out
-the exact edit, or says it is quick and not to ask: the skill covers working on a named branch,
-and its design check, checks, review, doc update and stop before commit still apply.
+`yotamake:simple-session` skill. If the change is too big for one session (`simple-session`,
+"Check the size"), use `yotamake:multi-session` instead. This holds when the user names the
+branch, spells out the exact edit, or says it is quick and not to ask: the skill covers working
+on a named branch, and its design check, checks, review, doc update and stop before commit
+still apply.
 Questions and explanations need no session.
 
 **If the plugin is not loaded** (no `yotamake:` skills are offered, as in a cloud session
@@ -88,6 +89,8 @@ says how). Put them in the report and ask before running them (see Commands).
 - **Docs-only:** a branch that changes only files under `docs/` and Markdown files at the
   repository root other than `CLAUDE.md`. `CLAUDE.md` and Markdown under `plugin/` are
   code.
+- **Session size:** about 400 changed lines or 15 files in one diff, not counting lockfiles
+  and generated files. `simple-session` sizes a change against it.
 - **Version bump:** a change under `plugin/` that reaches users (anything but `plugin/evals/`)
   bumps `version` in both `plugin/.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json`: patch for a fix, minor for a feature. It is its own

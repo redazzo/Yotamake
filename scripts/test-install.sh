@@ -30,6 +30,14 @@ full_install() {
     test -e "$(git rev-parse --git-path yotamake-check-passed)"
 }
 
+# The installed CLAUDE.md has a filled Session size line under Branching and releases.
+session_size_line() {
+    local line
+    line=$(sed -n '/^## Branching and releases/,/^## /p' "$full/CLAUDE.md" |
+        grep -A1 '^- \*\*Session size:\*\*')
+    [[ "$line" =~ [0-9]+\ changed\ lines && "$line" != *"FILL IN"* ]]
+}
+
 lite_install() {
     git init -q -b main "$lite"
     "$plugin/install.sh" "$lite" --lite
@@ -176,6 +184,7 @@ installer_hooks_path_notes() {
 export GIT_CONFIG_GLOBAL=$tmp/gitconfig GIT_CONFIG_NOSYSTEM=1
 : > "$GIT_CONFIG_GLOBAL"
 step "full install passes its own check and writes the stamp" full_install
+step "the installed CLAUDE.md has a filled Session size line" session_size_line
 step "lite install has no docs system, and its empty check leaves no stamp" lite_install
 step "a lite refresh adds no files" lite_refresh_adds_nothing
 step "the eval fixture passes its check" eval_fixture

@@ -34,7 +34,7 @@ Status values: `todo`, `in progress`, `done`, `skipped`.
 
 ## S0 — Analysis and planning — `done`
 
-## S1 — ADR for the session definition (F1, F14; A1, A5) — `in progress`
+## S1 — ADR for the session definition (F1, F14; A1, A5) — `done`
 
 Branch: the assigned branch.
 Needs: none
@@ -53,7 +53,7 @@ User involvement: approve the commit.
 
 ✂ **Clear context.**
 
-## S2 — The `**Session size:**` line (F9, F10; A4) — `todo`
+## S2 — The `**Session size:**` line (F9, F10; A4) — `done`
 
 Branch: the assigned branch.
 Needs: S1
@@ -108,6 +108,9 @@ Needs: S3
    triggers; on such a pause, after the user agrees, the main conversation may split the
    session in `plan.md` (A7). Update `:8,34` wording if it treats context as the limit.
 4. Check `harness-upgrades.md`, `spec`, `improve-architecture` pointers still read true (F11).
+4a. `plugin/template/CLAUDE.md`, **Conventions**, still says "Work that spans several contexts
+   runs as numbered sessions" (found in S2). Reword it, and in the eval fixture and this
+   repository's copy if present; add the step to the 0.38.0 `upgrades.md` entry.
 5. `docs.md` rows. `scripts/check` and the review, then propose the commit.
 
 User involvement: approve the commit.
