@@ -11,10 +11,11 @@
 ## How to work here
 
 Every change to code, tests or docs runs as a session, however small: use the
-`yotamake:simple-session` skill. If the change will not fit one branch and one context, use
-`yotamake:multi-session` instead. This holds when the user names the branch, spells out
-the exact edit, or says it is quick and not to ask: the skill covers working on a named branch,
-and its design check, checks, review, doc update and stop before commit still apply.
+`yotamake:simple-session` skill. If the change is too big for one session (`simple-session`,
+"Check the size"), use `yotamake:multi-session` instead. This holds when the user names the
+branch, spells out the exact edit, or says it is quick and not to ask: the skill covers working
+on a named branch, and its design check, checks, review, doc update and stop before commit
+still apply.
 Questions and explanations need no session.
 
 **If the plugin is not loaded** (no `yotamake:` skills are offered), its skills and hooks are
@@ -77,6 +78,9 @@ behaviour.
   repository root other than `CLAUDE.md`. <!-- Change the paths if the docs live elsewhere,
   or if some of these files are prompts or other Markdown that acts as code. Then change the
   `docs` lines in `.claude/yotamake/project.conf` to match: a hook reads them. -->
+- **Session size:** about 400 changed lines or 15 files in one diff, not counting lockfiles
+  and generated files. `simple-session` sizes a change against it. <!-- A judgment, not a
+  measured number: raise or lower it to what the project's reviews can read with care. -->
 - **Version bump:** <!-- FILL IN or delete: the command (e.g. `pnpm run version:patch`), the
   file it changes, and the rule (e.g. "code changes get a patch bump as its own commit,
   `chore(release): bump version to X.Y.Z`; docs-only branches do not"). -->
@@ -133,7 +137,7 @@ to it rather than restate it.
 no recurring caller is a script run locally, not a permanent endpoint. The test is "who calls
 this next month?" An endpoint for a single use is permanent attack surface.
 
-**Work that spans several contexts** runs as numbered sessions with a working folder that
+**Work too big for one session** runs as numbered sessions with a working folder that
 survives `/clear`: git-ignored under `.scratchpad/`, or committed under `.sessions/` in an
 ephemeral environment. See the `yotamake:multi-session` skill.
 

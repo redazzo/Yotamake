@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-18
+updated: 2026-11-19
 owns: [domain-language]
 ---
 
@@ -42,8 +42,9 @@ where the thing is that file or folder.
 
 ## Working
 
-- **Session:** one change, run on one branch with one merge, that fits in one context. Every
-  change to code, tests or docs runs as a session. _Avoid:_ task, job.
+- **Session:** one change on one branch with one merge, small enough to review as one diff
+  and revert on its own, with its decisions settled first. Every change to code, tests or docs runs as one.
+  `simple-session`, "Check the size", owns the rule. _Avoid:_ task, job.
 - **Multi-session effort:** work too big for one session, run as numbered sessions that share
   a working folder. _Avoid:_ project, epic.
 - **S0, S1, …:** the numbered sessions of a multi-session effort. S0 analyses the work and

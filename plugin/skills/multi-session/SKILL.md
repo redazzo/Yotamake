@@ -1,16 +1,17 @@
 ---
 name: multi-session
-description: Plan and run work that will not fit in one context (a review, a migration, a multi-phase refactor) as numbered sessions with a working folder that survives /clear. Use when the user asks for such work, when a task clearly needs several branches or several context clears, or when the user says "start the next session".
+description: Plan and run work too big for one session (a review, a migration, a multi-phase refactor) as numbered sessions with a working folder that survives /clear. Use when the user asks for such work, when a task clearly needs several sessions, or when the user says "start the next session".
 ---
 
 # Multi-session work
 
-Work that spans several contexts keeps its state in a working folder, so a fresh context can
+Work too big for one session keeps its state in a working folder, so a fresh context can
 pick it up from a few file reads instead of re-deriving it.
 
-A session is a branch and a merge that fits in one context. A multi-session effort is a
-series of sessions that together complete a task. The user can `/clear` between sessions, and
-the folder survives to let the next session start quickly.
+A session is one change on one branch with one merge, sized by `simple-session`, "Check the
+size". A multi-session effort is a series of sessions that together complete a task.
+The user can `/clear` between sessions, and the folder survives to let the next session start
+quickly.
 
 Each session follows the `simple-session` skill for branching, checks, review, reporting and
 integration. This skill adds the working folder and the order of sessions.
@@ -105,14 +106,15 @@ session, offer to resume that effort instead of starting a new one.
    `<this skill's directory>/../../reference/architecture-styles.md`. Put the options and
    the recommendation in the Design section, and order the sessions as "Changing the style"
    says.
-4. Split the work into sessions in `plan.md`, below its S0 heading. Size each one to **one
-   branch and one merge (or, on an assigned branch, one set of commits) that fits in one
-   context**, so a `/clear` never lands mid-change. Order them so each makes
-   the next one easier (bugs first, then deletions, then refactors, docs last so they describe
-   the final state). With a spec, each session names the criteria it delivers, and every
-   criterion is in some session. Give each session a `Needs:` line naming the sessions it
-   depends on (`Needs: S1, S2`, or `Needs: none`), and list the files it will change when
-   another session could run beside it.
+4. Split the work into sessions in `plan.md`, below its S0 heading. Each is one branch and one
+   merge (on an assigned branch, one set of commits), sized by `simple-session`, "Check the
+   size", so a `/clear` never lands mid-change. A step that cannot be undone gets a session of
+   its own; a signal the plan already accounts for does not stop a session later. Order them
+   so each makes the next one easier (bugs first, then deletions, then refactors, docs last
+   so they describe the final state). With a spec, each session names the criteria it
+   delivers, and every criterion is in some session. Give each session a `Needs:` line naming
+   the sessions it depends on (`Needs: S1, S2`, or `Needs: none`), and list the files it will
+   change when another session could run beside it.
 5. Put every question for the user in `decisions.md`, tagged with the session that needs the
    answer. Give a recommendation with each. Ask at the start of that session, not all up front:
    by then the earlier sessions may have changed the question. Step 6 still lists them at the
@@ -161,6 +163,12 @@ Under autopilot, "Autopilot" overrides these where it says so.
   done, commit hashes, what is left, anything surprising), check `docs.md` is up to date, then
   tell the user it is a good point to `/clear`. In a committed setup, commit and push those
   updates first.
+- A session that stops partway (`simple-session`, "Do the work", its "Stop partway") can be
+  split once the user says yes (record it in `decisions.md`). The work so far becomes this
+  session and goes on to its report, review and commit. The rest becomes new sessions after
+  it in `plan.md` (for example `S<N>b`): each gets its own `Needs:` line, takes the criteria
+  this session no longer delivers, and is added to the `Needs:` of every session that needed
+  this one.
 
 ## Running sessions in parallel
 

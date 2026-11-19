@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: 24-should-fit
+context:
+  scaffold_script: scaffold.sh
+expected_outcome: |
+  The run states a size estimate and treats the change (a schema column plus the code that uses it) as one session: it does not say the work is too big or offer multi-session. Work stays on the assigned branch; db/schema.sql gains a nickname column; greetUser greets by nickname with a fallback to the name; docs/reference/greeting.md is updated; scripts/check is run; no commit.

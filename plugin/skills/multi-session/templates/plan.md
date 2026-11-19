@@ -1,7 +1,8 @@
 # Plan
 
 <N> sessions after S0. Clear context between them (marked ✂). Each session is one branch
-(or, on an assigned branch, one set of commits), small enough to finish in one context. Order: <why this order>.
+(or, on an assigned branch, one set of commits), sized by `simple-session`, "Check the size".
+Order: <why this order>.
 
 Status values: `todo`, `in progress`, `done`, `skipped`.
 

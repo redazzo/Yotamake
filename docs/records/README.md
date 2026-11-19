@@ -18,6 +18,7 @@ run `node scripts/docs/generate-records-index.mjs` after adding one.
 
 | Started | Record |
 |---|---|
+| 2026-11-19 | [Session sizing by review, revert and decisions](./2026/2026-11-19-session-sizing.md) |
 | 2026-11-18 | [Commit gate on session steps](./2026/2026-11-18-commit-gate.md) |
 
 ## Complete

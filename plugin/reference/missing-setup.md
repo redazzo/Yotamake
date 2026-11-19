@@ -1,8 +1,9 @@
 # Missing setup and tools
 
-The `simple-session` skill sends you here ("Missing setup and tools") from the step where it finds part of the project's
-setup missing, or a tool the review needs not available. A fully set-up project never needs
-this file.
+The `simple-session` skill sends you here ("Missing setup and tools") from the step where it
+finds part of the project's setup missing, or a tool the review needs not available. A full
+install with every section filled never needs this file; a lite install needs only "No docs
+system".
 
 ## The project
 
@@ -12,6 +13,8 @@ this file.
   `/yotamake:setup` can fill it in.
 - **No `scripts/check`.** In "Run the checks", run the commands the **Checks** section of
   `CLAUDE.md` lists instead. Say in the report that the project has no single gate.
+- **No docs system.** The repository has no `docs/README.md` (a lite install). In "Do the
+  work", fix `CLAUDE.md` or `README.md` where they describe the change.
 - **An empty gate.** `scripts/check` exists but has no checks yet. Say in the report that the
   gate is empty and that `/yotamake:setup` can add them.
 

@@ -38,6 +38,11 @@ all `done`. Then, in the main conversation:
    paused agent so it carries on. If that agent can no longer be reached, start a new one
    with the brief, adding one line: what was settled. If the user would rather stop the run
    here, the session stays `in progress` for "Resuming autopilot".
+
+   A `PAUSE: size` also offers to split the session, as `multi-session`, "Rules for every
+   session", says; it waits for the user's yes. You make the split in `plan.md`, not the
+   agent. Then tell the agent to stop and return its report for the work so far, and go on
+   to the review and commit below.
 4. **Review.** Run `scripts/check`, saving its output as `multi-session`, "Rules for every
    session", says. Then run the review as `simple-session`, "Review", says, on this
    session's uncommitted diff, not the whole mother branch: the docs-only and trivial tests
@@ -64,9 +69,11 @@ all `done`. Then, in the main conversation:
 > merge, run `/simplify` or `/code-review`, or start agents of your own. Do not edit
 > `plan.md` or `log.md`. Stop and return `PAUSE: <reason>` instead of going on wherever a
 > step or skill you follow says to stop and ask the user; when `scripts/check` still fails
-> after two fix attempts; or when the session cannot finish within its plan. Otherwise
-> return, in under 30 lines, what `simple-session`, "Stop and report", lists, leaving out
-> the review and the commit message; then the `docs.md` rows added and anything surprising.
+> after two fix attempts; or when the session cannot finish within its plan. Return
+> `PAUSE: size — <reason>` when a size signal holds partway (`simple-session`, "Do the work",
+> its "Stop partway"). Otherwise return, in under 30 lines, what `simple-session`,
+> "Stop and report", lists, leaving out the review and the commit message; then the
+> `docs.md` rows added and anything surprising.
 
 **The end.** After the last session:
 

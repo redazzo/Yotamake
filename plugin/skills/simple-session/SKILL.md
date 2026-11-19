@@ -1,27 +1,28 @@
 ---
 name: simple-session
-description: Use before editing code, tests or docs in a repository set up with the harness (it has scripts/check) — for ANY change, even a one-line fix, a rename or a typo, and also when the user already names the branch, says exactly what to change, says it is quick or not to ask, or the environment assigns a branch. Runs the change as one session: work on that branch (or cut one from the main branch), update the doc that owns the change, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use multi-session instead when the work needs several branches or several context clears. Not for questions or explanations.
+description: Use before editing code, tests or docs in a repository set up with the harness (it has scripts/check) — for ANY change, even a one-line fix, a rename or a typo, and also when the user already names the branch, says exactly what to change, says it is quick or not to ask, or the environment assigns a branch. Runs the change as one session: work on that branch (or cut one from the main branch), update the doc that owns the change, run scripts/check and a review, then stop and ask before commit, version bump and merge or pull request. Use multi-session instead when the work is too big to review and revert as one diff, or has a decision that must wait for part of the work. Not for questions or explanations.
 ---
 
 # Simple session
 
-A session is one branch and one merge that fits in one context. This skill is the
-`multi-session` rules without the working folder: no plan, findings file or log, because nothing
-has to survive a `/clear`.
+A session is one change, on one branch with one merge, that can be reviewed as one diff and
+reverted on its own, with its decisions settled before it starts (step 1). This skill is the
+`multi-session` rules without the working folder: no plan, findings file or log, because
+nothing has to survive a `/clear`.
 
 Project specifics live in `CLAUDE.md`, not here. This skill reads these sections:
 
 - **Checks** — how the project's one check command works (normally `scripts/check`), and
   the `Test-first` line (step 4, "Do the work").
 - **Branching and releases** — the main branch, branch prefixes, how to integrate (a local
-  merge or a pull request), whether code changes get a version bump, and which files count
-  as docs (the `Docs-only` line).
+  merge or a pull request), whether code changes get a version bump, which files count
+  as docs (the `Docs-only` line), and the `Session size` limit (steps 1 and 4).
 - **Architecture** — the design a change follows: its `Style`, `Modules`, `Boundaries`,
   `Shared code`, `Patterns`, `Constraints` and `Domain language` lines, and the accepted
   ADRs (step 3).
 
-If a section is missing or still holds `<!-- FILL IN -->` placeholders, say so once in the
-report and use the defaults given below or in "Missing setup and tools".
+If a section or line is missing or still holds `<!-- FILL IN -->` placeholders, say so once
+in the report and use the defaults given below or in "Missing setup and tools".
 
 **Docs-only.** A docs-only branch skips the design and review steps and the version bump. A
 branch is docs-only when every file it changes is a doc, as the `Docs-only` line names them.
@@ -46,8 +47,8 @@ why to drop it. Write it before your last `scripts/check` run, so that run cover
 
 ## Missing setup and tools
 
-No filled **Architecture** section, no `scripts/check` or an empty one, or a review tool
-missing: read `<this skill's directory>/../../reference/missing-setup.md` at that step.
+No filled **Architecture** section, no `scripts/check` or an empty one, no `docs/README.md`,
+or no review tool: read `<this skill's directory>/../../reference/missing-setup.md` at that step.
 
 ## 0. Harness upgrades — first
 
@@ -58,26 +59,30 @@ When there is such a line, or the plugin is not loaded, read
 
 ## 1. Check the size — before branching
 
-Do this before any branch, edit or install for the request. The change is **too big for one
-session** if any of these hold:
+Do this before any branch, edit or install for the request. Unless the change is trivial,
+first write a one-line estimate, e.g. "Estimate: 5 files, about 150 changed lines." The
+change is **too big for one session** if any of these hold:
 
-- it adds or changes a database schema or migration *and* other code;
-- it adds more than one new interface (an HTTP API, a CLI, a UI screen, a background job);
-- it touches more than one service or package;
-- it needs an ADR;
-- you would want to `/clear` before finishing.
+- the estimate is over the `Session size` line (a judgment; if it is missing or unfilled,
+  about 400 changed lines or 15 files, not counting lockfiles and generated files);
+- it bundles separate changes that could each ship, and be reviewed, alone;
+- a decision can only be made after part of the work is done;
+- it will span days or people;
+- it has a step that cannot be undone, beside work that could ship separately;
+- as a backstop, it clearly will not fit in one context.
 
-If any hold, do not branch or edit. Say in one or two sentences that it is too big for one
-session and which test it fails, then offer to plan it with the `multi-session` skill. Stop
-there. Otherwise carry on without comment.
+Schema plus code, several interfaces or several packages are not too big by themselves. Nor
+is an ADR: it lands first, as its own commit (or session), once the user agrees. If a signal
+holds, do not branch or edit: name it, offer `multi-session`, and stop. Otherwise say the
+estimate and carry on.
 
 If the request is ambiguous in a way that changes what you build, ask now. Do not ask about
 things the code or CLAUDE.md already answer.
 
 Look for a spec from `/yotamake:spec`: a `spec-*.md` file in `.scratchpad/` or `.sessions/`.
 If one matches this change, read it now; its acceptance criteria (A1, A2, …) are what done
-means. If more than one might match, ask which. If the change is too big and you offer
-`multi-session`, say that the spec moves into its folder.
+means. If more than one might match, ask which. If you offer `multi-session`, say that the
+spec moves into its folder.
 
 ## 2. Branch
 
@@ -130,11 +135,11 @@ section of CLAUDE.md and decide how the change fits before you write it.
      report names it.
 
    Say what conflicts and quote the rule. Give options with a recommendation, for example: a
-   way that keeps the rule; changing the rule first (edit Architecture, or write a new ADR,
-   which makes the work too big for one session, step 1; the order is in "Changing the style"
-   in `<this skill's directory>/../../reference/architecture-styles.md`); or dropping that
-   part. Do this every time, even when the user asked for exactly that change or said not to
-   ask. The rule is the project's, and changing it is a separate decision. Wait for the answer.
+   way that keeps the rule; changing the rule first (edit Architecture, or write a new ADR
+   first, as in step 1; the order is in "Changing the style" in
+   `<this skill's directory>/../../reference/architecture-styles.md`); or dropping that part.
+   Do this every time, even when the user asked for exactly that change or said not to ask.
+   The rule is the project's, and changing it is a separate decision. Wait for the answer.
 
 ## 4. Do the work
 
@@ -148,16 +153,17 @@ test. Run just that test (not `scripts/check`) and see it fail for the reason yo
 then change the code and see it pass. Refactors, docs-only and trivial branches are exempt.
 When the line is missing or says `no`, write tests as the project already does.
 
-**Bug fixes.** When the change fixes a bug, follow the `debugging` skill here, then come
-back for step 5.
+**Bug fixes.** For a bug fix, follow the `debugging` skill here, then come back for step 5.
+
+**Stop partway**, here or in `debugging`, if a step 1 signal starts to hold (judge the size
+by eye; measure it once, for the report): say which, and offer `multi-session` with the work
+so far as S1. Inside a `multi-session` effort, stop and ask instead (autopilot: `PAUSE`).
 
 If the change alters how something works, update the reference doc that owns it in the same
 branch. The "Owns" table in `docs/README.md` names it. Also fix CLAUDE.md if it describes the
 thing you changed, and bump `updated:` on each doc you edit. A follow-up you are not doing is
 a finding not acted on. An architecturally significant decision needs an ADR in
-`docs/decisions/`; ask before writing one. The `write-doc` skill covers the formats.
-If the repository has no `docs/README.md` (a lite install), there is no docs system: fix
-CLAUDE.md or `README.md` where they describe the change.
+`docs/decisions/`, landed first as in step 1. The `write-doc` skill covers the formats.
 
 ## 5. Run the checks
 
@@ -222,6 +228,7 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
   "nothing"), and "New, because:" each new function, type, module or dependency and why
   nothing existing fit (or "nothing new");
 - which docs you updated, or why none needed it;
+- unless trivial, step 1's estimate beside the real diff size (files and changed lines);
 - with a spec: each criterion and how it was checked (test name or manual step), and
   whether to delete the spec file once this is merged;
 - with `Test-first: yes`, the test you saw fail before the change;
