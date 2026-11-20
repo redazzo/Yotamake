@@ -182,16 +182,17 @@ and follow it: when it is allowed, how to start one, and how to commit and merge
 ## Autopilot
 
 Autopilot runs every session after S0 without the user, on one mother branch, then writes one
-report and asks one question: merge (ADR-0007). It is on by default from S0's approval
-(ADR-0009, and step 6 of "Starting a new effort"). When it starts on approval, when the user
+report and asks one question: commit and merge (ADR-0012). It is on by default from S0's
+approval (step 6 of "Starting a new effort"). When it starts on approval, when the user
 turns it on or resumes it ("run autopilot", "continue autopilot"), or the folder's
 `README.md` says `Autopilot: on`, read `<this skill's directory>/../../reference/autopilot.md` and follow it. It overrides "Rules for every session" and "Closing out" where it says so.
 
 **Turning autopilot off.** When the user turns it off, at S0's approval or when resuming,
 write `Autopilot: off (<yyyy-mm-dd>).` under **Setup** in `README.md` (replacing any `on`
 line), a row in `decisions.md` saying they chose it, and the normal resume line. The effort
-then runs session by session. If sessions already ran under autopilot, their commits are on
-its mother branch: ask whether the next sessions build on that branch or it is merged first.
+then runs session by session. If sessions already ran under autopilot, their work is on its
+mother branch. In the local setup it is uncommitted: review and commit it first, as one
+session. Then ask whether the next sessions build on that branch or it is merged first.
 
 ## Closing out
 
