@@ -469,6 +469,43 @@ is too long to follow.
 branches, so more cuts mean either a cap that forces moves, or tighter wording in
 Architecture (3.4 KB, the largest section). Found by the review of that trim.
 
+## Inventory names found in prose
+
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-20 · **Added:** 2026-11-20 · **Trigger to act:** a list item is
+dropped from an inventory block and the docs linter stays green.
+
+The docs linter's `inventory` rule counts a path as named when its name appears anywhere in
+the block, prose included. Removing `.githooks/pre-commit` from the README's repository tree
+passed, because "the pre-commit hook" in the same block still matched. The review of the
+docs-drift effort found the root cause: the rule guesses which words are paths, and each
+false hit added an exception (`names` mode, folders above a match, siblings beside it, the
+bare-`*` skip). The general fix: a name is the first word of each list item or tree line, or
+a code span; compare that set with the paths on disk, both ways. About 60 fewer lines.
+
+## Generate the decisions index, and check it in installed repositories
+
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-20 · **Added:** 2026-11-20 · **Trigger to act:** an installed
+repository's ADR index goes out of step with its ADR files, or `adr index` needs another rule.
+
+An ADR's status now sits in four places: its Status line, its front-matter, its index row
+and the table that holds the row. This repository's `scripts/consistency.mjs` (`adr index`)
+keeps them in step, but the template ships the split index with nothing to check it. The
+records index is generated instead (`generate-records-index.mjs --check`, run by the docs
+linter). Doing the same for `docs/decisions/` in the template would drop `adr index` and
+the hand edits, and reach every installed repository.
+
+## Docs linter line numbers skip the front-matter
+
+**Priority: Low** · **Category:** Tooling · **Status:** Waiting ·
+**Next review date:** 2027-02-20 · **Added:** 2026-11-20 · **Trigger to act:** a docs linter
+finding points someone at the wrong line, or the next change to how the linter reports lines.
+
+`splitFrontMatter` drops the front-matter before the linter counts lines, so a finding in a
+doc with front-matter reports a line number too low by the front-matter's length. It was
+like this before the `broken-anchor` and `inventory` rules, which share it.
+
 ## Stale-docs check: designed, not built
 
 **Priority: Low** · **Category:** Tooling · **Status:** Waiting ·

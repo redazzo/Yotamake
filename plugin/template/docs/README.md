@@ -25,6 +25,11 @@ Every subject has **one** document that owns it (the table below). Anything else
 mentions the subject links here rather than restating it. Two documents explaining the same
 thing is a bug in the docs.
 
+An overview (the root `README.md`, an index, a landing page) owns what exists and how the
+parts fit, never how a part works. It sums each part up in a line or two and links to the
+document that owns it. When an overview section grows into a manual, move the detail to its
+owner.
+
 ---
 
 ## Reference
@@ -67,8 +72,9 @@ item, each with an **Added** date and a **Trigger to act**. Longer analysis goes
 2. **Check nothing already owns the subject.** If a reference doc covers it, extend that doc.
 3. **Name it in kebab-case.**
 4. **Link it from this page** — except records, whose index is generated.
-5. **Run `node scripts/docs/lint-docs.mjs`.** It fails on a broken link, a stale records index,
-   or a document in `docs/` that nothing links to.
+5. **Run `node scripts/docs/lint-docs.mjs`.** It fails on a broken link or anchor, a stale
+   records index, an inventory block that does not match the disk, or a document in `docs/`
+   that nothing links to.
 
 Every document carries `kind:` front-matter (`reference`, `guide`, `decision` or `record`),
 plus `updated:` for reference and guides and `date:` for decisions and records. The linter

@@ -1,7 +1,7 @@
 ---
 kind: reference
 status: current
-updated: 2026-11-19
+updated: 2026-11-20
 owns: [domain-language]
 ---
 
@@ -65,6 +65,8 @@ where the thing is that file or folder.
   last commit and the last user prompt before the last code edit.
 - **Docs-only branch:** a branch where every changed file is a doc, as the `Docs-only` line
   of `CLAUDE.md` names them. `simple-session` says what it may skip.
+- **Fit read:** a docs-only branch's review: re-read each changed section whole, and move
+  detail that has outgrown the doc to the doc that owns it. `simple-session`, "Review".
 - **Trivial branch:** a branch that changes code, but where every changed line is a comment
   or a prose typo fix. `simple-session` says what it may skip.
 - **Side-fix:** a trivial, harmless fix outside the current task, made without asking and

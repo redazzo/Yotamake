@@ -75,7 +75,7 @@ paid run) and D12 (accept ADR-0008).
 ## What is left
 
 - `simple-session` sits at 250 of 250 lines, and this repository's `CLAUDE.md` is still
-  read whole — [backlog entry](../../backlog.md#keep-skills-short)
+  read whole — backlog entry, since closed
 - Why the judges failed case 23 — [backlog
   entry](../../backlog.md#llm-judges-fail-case-23-on-text-that-meets-them)
 - Session overhead on small changes, not started —
