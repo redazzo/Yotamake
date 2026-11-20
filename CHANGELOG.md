@@ -6,7 +6,7 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
-## Unreleased
+## 0.41.0 — 2026-11-20
 
 - The docs linter fails a link whose `#anchor` names no heading in its target, or in its
   own page (`broken-anchor`). A refreshed repository with such links sees `docs` fail: fix
