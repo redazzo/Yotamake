@@ -14,8 +14,8 @@ from.
 The enforcers, strongest first:
 
 - **Hook:** a plugin hook in `plugin/hooks/` blocks the action as it happens. How each one
-  works, and what gets past them (edits made from the shell), is in the README,
-  [The three ideas](../../README.md#the-three-ideas).
+  works, and what gets past them (edits made from the shell), is in
+  [hooks.md](./hooks.md).
 - **Permission:** the `ask` list in `.claude/settings.json`, so a person approves the command.
 - **Check:** `scripts/check` fails. The name in brackets is the check's name in its output,
   or the rule name `scripts/consistency.mjs` prints.
@@ -92,6 +92,9 @@ header comments of `scripts/consistency.mjs` and `scripts/docs/lint-docs.mjs`, n
 
 | Rule | Enforcer |
 |---|---|
-| A change in behaviour updates the doc that owns it | Review |
+| A change in behaviour updates the doc that owns it | Review. A docs-only branch gets no review, only the fit read (`simple-session`, "Review"): an instruction, with no hook or check |
+| `README.md` owns the overview: what exists and how it fits, not how each part works | Nothing. The fit read and the review are the only reads of it |
 | ADRs are never edited, only superseded or amended | Nothing |
+| An ADR change that replaces a numbered decision, or would be its third amendment, is a new ADR that supersedes it | Nothing. `write-doc` and `docs/decisions/README.md` say so |
+| The ADR index row's status matches the ADR's Status line, sits in the right table, and a Superseded ADR links its successor | Check (`adr index`) |
 | Plain English and short sentences | Nothing |

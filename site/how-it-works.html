@@ -42,7 +42,7 @@
 
   <article class="prose">
     <h1>How it works</h1>
-    <p class="lede">How a change moves through Yotamake, and which parts hooks enforce. Each step keeps a change small, checked, in line with your design, and yours to approve. Each skill's <code>SKILL.md</code> holds its exact rules, and the <a href="https://github.com/redazzo/Yotamake/blob/main/README.md">README</a> holds the full detail.</p>
+    <p class="lede">How a change moves through Yotamake, and which parts hooks enforce. Each step keeps a change small, checked, in line with your design, and yours to approve. Each skill's <code>SKILL.md</code> holds its exact rules, the <a href="https://github.com/redazzo/Yotamake/blob/main/README.md">README</a> is the overview, and the docs it links to hold the full detail.</p>
 
     <h2 id="split">The plugin and the repository</h2>
     <p>Yotamake is split in two. The plugin holds the method and is the same for every project. Each repository holds the facts that are specific to it.</p>
@@ -66,7 +66,7 @@
       <li><strong>Design and reuse</strong><p>Look for code to reuse, and check the change against Architecture. Stop and ask on a conflict.</p></li>
       <li><strong>Do the work</strong><p>Keep to one concern. Update the doc that owns what changed. With <code>Test-first: yes</code>, start with a failing test. A bug fix follows the <a href="skills.html#debugging"><code>debugging</code></a> skill. If the change outgrows one session partway, Claude stops and offers a multi-session plan, with the work so far as its first session.</p></li>
       <li><strong>Run the checks</strong><p>Run <code>scripts/check</code>. Never skip or weaken a check to get a pass.</p></li>
-      <li><strong>Review</strong><p>Once, on the whole branch: the built-in <code>/simplify</code>, a design read by a fresh agent, and <code>/code-review</code>. Docs-only and trivial branches skip it. A real finding the branch does not fix goes into the backlog with a trigger to act.</p></li>
+      <li><strong>Review</strong><p>Once, on the whole branch: the built-in <code>/simplify</code>, a design read by a fresh agent, and <code>/code-review</code>. Trivial branches skip it. A docs-only branch gets a fit read instead: each changed section re-read whole, and detail that has outgrown the doc moved to the doc that owns it. A real finding the branch does not fix goes into the backlog with a trigger to act.</p></li>
       <li class="stop"><strong>Stop and report</strong><p>What changed, the estimated and real size (not for trivial changes), what was reused, which docs were updated, the check and review results, and a proposed commit message. Then ask: commit and merge?</p></li>
     </ol>
     <p>On a yes, Claude commits, bumps the version if the project uses bumps, and merges locally, then does any after-merge step the project lists, such as a release tag. Or it pushes and opens a pull request if the project works that way. It never deploys.</p>
@@ -136,6 +136,7 @@
     </div>
     <p>The repository also has two SessionStart hooks of its own, which work without the plugin. One sets <code>core.hooksPath</code>. The other tells Claude the branch, any active multi-session effort, and that every change runs as a session.</p>
     <p>A repository that works on main on purpose can opt out with an empty file at <code>.claude/yotamake/allow-edits-on-main</code>. A person creates it; Claude cannot.</p>
+    <p>How each hook decides, and what gets past it, is in <a href="https://github.com/redazzo/Yotamake/blob/main/docs/reference/hooks.md">docs/reference/hooks.md</a>.</p>
 
     <h2 id="limits">What the hooks do not cover</h2>
     <p>The edit hooks watch the Edit, Write and NotebookEdit tools only, and the protected-paths hook Read too, but not Grep. The Bash hook watches git commands only. So a shell command gets past them: <code>sed -i</code>, <code>echo &gt; .env</code>, or a code change made from the shell, which neither the Stop hook nor the commit gate sees. Claude Code's own permission prompt for Bash is the guard there. The commit gate sees that a review ran, not that its findings were fixed.</p>
@@ -150,7 +151,7 @@
     </ul>
     <p>Plus <code>docs/backlog.md</code> for open work, each item with the trigger that should make someone pick it up.</p>
     <p>When two docs disagree: code beats decisions, decisions beat reference, reference beats records. Each subject has one owning doc, named in the "Owns" table in <code>docs/README.md</code>. A change in behaviour updates that doc on the same branch.</p>
-    <p>The linter fails on broken links, docs nothing links to, bad front-matter and a stale records index. For a repository with existing link debt, <code>node scripts/docs/lint-docs.mjs --update-baseline</code> records it once, and after that only new problems fail.</p>
+    <p>The linter fails on broken links and anchors, docs nothing links to, bad front-matter and a stale records index. It also checks inventory blocks: a list of files in a doc, marked with an <code>&lt;!-- inventory: &lt;glob&gt; --&gt;</code> comment, must match what is on disk. For a repository with existing link debt, <code>node scripts/docs/lint-docs.mjs --update-baseline</code> records it once, and after that only new problems fail.</p>
 
     <h2 id="evals">Evals</h2>
     <p>The plugin has an eval suite: over twenty cases, each run against a small project built fresh with the harness installed. They check behaviour such as "branches before editing", "refuses a change that is too big", "reuses the shared helper", and "stops at a boundary even when told not to ask". The headline number is the score with the plugin minus the score without it. The <a href="https://github.com/redazzo/Yotamake/blob/main/README.md#evals">README's eval table</a> lists every case.</p>

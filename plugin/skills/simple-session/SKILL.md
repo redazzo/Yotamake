@@ -24,11 +24,11 @@ Project specifics live in `CLAUDE.md`, not here. This skill reads these sections
 If a section or line is missing or still holds `<!-- FILL IN -->` placeholders, say so once
 in the report and use the defaults given below or in "Missing setup and tools".
 
-**Docs-only.** A docs-only branch skips the design and review steps and the version bump. A
-branch is docs-only when every file it changes is a doc, as the `Docs-only` line names them.
-Without that line, the docs are the files under `docs/` and the Markdown files at the
-repository root other than `CLAUDE.md`. Everything else counts as code. When unsure, treat
-the file as code.
+**Docs-only.** A docs-only branch skips the design step, the review skills and the version
+bump; its review is the fit read (step 6). A branch is docs-only when every file it changes
+is a doc, as the `Docs-only` line names them. Without that line, the docs are the files
+under `docs/` and the Markdown files at the root other than `CLAUDE.md`. Everything else
+counts as code. When unsure, treat the file as code.
 
 **Trivial.** A trivial branch changes code, but every changed line is a comment or a prose
 typo fix (in a docstring, or in Markdown that counts as code). It skips the design and
@@ -180,22 +180,22 @@ branch, say so and show the line, rather than fixing it in this branch.
 
 ## 6. Review
 
-The review runs once per session, here: after the work is done and the checks pass, on the
-whole branch diff. Never after each edit. Fixing its findings does not start another review;
-re-run only `scripts/check` (below). If the user asks for more changes after the report, run
-the full review once more before the next report, on what changed since the last one: both
-skills again, however small the new change, unless that change alone is trivial.
+The review runs once per session, here, on the whole branch diff once the checks pass; never
+after each edit. Fixing its findings does not start another review; re-run only
+`scripts/check`. If the user asks for more changes after the report, run the full review
+once more, on what changed since: both skills, unless that change alone is trivial.
 
-Skip this step when the branch is docs-only or trivial. Any other branch gets the full
-review, however small its diff: a small diff makes a cheap review, and reading it yourself
-does not replace the skills. Call each with the Skill tool from this context, not from a
-subagent you start: each runs its own agents, so their reading stays out of this context.
-Only the design read (part 2) goes to a subagent. A skill or the Agent tool not available:
-see "Missing setup and tools" above.
+Skip this step when the branch is trivial. A docs-only branch gets only the **fit read**:
+re-read each section it changed, whole, not just your lines. Move detail that has outgrown
+the doc to the doc that owns it (the Owns table in `docs/README.md`) and link there
+(`write-doc`, "Check nothing already owns the subject"). If it moved anything,
+re-run `scripts/check`. Any other branch gets the full review, however small its diff:
+reading it yourself does not replace the skills. Call each with the Skill tool from this
+context, not from a subagent you start; only the design read (part 2) goes to a subagent.
+A skill or the Agent tool not available: see "Missing setup and tools" above.
 
-Both skills read `git diff HEAD`, which leaves out files git does not track yet. So first run
-`git add -N` on each new file this branch adds (`git status --short` marks them `??`): the
-diff then shows them in full, but nothing is staged or committed.
+Both skills read `git diff HEAD`, which leaves out untracked files. So first run `git add -N`
+on each new file (`??` in `git status --short`): the diff shows it, and nothing is staged.
 
 Otherwise review the branch's diff against the main branch in three parts:
 
@@ -234,8 +234,8 @@ sessions in parallel" for a worktree session, "Autopilot" under autopilot.) Tell
 - with `Test-first: yes`, the test you saw fail before the change;
 - for a bug fix, what `debugging`, "Report", asks for;
 - the check results (one line each);
-- the review: which skills you ran, what they found and fixed, or
-  that it was skipped because the branch is docs-only, or trivial (and why);
+- the review: which skills you ran, what they found and fixed; on a docs-only branch, what
+  the fit read moved, or that nothing had outgrown its doc; or why it was skipped as trivial;
 - any side-fixes, each finding not acted on and where it went (a backlog entry, the ledger,
   or this report), and the findings you dropped as wrong, one line each;
 - the commit message you propose (Conventional Commits, `type(scope): summary`, ending with

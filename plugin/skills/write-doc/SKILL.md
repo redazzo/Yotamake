@@ -17,7 +17,7 @@ never set up). Say so and ask where the doc should go; do not create the skeleto
 |---|---|---|---|
 | How the system works now | reference | `docs/reference/<name>.md` | Corrected in place, `updated:` bumped |
 | How to do a task | guide | `docs/guides/<name>.md` | Corrected in place, `updated:` bumped |
-| A choice that constrains future work | decision (ADR) | `docs/decisions/NNNN-<slug>.md` | Never edited; superseded or given a dated amendment |
+| A choice that constrains future work | decision (ADR) | `docs/decisions/NNNN-<slug>.md` | Never edited; superseded, given a dated amendment, or withdrawn |
 | Work you did, and why | record | `docs/records/<year>/<YYYY-MM-DD>-<slug>.md` | Written once; only `status:` changes |
 | Something that needs doing | backlog entry | a `##` entry in `docs/backlog.md` | Deleted when the work lands |
 
@@ -27,6 +27,11 @@ When two docs disagree: **code > decisions > reference > records.**
 
 Search the "Owns" table in `docs/README.md`. If a reference doc covers the subject, extend it
 rather than adding a second one. Two docs explaining the same thing is a bug.
+
+**Overviews.** A root `README.md`, an index or a landing page owns what exists and how the
+parts fit, never how a part works. Sum each part up in a line or two and link to the doc
+that owns it; if none does, write one rather than growing the overview. Its lists of files
+go in inventory blocks (step 4).
 
 ## 3. Write it
 
@@ -60,7 +65,10 @@ spans several documents. `status: current` while open, `historical` when complet
 3. **A real trade-off:** there were real alternatives, and one was chosen for a reason.
 
 Ask the user before writing one. Number it one above the highest in `docs/decisions/`, and
-add a row to the index in `docs/decisions/README.md`.
+add a row to the index in `docs/decisions/README.md`, under "In force" where it has one.
+
+**Changing an ADR.** Amend or supersede as "Supersede or amend" in `docs/decisions/README.md`
+says; the decision template's last comment has the Status line wording for each case.
 
 **Avoid**, in every kind:
 
@@ -93,5 +101,6 @@ work lands.
 node scripts/docs/lint-docs.mjs
 ```
 
-It fails on a broken link, a doc in `docs/` that nothing links to, bad front-matter, or a
-stale records index. Fix every finding before reporting.
+Fix every finding before reporting; the linter's header comment lists its rules. A list of
+files on disk (skills, hooks, scripts) goes in an inventory block, so the linter keeps it
+true: `<!-- inventory: <glob> -->`, the list, then `<!-- /inventory -->`.

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Documentation linter — internal link integrity and doc front-matter.
+ * Documentation linter — internal links and anchors, inventory blocks, and doc front-matter.
  *
  * WHY THIS EXISTS. Hand-written relative markdown links decay silently: files move,
  * get renamed or deleted, and nothing notices. Docs nobody links to become invisible.
@@ -10,6 +10,9 @@
  * WHAT IS ENFORCED. Every rule below fails the run:
  *
  *   - broken links — every internal link must resolve to a file.
+ *   - broken anchors — a link's `#fragment` into a Markdown file, or a same-page `#…`
+ *     link, must name a heading there (by GitHub's slug rules, `-1` for a repeat) or an
+ *     HTML `id`/`name`. Fragments into other files are not checked.
  *   - orphans — every file under docs/ must be reachable from docs/README.md by
  *     following links. That index is the single entry point.
  *   - doc-to-doc link depth — a link from one docs/ file to another may not walk
@@ -17,6 +20,15 @@
  *     from docs to source files are exempt.
  *   - front-matter — validated where present. Records need kind/date/status.
  *   - a stale records index (via generate-records-index.mjs --check).
+ *   - inventory blocks — a list a doc keeps of files on disk, written between
+ *     `<!-- inventory: <glob> [<glob> …] -->` and `<!-- /inventory -->`, must name every
+ *     path its globs match (globs are from the repository root; `*` stays within one
+ *     name; a trailing `/` matches folders). A path is named when it ends with a word
+ *     in the list (`lib.sh`, `hooks/lib.sh`, `skills/` for a folder). A word that looks
+ *     like a match (it fits the glob's last part) but names nothing on disk fails too; a
+ *     bare `*` for files is never checked this way, since any word fits it. Add `names`
+ *     after the globs for a list that writes folders without the `/`: it compares bare
+ *     names, and only its `code` words count as claims.
  *
  * THE RATCHET. For adopting the harness in a repo with existing link debt:
  * `--update-baseline` writes scripts/docs/docs-lint-baseline.txt with the current
@@ -27,8 +39,9 @@
  * Directories containing a package.json are skipped: a vendored sample app inside a
  * record is that record's payload, not documentation.
  *
- * WHAT IT CANNOT DO. It does not verify `#anchor` fragments, and it says nothing
- * about whether a document is *accurate* — only whether its links resolve.
+ * WHAT IT CANNOT DO. It says nothing about whether a document is *accurate*: only
+ * whether its links and anchors resolve, and whether its inventory blocks match the disk.
+ * A list outside an inventory block is not compared with anything.
  *
  * Exit codes: 0 clean · 1 findings, stale baseline, or stale records index · 2 could not run.
  */
@@ -89,46 +102,244 @@ function findMarkdownFiles(dir, acc = []) {
  * not mistaken for a real link. Replaced with spaces rather than removed, so
  * line numbers in findings still point at the right line.
  */
-function stripCode(source) {
-  const blank = (m) => m.replace(/[^\n]/g, ' ');
-  return source
-    .replace(/^([ \t]*)(```|~~~)[\s\S]*?^\1?\2[^\n]*$/gm, blank)
-    .replace(/`[^`\n]*`/g, blank);
+const blank = (m) => m.replace(/[^\n]/g, ' ');
+
+/** Blank out fenced code only. Headings keep their inline code, which their slug uses. */
+function stripFences(source) {
+  return source.replace(/^([ \t]*)(```|~~~)[\s\S]*?^\1?\2[^\n]*$/gm, blank);
 }
+
+function stripCode(source) {
+  return stripFences(source).replace(/`[^`\n]*`/g, blank);
+}
+
+const lineAt = (text, index) => text.slice(0, index).split('\n').length;
+
+/** A percent-decoded string; a malformed escape is kept literal, to fail honestly. */
+const safeDecode = (s) => {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+};
 
 const LINK_RE = /\[[^\]]*\]\(\s*([^)\s]+)(?:\s+"[^"]*")?\s*\)/g;
 
-/** Every internal link target in a document, with the line it appears on. */
-function internalLinks(source) {
-  const body = stripCode(splitFrontMatter(source).body);
+/**
+ * Every internal link in a document, with the line it appears on. A same-page `#…` link
+ * comes back with `same: true` and no target; `fragment` is the part after `#`, if any.
+ */
+function internalLinks(body) {
+  body = stripCode(body);
   const links = [];
 
   for (const match of body.matchAll(LINK_RE)) {
     let href = match[1].trim();
     if (href.startsWith('<') && href.endsWith('>')) href = href.slice(1, -1);
 
-    // External, same-page anchors, and protocol-relative URLs are not ours to check.
-    if (/^(https?:|mailto:|tel:|data:|#|\/\/)/.test(href)) continue;
+    // External and protocol-relative URLs are not ours to check.
+    if (/^(https?:|mailto:|tel:|data:|\/\/)/.test(href)) continue;
+    const line = lineAt(body, match.index);
 
-    const target = href.split('#')[0].split('?')[0].trim();
-    if (!target) continue;
-
-    let decoded;
-    try {
-      decoded = decodeURIComponent(target);
-    } catch {
-      decoded = target; // malformed escape — check the literal path and let it fail honestly
+    const hash = href.indexOf('#');
+    const fragment = hash < 0 ? '' : href.slice(hash + 1);
+    if (hash === 0) {
+      if (fragment) links.push({ href, same: true, fragment, line });
+      continue;
     }
+
+    const target = href.slice(0, hash < 0 ? undefined : hash).split('?')[0].trim();
+    if (!target) continue;
+    const decoded = safeDecode(target);
 
     links.push({
       href,
       target: decoded,
-      line: body.slice(0, match.index).split('\n').length,
+      fragment,
+      line,
       depth: (decoded.match(/\.\.\//g) || []).length,
       absolute: decoded.startsWith('/'),
     });
   }
   return links;
+}
+
+// ---------------------------------------------------------------------------
+// Anchors
+// ---------------------------------------------------------------------------
+
+/**
+ * A heading's anchor as GitHub makes it: the text without link targets, tags and
+ * emphasis, lower-cased, punctuation dropped except `-` and `_`, each space a `-`.
+ */
+function slugOf(text) {
+  return text
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .replace(/(^|[^\p{L}\p{N}])_+([^_]+?)_+(?=[^\p{L}\p{N}]|$)/gu, '$1$2')
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}\p{Pc} -]/gu, '')
+    .replace(/ /g, '-');
+}
+
+/** A line that can sit above a setext underline: plain paragraph text. */
+const isParagraphLine = (line) => line.trim() !== '' && !/^\s*([#>|]|[-*+]\s|\d+[.)]\s|<!--)/.test(line);
+
+/**
+ * Every anchor a link may name in a document: one per heading (a repeat gets `-1`,
+ * `-2`, as on GitHub), plus each `id` or `name` attribute in its HTML.
+ */
+function headingAnchors(body) {
+  const lines = stripFences(body).split('\n');
+  const anchors = new Set();
+  const seen = new Map();
+  const add = (text) => {
+    const base = slugOf(text);
+    const count = seen.get(base) ?? 0;
+    seen.set(base, count + 1);
+    anchors.add(count ? `${base}-${count}` : base);
+  };
+
+  lines.forEach((line, i) => {
+    const atx = line.match(/^ {0,3}#{1,6}(?:[ \t]+(.*?))?(?:[ \t]+#+)?[ \t]*$/);
+    if (atx) add(atx[1] ?? '');
+    else if (i > 0 && /^ {0,3}(=+|-+)[ \t]*$/.test(line) && isParagraphLine(lines[i - 1])) add(lines[i - 1]);
+  });
+  for (const m of stripCode(body).matchAll(/<[a-z][^>]*?\s(?:id|name)\s*=\s*["']([^"']+)["']/gi)) {
+    anchors.add(m[1].toLowerCase());
+  }
+  return anchors;
+}
+
+const hasAnchor = (anchors, fragment) => anchors.has(safeDecode(fragment).toLowerCase());
+
+// ---------------------------------------------------------------------------
+// Inventory blocks
+// ---------------------------------------------------------------------------
+
+/** What separates the names in a block: spaces, code marks, commas, brackets, table bars. */
+const TOKEN_SPLIT = /[\s`,()[\]{}|<>"']+/;
+const cleanToken = (t) => t.replace(/^\*+/, '').replace(/[*.:;!?]+$/, '').replace(/^\.\//, '');
+const tokensOf = (text) => text.split(TOKEN_SPLIT).map(cleanToken).filter(Boolean);
+
+/** A glob part as a regular expression. `*` matches within one name, never across `/`. */
+const partRegex = (part) =>
+  new RegExp(`^${part.split('*').map((s) => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('[^/]*')}$`);
+
+function parseGlob(glob) {
+  const dirOnly = glob.endsWith('/');
+  const parts = glob.replace(/^\.?\//, '').replace(/\/+$/, '').split('/');
+  return { glob, dirOnly, parts };
+}
+
+/** The repo-relative paths a glob matches; a directory ends in `/`. Hidden names need a `.` in the glob. */
+function expandGlob({ dirOnly, parts }) {
+  let found = [''];
+  parts.forEach((part, i) => {
+    const last = i === parts.length - 1;
+    const next = [];
+    const re = partRegex(part);
+    for (const dir of found) {
+      for (const entry of readdirSync(path.join(REPO_ROOT, dir), { withFileTypes: true })) {
+        if (!re.test(entry.name) || (entry.name.startsWith('.') && !part.startsWith('.'))) continue;
+        if (!last) {
+          if (entry.isDirectory()) next.push(`${dir}${entry.name}/`);
+        } else if (dirOnly ? entry.isDirectory() : entry.isFile()) {
+          next.push(`${dir}${entry.name}${dirOnly ? '/' : ''}`);
+        }
+      }
+    }
+    found = next;
+  });
+  return found.sort();
+}
+
+/** A token names a path when the path ends with it, at a `/`. `names` blocks drop the trailing `/`. */
+function tokenNames(pathOnDisk, token, bare) {
+  const p = bare ? pathOnDisk.replace(/\/$/, '') : pathOnDisk;
+  const t = bare ? token.replace(/\/$/, '') : token;
+  return p === t || p.endsWith(`/${t}`);
+}
+
+/**
+ * Whether a token looks like something the glob would match, so is a claim that it is
+ * on disk. Its last part must fit the glob's last part (a trailing `/` for `*\/`), and a
+ * bare `*` for files claims nothing, since any word would fit it.
+ */
+function tokenClaims({ dirOnly, parts }, token, bare) {
+  if (token.includes('*') || token.includes('://')) return false;
+  if (!bare && token.endsWith('/') !== dirOnly) return false;
+  const tokenParts = token.replace(/\/$/, '').split('/');
+  if (tokenParts.length > parts.length || tokenParts.some((p) => !p)) return false;
+  if (!dirOnly && /^\*+$/.test(parts.at(-1))) return false;
+  const tail = parts.slice(parts.length - tokenParts.length);
+  return tokenParts.every((p, i) => partRegex(tail[i]).test(p) && (!p.startsWith('.') || tail[i].startsWith('.')));
+}
+
+/** Whether the token is on disk inside `dir`, as a folder when it ends in `/`. */
+function existsBeside(dir, token, bare) {
+  const abs = path.join(REPO_ROOT, dir, token);
+  if (!existsSync(abs)) return false;
+  return bare || token.endsWith('/') === statSync(abs).isDirectory();
+}
+
+/**
+ * The inventory blocks in a document: `<!-- inventory: <glob> [<glob> …] [names] -->`, then
+ * the list, then `<!-- /inventory -->`. The markers are found outside code; the list
+ * between them is read as written, code blocks included.
+ */
+function inventoryBlocks(body) {
+  const plain = stripCode(body);
+  const blocks = [];
+  for (const open of plain.matchAll(/<!--\s*inventory:([^>]*?)-->/g)) {
+    const words = open[1].trim().split(/\s+/).filter(Boolean);
+    const bare = words.at(-1) === 'names';
+    if (bare) words.pop();
+    const start = open.index + open[0].length;
+    const end = plain.slice(start).search(/<!--\s*\/inventory\s*-->/);
+    blocks.push({
+      globs: words.map(parseGlob),
+      bare,
+      line: lineAt(body, open.index),
+      text: end < 0 ? null : body.slice(start, start + end),
+    });
+  }
+  return blocks;
+}
+
+/** What a block gets wrong: a path on disk it does not name, or a name it claims that is not on disk. */
+function inventoryProblems({ globs, bare, text }) {
+  if (!globs.length) return ['the inventory block names no glob'];
+  if (text === null) return ['the inventory block has no closing <!-- /inventory -->'];
+
+  const tokens = tokensOf(text);
+  // A `names` block writes bare words, so only its code spans count as claims.
+  const claims = bare ? [...text.matchAll(/`([^`\n]+)`/g)].flatMap((m) => tokensOf(m[1])) : tokens;
+  const problems = [];
+  const onDisk = new Set();
+  const above = new Set(); // folders above a match, which a tree names as headings
+
+  for (const glob of globs) {
+    for (const match of expandGlob(glob)) {
+      onDisk.add(match);
+      const segments = match.replace(/\/$/, '').split('/');
+      for (let i = 1; i < segments.length; i++) above.add(`${segments.slice(0, i).join('/')}/`);
+      if (!tokens.some((t) => tokenNames(match, t, bare))) {
+        problems.push(`${glob.glob}: ${match} is on disk but the block does not name it`);
+      }
+    }
+  }
+  const known = [...onDisk, ...above];
+  for (const token of new Set(claims)) {
+    if (!globs.some((g) => tokenClaims(g, token, bare))) continue;
+    if (known.some((p) => tokenNames(p, token, bare))) continue;
+    // A tree also names what sits beside the matches, such as other folders.
+    if ([...above].some((dir) => existsBeside(dir, token, bare))) continue;
+    problems.push(`${globs.map((g) => g.glob).join(' ')}: the block names ${token}, which is not on disk`);
+  }
+  return problems;
 }
 
 // ---------------------------------------------------------------------------
@@ -200,19 +411,46 @@ function lint() {
   const files = findMarkdownFiles(REPO_ROOT).sort();
   const findings = [];
   const linkGraph = new Map(); // repo-relative file -> Set of repo-relative targets
+  const sources = new Map(); // absolute path -> text, each file read once
+  const sourceOf = (absolute) => {
+    if (!sources.has(absolute)) sources.set(absolute, readFileSync(absolute, 'utf8').replace(/\r\n/g, '\n'));
+    return sources.get(absolute);
+  };
+  const anchorCache = new Map(); // absolute path -> Set of anchors
+  const anchorsOf = (absolute) => {
+    if (!anchorCache.has(absolute)) anchorCache.set(absolute, headingAnchors(splitFrontMatter(sourceOf(absolute)).body));
+    return anchorCache.get(absolute);
+  };
   let totalLinks = 0;
 
   for (const absolute of files) {
     const file = path.relative(REPO_ROOT, absolute);
-    const source = readFileSync(absolute, 'utf8').replace(/\r\n/g, '\n');
+    const source = sourceOf(absolute);
+    const { body } = splitFrontMatter(source);
 
     for (const problem of frontMatterProblems(readFrontMatter(source).data)) {
       findings.push({ rule: 'front-matter', file, detail: problem, line: 1 });
     }
 
+    for (const block of inventoryBlocks(body)) {
+      for (const problem of inventoryProblems(block)) {
+        findings.push({ rule: 'inventory', file, detail: problem, line: block.line });
+      }
+    }
+
     const outbound = new Set();
-    for (const link of internalLinks(source)) {
+    for (const link of internalLinks(body)) {
       totalLinks += 1;
+      const brokenAnchor = (target) => {
+        if (!hasAnchor(anchorsOf(target), link.fragment)) {
+          findings.push({ rule: 'broken-anchor', file, detail: link.href, line: link.line });
+        }
+      };
+
+      if (link.same) {
+        brokenAnchor(absolute);
+        continue;
+      }
 
       // A leading `/` is repo-root-relative on GitHub but filesystem-absolute to
       // Node, so it has to be re-anchored before it can be checked at all.
@@ -235,6 +473,7 @@ function lint() {
       }
       if (resolved.endsWith('.md') && statSync(resolved).isFile()) {
         outbound.add(targetRel);
+        if (link.fragment) brokenAnchor(resolved);
       }
     }
     linkGraph.set(file, outbound);

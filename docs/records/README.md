@@ -25,6 +25,7 @@ run `node scripts/docs/generate-records-index.mjs` after adding one.
 
 | Date | Record |
 |---|---|
+| 2026-11-20 | [Catching docs drift](./2026/2026-11-20-docs-drift.md) |
 | 2026-11-17 | [The second Medium backlog: changelog and tags, empty gate, case 23, short skills, project.conf](./2026/2026-11-17-releases-short-skills-project-conf.md) |
 | 2026-11-12 | [Autopilot for multi-session efforts](./2026/2026-11-12-autopilot.md) |
 | 2026-11-12 | [The medium-priority backlog: cost, trivial tier, test-first, debugging, design read](./2026/2026-11-12-medium-backlog.md) |

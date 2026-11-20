@@ -88,4 +88,4 @@ D0 and D6 are the user's answers. Under autopilot, D1–D5 and D7 took the recom
 - The size check can still misjudge a change — [backlog entry](../../backlog.md#the-size-check-can-misjudge-a-change)
 - A size warning hook — [backlog entry](../../backlog.md#size-warning-hook)
 - A middle tier between the two session skills — [backlog entry](../../backlog.md#a-middle-tier-between-the-two-session-skills)
-- The review window restarted during a cloud autopilot run — [backlog entry](../../backlog.md#the-review-window-restarted-during-a-cloud-autopilot-run)
+- The review window restarted during a cloud autopilot run — backlog entry, closed by the 0.39.1 fix

@@ -12,13 +12,30 @@ here. Ask the user before writing one.
 ## Status legend
 
 - **Accepted** — in force; the system is built this way today.
-- **Superseded** — replaced by a later ADR. The old one stays.
-- **Proposed** — under discussion.
+- **Proposed** — under discussion. Listed with the ADRs in force until it is accepted or
+  withdrawn.
+- **Superseded** — replaced by a later ADR, which its Status line links. The old one stays.
+- **Withdrawn** — a proposal dropped before it was accepted. It stays, and its Status line
+  says why.
 
-An ADR is never edited to reflect a change of mind. It is superseded by a new one, or given a
-dated amendment section at the end.
+## Supersede or amend
+
+An ADR is never edited to reflect a change of mind. A dated amendment section at the end,
+or a later ADR's **Amends** line, may correct a detail or add one. Write a new ADR that
+states the whole decision as it now stands, and supersedes the old one, when the change
+would:
+
+- replace one of the old ADR's numbered decisions; or
+- be its third amendment.
+
+Then a reader finds the decision in one file, not spread over several amendments.
 
 ## Index
+
+Each row's status matches the ADR's Status line. `scripts/check` fails when they differ
+(`adr index`).
+
+### In force
 
 | ADR | Title | Status |
 |-----|-------|--------|
@@ -34,11 +51,19 @@ dated amendment section at the end.
 | [0010](./0010-commit-gate-by-step-table.md) | A plugin hook refuses `git commit` until the check and the review are done, by one step table | Accepted |
 | [0011](./0011-session-sized-by-review-revert-and-decisions.md) | A session is sized by review, revert and decisions, with context as a backstop | Accepted |
 
+### Superseded and withdrawn
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| — | _None yet._ | — |
+
 ## Template
 
 File: `docs/decisions/NNNN-<kebab-slug>.md`, numbered one above the highest here. Add a row
-to the index above. Start from the decision template of the `write-doc` skill
+under "In force" above. Start from the decision template of the `write-doc` skill
 (`templates/decision.md` in the skill). It says how to supersede or amend an ADR later.
+When an ADR is superseded or withdrawn, move its row to the second table with its new
+status, e.g. `Superseded by [NNNN](./NNNN-<slug>.md)`.
 
 Older ADRs may have one `**Supersedes / amends:**` line. It means the same as the template's
 separate **Supersedes** and **Amends** lines.

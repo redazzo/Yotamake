@@ -25,6 +25,11 @@ Every subject has **one** document that owns it (the table below). Anything else
 mentions the subject links here rather than restating it. Two documents explaining the same
 thing is a bug in the docs.
 
+An overview (the root `README.md`, an index, a landing page) owns what exists and how the
+parts fit, never how a part works. It sums each part up in a line or two and links to the
+document that owns it. When an overview section grows into a manual, move the detail to its
+owner.
+
 ---
 
 ## Reference
@@ -32,9 +37,10 @@ thing is a bug in the docs.
 How the system works today. If one of these disagrees with the code, the doc is wrong.
 
 The root [README.md](../README.md), which every user reads first, owns the overview of the
-harness: install, how it is split, the hooks, the docs system and the evals. Each skill's
-rules are owned by its own `plugin/skills/<name>/SKILL.md`. The README sums up a skill and
-links to it, rather than restating its rules.
+harness: install, how it is split, how it holds, the docs system and the evals. It sums up
+each hook in a line; how the hooks work is in [reference/hooks.md](./reference/hooks.md).
+Each skill's rules are owned by its own `plugin/skills/<name>/SKILL.md`. The README sums up a
+skill and links to it, rather than restating its rules.
 
 The website in [`site/`](../site/index.html) is an introduction for new users. It owns no
 subject: it sums up the README and the skills and links to them. The README's "Developing
@@ -43,6 +49,7 @@ Yotamake" section says how it is published and kept in step.
 | Document | Owns |
 |---|---|
 | [reference/glossary.md](./reference/glossary.md) | Domain language: the harness's own words and what each means |
+| [reference/hooks.md](./reference/hooks.md) | The hooks and `ask` rules: what each blocks, how the `Stop` and commit gates decide, and what gets past them |
 | [reference/rules-and-enforcers.md](./reference/rules-and-enforcers.md) | Each rule in `CLAUDE.md` and what enforces it |
 | [CHANGELOG.md](../CHANGELOG.md) | Release history: what changed in each version |
 
@@ -80,8 +87,9 @@ item, each with an **Added** date and a **Trigger to act**. Longer analysis goes
 2. **Check nothing already owns the subject.** If a reference doc covers it, extend that doc.
 3. **Name it in kebab-case.**
 4. **Link it from this page** — except records, whose index is generated.
-5. **Run `node scripts/docs/lint-docs.mjs`.** It fails on a broken link, a stale records index,
-   or a document in `docs/` that nothing links to.
+5. **Run `node scripts/docs/lint-docs.mjs`.** It fails on a broken link or anchor, a stale
+   records index, an inventory block that does not match the disk, or a document in `docs/`
+   that nothing links to.
 
 Every document carries `kind:` front-matter (`reference`, `guide`, `decision` or `record`),
 plus `updated:` for reference and guides and `date:` for decisions and records. The linter

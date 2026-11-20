@@ -44,6 +44,12 @@
  *     harness) match plugin/template/. Re-run ./plugin/install.sh . to refresh them.
  *   - project conf: main-branch in .claude/yotamake/project.conf names the branch the
  *     CLAUDE.md "Main branch" line does (ADR-0008: CLAUDE.md is the source; fix the conf).
+ *   - adr index: docs/decisions/README.md lists every ADR file once. A row's status (its
+ *     first word) is the one on the file's `**Status:**` line, and the front-matter agrees
+ *     (Accepted, Proposed: current; Superseded: superseded; Withdrawn: historical).
+ *     Accepted and Proposed rows sit under "In force", the others under "Superseded and
+ *     withdrawn". A Superseded ADR links the ADR that replaces it, in its row and on its
+ *     Status line, and that ADR exists.
  *
  * Exit 0 when every rule holds, 1 otherwise.
  */
@@ -52,6 +58,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readFrontMatter } from './docs/generate-records-index.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(path.join(ROOT, p), 'utf8');
@@ -392,6 +399,55 @@ function checkProjectConf() {
   }
 }
 
+/** ADR status (first word of the Status line) -> the front-matter status it goes with. */
+const ADR_STATUSES = { Accepted: 'current', Proposed: 'current', Superseded: 'superseded', Withdrawn: 'historical' };
+/** The index table each status belongs under: in force while its front-matter is current. */
+const adrTable = (status) => (ADR_STATUSES[status] === 'current' ? 'In force' : 'Superseded and withdrawn');
+/** A link to an ADR file: "(./0012-x.md)", capturing "0012-x.md". */
+const ADR_LINK = String.raw`\(\.\/(\d{4}-[\w-]+\.md)\)`;
+const adrLinks = (text) => [...text.matchAll(new RegExp(`\\]${ADR_LINK}`, 'g'))].map((m) => m[1]);
+
+function checkAdrIndex() {
+  const dir = 'docs/decisions';
+  if (!existsSync(path.join(ROOT, dir, 'README.md'))) return;
+  const files = new Set(readdirSync(path.join(ROOT, dir)).filter((f) => /^\d{4}-.*\.md$/.test(f)));
+  const index = read(`${dir}/README.md`);
+  const rows = new Map(); // file -> { table, status cell }
+  for (const part of index.split(/^### /m).slice(1)) {
+    const table = part.split('\n')[0].trim();
+    for (const m of part.matchAll(new RegExp(`^\\| \\[\\d{4}\\]${ADR_LINK} \\|[^|]*\\| ([^\\n]*?) \\|$`, 'gm'))) {
+      if (rows.has(m[1])) fail('adr index', `${dir}/README.md lists ${m[1]} twice`);
+      rows.set(m[1], { table, cell: m[2] });
+    }
+  }
+  for (const f of files) if (!rows.has(f)) fail('adr index', `${dir}/README.md has no row for ${f}`);
+  for (const [f, { table, cell }] of rows) {
+    if (!files.has(f)) { fail('adr index', `${dir}/README.md lists ${f}, not in ${dir}/`); continue; }
+    const where = `${dir}/${f}`;
+    const source = read(where);
+    const line = source.match(/^- \*\*Status:\*\*(.*)$/m)?.[1] ?? '';
+    const status = line.match(/[A-Za-z]+/)?.[0];
+    const listed = cell.match(/[A-Za-z]+/)?.[0];
+    if (!(status in ADR_STATUSES)) {
+      fail('adr index', `${where} has no Status line starting ${Object.keys(ADR_STATUSES).join(', ')}`);
+      continue;
+    }
+    if (listed !== status) fail('adr index', `${dir}/README.md says ${f} is ${listed}, its Status line says ${status}`);
+    if (table !== adrTable(status)) fail('adr index', `${f} is ${status}; list it under "${adrTable(status)}", not "${table}"`);
+    const front = readFrontMatter(source).data.status;
+    if (front !== ADR_STATUSES[status]) {
+      fail('adr index', `${where} is ${status} but its front-matter says status: ${front}; make it ${ADR_STATUSES[status]}`);
+    }
+    if (status === 'Superseded') {
+      for (const [what, text] of [['its Status line', line], ['its index row', cell]]) {
+        const by = adrLinks(text).filter((l) => l !== f);
+        if (!by.length) fail('adr index', `${where} is Superseded, but ${what} links no ADR that replaces it`);
+        for (const l of by) if (!files.has(l)) fail('adr index', `${where} is superseded by ${l}, not in ${dir}/`);
+      }
+    }
+  }
+}
+
 function checkUpgrades(changed) {
   if (changed.includes('plugin/reference/upgrades.md')) return;
   // Template files that reach older installs on their own. The last two mirror special
@@ -428,6 +484,7 @@ if (process.argv[2] === 'upgrades') {
   checkPortableSed();
   checkHarnessCopies();
   checkProjectConf();
+  checkAdrIndex();
 }
 
 for (const p of problems) console.error(p);

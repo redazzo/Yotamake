@@ -6,6 +6,26 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## Unreleased
+
+- The docs linter fails a link whose `#anchor` names no heading in its target, or in its
+  own page (`broken-anchor`). A refreshed repository with such links sees `docs` fail: fix
+  them, or run `node scripts/docs/lint-docs.mjs --update-baseline` once to record them.
+- The docs linter checks inventory blocks: a list of files written between
+  `<!-- inventory: <glob> -->` and `<!-- /inventory -->` must name every path the glob
+  matches, and nothing that is not on disk (`inventory`).
+- `simple-session`: a docs-only branch gets a fit read. It re-reads each changed section
+  whole, moves detail that has outgrown the doc to the doc that owns it, and the report
+  says what moved.
+- `write-doc` and the template `docs/README.md`: an overview owns what exists and how the
+  parts fit, never how a part works.
+- The plugin page (`plugin/README.md`) names every skill and hook again; it had missed
+  `improve-architecture` and five hooks.
+- `write-doc` and the template `docs/decisions/README.md`: an ADR change that replaces one
+  of its numbered decisions, or would be its third amendment, is a new ADR that supersedes
+  it. A dropped proposal is **Withdrawn**. The index lists the ADRs in force apart from the
+  superseded and withdrawn ones.
+
 ## 0.39.1 — 2026-11-20
 
 - The commit gate no longer counts a subagent's hand-back message as a user prompt, so a

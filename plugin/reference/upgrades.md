@@ -20,6 +20,32 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.41.0 — Docs linter anchors and inventory blocks; what an overview owns; ADR index by status
+
+- **Check:** `node scripts/docs/lint-docs.mjs` passes, the linter line under "Adding a
+  document" in `docs/README.md` names broken anchors, and `docs/README.md` has a paragraph
+  starting "An overview". Where `docs/decisions/README.md` exists, it has a "Supersede or
+  amend" section and its index has "In force" and "Superseded and withdrawn" tables.
+- **Apply:**
+  - The refreshed linter fails a link whose `#fragment` names no heading in its target
+    (`broken-anchor`). For each finding, point the link at the heading's anchor as it is
+    now, or drop the fragment. When there are many, ask the user whether to run
+    `node scripts/docs/lint-docs.mjs --update-baseline` once to record them as debt.
+  - In `docs/README.md`, "Adding a document", make the linter line's list read "a broken link or anchor, a stale
+    records index, an inventory block that does not match the disk, or a document in
+    `docs/` that nothing links to", as in the plugin's `template/docs/README.md`.
+  - In `docs/README.md`, after the paragraph that ends "a bug in the docs", add the
+    template's paragraph on overviews: an overview owns what exists and how the parts fit,
+    never how a part works. If its Owns table makes an overview own detailed subjects, tell
+    the user; moving that detail out is its own docs-only branch.
+  - In `docs/decisions/README.md`, replace the "Status legend" section with the template's
+    "Status legend" (it adds **Withdrawn**) and "Supersede or amend" sections. Split the
+    index into the template's two tables: Accepted and Proposed rows under "In force",
+    Superseded and Withdrawn rows under "Superseded and withdrawn". Keep each row as it is.
+    If a row's status differs from its ADR's Status line, tell the user rather than change
+    the ADR. Copy the template's "When an ADR is superseded or withdrawn" sentence into
+    "Template".
+
 ## 0.38.0 — Session size line and session definition
 
 - **Check:** `CLAUDE.md`, **Branching and releases**, has a line starting

@@ -86,6 +86,36 @@ quoted_status_agrees() {
     node scripts/docs/lint-docs.mjs
 }
 
+# True when the docs linter fails.
+lint_fails() { ! node scripts/docs/lint-docs.mjs >/dev/null 2>&1; }
+
+# The docs linter fails a link whose #fragment names no heading, in another file or its own.
+lint_fails_broken_anchor() {
+    cd "$full"
+    printf '# Notes\n\n[index](docs/README.md#no-such-heading)\n' > notes.md
+    lint_fails || return 1
+    printf '# Notes\n\n[index](docs/README.md#reference) [here](#missing)\n' > notes.md
+    lint_fails || return 1
+    printf '# Notes\n\n## The `docs` check\n\n## Notes\n\n[i](docs/README.md#reference) [a](#the-docs-check) [b](#notes-1) <a id="x"></a>[c](#x)\n' > notes.md
+    node scripts/docs/lint-docs.mjs
+    rm notes.md
+}
+
+# An inventory block fails when a path its glob matches is not named, or it names one not on disk.
+lint_checks_inventory() {
+    cd "$full"
+    mkdir -p items kinds/one && touch items/a.sh items/b.sh
+    printf '<!-- inventory: items/*.sh -->\n- `a.sh`\n<!-- /inventory -->\n' > notes.md
+    lint_fails || return 1
+    printf '<!-- inventory: items/*.sh -->\n- `a.sh` and b.sh, c.sh\n<!-- /inventory -->\n' > notes.md
+    lint_fails || return 1
+    printf '<!-- inventory: kinds/*/ names -->\n`one`, `two`\n<!-- /inventory -->\n' > notes.md
+    lint_fails || return 1
+    printf '<!-- inventory: items/*.sh -->\n```\nitems/\n  a.sh  b.sh   run with bash\n```\n<!-- /inventory -->\n<!-- inventory: kinds/*/ names -->Kinds: `one`.<!-- /inventory -->\n' > notes.md
+    node scripts/docs/lint-docs.mjs
+    rm -r notes.md items kinds
+}
+
 settings_merge_keeps_ours() {
     cd "$full"
     node -e '
@@ -190,6 +220,8 @@ step "a lite refresh adds no files" lite_refresh_adds_nothing
 step "the eval fixture passes its check" eval_fixture
 step "a refresh regenerates a stale records index" refresh_regenerates_stale_index
 step "a quoted status is read the same by the index and the linter" quoted_status_agrees
+step "the docs linter fails a broken anchor, in another file or its own" lint_fails_broken_anchor
+step "the docs linter checks an inventory block both ways" lint_checks_inventory
 step "the settings merge keeps the repository's own entries" settings_merge_keeps_ours
 step "the settings merge adds the SessionStart hook once" settings_merge_adds_hook_once
 step "a refresh adds new ask rules to older settings" settings_merge_adds_ask_rules
