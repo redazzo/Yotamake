@@ -6,7 +6,7 @@ status: current
 
 # ADR-0005: Independent sessions of one effort may run in parallel worktrees
 
-- **Status:** Accepted (2026-11-11)
+- **Status:** Accepted (2026-11-11), amended 2026-11-20
 - **Date:** 2026-11-11
 - **Work record:** none yet (effort "Subagents and worktrees")
 - **Supersedes / amends:** none. Keeps [ADR-0003](./0003-stop-points-enforced-by-ask-rules.md)
@@ -119,3 +119,12 @@ new worktree may need setup, and that commits in parallel sessions still need a 
 turned down, one conversation driving session subagents, for one case only: an effort the
 user put on autopilot after approving its spec, plan and Design. Those sessions run one at a
 time on one branch, not in parallel worktrees. Everything else here stands.
+
+## Amendment (2026-11-20): worktree commits no longer prompt
+
+[ADR-0013](./0013-commit-gated-not-prompted.md) moves `git commit` from `ask` to `allow`.
+Rule 6's safeguard ("The `ask` rule stays, so Claude Code still prompts for each commit") no
+longer holds: the effort's opt-in in `decisions.md` is now the user's yes for its worktree
+commits, and the commit gate still refuses a commit before the check and the review. Merge,
+push, rebase, `reset --hard`, tag and the release keep their full stop. Everything else here
+stands.

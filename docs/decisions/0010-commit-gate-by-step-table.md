@@ -203,3 +203,11 @@ fires, and would mean reading a file on every prompt.
 local setup, autopilot sessions do not commit, and one review after close-out covers the
 whole effort; the review rule accepts it unchanged. In the committed setup each session
 still needs its own review. The rest of this decision stands.
+
+## Amendment (2026-11-20): the `ask` rule on `git commit` is gone
+
+[ADR-0013](./0013-commit-gated-not-prompted.md) moves `git commit` from `ask` to `allow`. The
+statements here that the `ask` rule stays and that a commit which passes the gate still
+asks no longer hold. Nor does the reason this gate needed no Boundary exception: with no
+`ask` rule behind it, the gate is the only hook check on a commit, and it still lets the
+commit through when it cannot decide. ADR-0013 accepts that. The gate itself is unchanged.
