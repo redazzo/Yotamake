@@ -24,10 +24,10 @@
       "Bash(git switch -c:*)",
       "Bash(git add:*)",
       "Bash(git pull --ff-only:*)",
-      "Bash(git switch:*)"
+      "Bash(git switch:*)",
+      "Bash(git commit:*)"
     ],
     "ask": [
-      "Bash(git commit:*)",
       "Bash(git merge:*)",
       "Bash(git push:*)",
       "Bash(git rebase:*)",
