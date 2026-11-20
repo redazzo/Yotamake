@@ -1,12 +1,12 @@
 ---
 kind: decision
 date: 2026-11-17
-status: current
+status: superseded
 ---
 
 # ADR-0009: Autopilot is the default for a multi-session effort once S0 is approved
 
-- **Status:** Accepted (2026-11-17), when `multi-session`, `plugin/reference/autopilot.md`
+- **Status:** Superseded by [ADR-0012](./0012-autopilot-one-commit-per-effort.md) (2026-11-20). Was Accepted (2026-11-17), when `multi-session`, `plugin/reference/autopilot.md`
   and eval case 22 changed to match.
 - **Date:** 2026-11-17
 - **Work record:** none yet

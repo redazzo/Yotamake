@@ -196,3 +196,10 @@ If the list keeps growing, the general route is the transcript: each entry there
 `origin.kind` (`human`, `task-notification`, `peer`) and the `prompt_id` the hook gets. It
 was not taken because that format is undocumented, may not be written yet when the hook
 fires, and would mean reading a file on every prompt.
+
+## Amendment (2026-11-20): autopilot reviews once per effort
+
+[ADR-0012](./0012-autopilot-one-commit-per-effort.md) amends item 5's last sentence. In the
+local setup, autopilot sessions do not commit, and one review after close-out covers the
+whole effort; the review rule accepts it unchanged. In the committed setup each session
+still needs its own review. The rest of this decision stands.
