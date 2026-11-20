@@ -6,7 +6,7 @@ status: current
 
 # ADR-0012: Autopilot runs an approved effort in subagents, and commits and reviews it once
 
-- **Status:** Accepted (2026-11-20)
+- **Status:** Accepted (2026-11-20), amended 2026-11-20
 - **Date:** 2026-11-20
 - **Work record:** none yet
 - **Supersedes:** [ADR-0007](./0007-autopilot-runs-sessions-in-subagents.md) (with its three
@@ -113,3 +113,9 @@ parent's `session_id`, plus `agent_id`; the `Stop` gate leaves such edits out.
   `plugin/skills/multi-session/templates/report.md`
 - `plugin/hooks/steps.json`, `plugin/hooks/steps.mjs`
 - `plugin/evals/22-multi-session-autopilot-offer/`
+
+## Amendment (2026-11-20): the commit no longer prompts
+
+[ADR-0013](./0013-commit-gated-not-prompted.md) moves `git commit` from `ask` to `allow`. In
+rule 5, `git merge` still prompts; `git commit` no longer does, and waits for the user's yes
+to the final report instead. The rest of this decision stands.

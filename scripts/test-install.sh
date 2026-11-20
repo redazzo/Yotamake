@@ -144,6 +144,23 @@ settings_merge_adds_ask_rules() {
         if (!p.allow.includes("Bash(git branch:*)")) process.exit(1);'
 }
 
+# A refresh moves git commit from ask to allow in an older settings file (ADR-0013), and
+# leaves the other ask rules and the repository's own rules alone.
+settings_merge_drops_commit_ask() {
+    cd "$full"
+    node -e '
+        const fs = require("fs"), p = ".claude/settings.json", d = JSON.parse(fs.readFileSync(p));
+        d.permissions.allow = d.permissions.allow.filter((r) => r !== "Bash(git commit:*)");
+        d.permissions.ask.unshift("Bash(git commit:*)"); d.permissions.ask.push("Bash(make deploy:*)");
+        fs.writeFileSync(p, JSON.stringify(d));'
+    "$plugin/install.sh" "$full" >/dev/null
+    node -e '
+        const p = require("./.claude/settings.json").permissions;
+        if (p.ask.includes("Bash(git commit:*)") || !p.allow.includes("Bash(git commit:*)")) process.exit(1);
+        for (const r of ["Bash(git merge:*)", "Bash(git push:*)", "Bash(make deploy:*)"])
+            if (!p.ask.includes(r)) process.exit(1);'
+}
+
 # project.conf is project-owned (ADR-0008): seeded with the defaults, never rewritten, and
 # scripts/check reads its main branch from it.
 project_conf_seeded_and_kept() {
@@ -225,6 +242,7 @@ step "the docs linter checks an inventory block both ways" lint_checks_inventory
 step "the settings merge keeps the repository's own entries" settings_merge_keeps_ours
 step "the settings merge adds the SessionStart hook once" settings_merge_adds_hook_once
 step "a refresh adds new ask rules to older settings" settings_merge_adds_ask_rules
+step "a refresh moves git commit from ask to allow" settings_merge_drops_commit_ask
 step "project.conf is seeded once and scripts/check reads it" project_conf_seeded_and_kept
 step "a skipped hooks-path script leaves only its hook entry out" \
     skipped_script_leaves_only_its_hook_out set-hooks-path.sh session-context.sh

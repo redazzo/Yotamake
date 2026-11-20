@@ -1,12 +1,12 @@
 ---
 kind: decision
 date: 2026-11-09
-status: current
+status: superseded
 ---
 
 # ADR-0003: Stop points are enforced by permission ask rules
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0013](./0013-commit-gated-not-prompted.md) (2026-11-20). Was Accepted (in force since 2026-10-28).
 - **Date:** 2026-11-09 (written after the fact; in force since 2026-10-28)
 - **Work record:** none
 - **Supersedes / amends:** none

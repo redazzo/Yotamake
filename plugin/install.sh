@@ -14,7 +14,8 @@
 #   Generated      docs/records/README.md: regenerated when stale, so a refreshed
 #                  generator never leaves the docs check failing.
 #   Merged         .claude/settings.json: the harness's marketplace, plugin, permission
-#                  and hook entries are added to whatever is already there.
+#                  and hook entries are added to whatever is already there. Only a
+#                  retired harness rule (git commit under ask) is ever removed.
 #
 # A repository can opt out of any template file, harness-owned or not, by listing
 # its path in .claude/yotamake/skip (one per line, # for comments). The installer
@@ -124,7 +125,8 @@ done < <(find "$src" -type f -print0 | sort -z)
 
 # Merge settings.json: add the harness's entries, keep everything else. An allow rule
 # or hook entry that names a script the repository opted out of, and does not have, is
-# left out. A hook entry is added once per event, known by the scripts it runs.
+# left out. A hook entry is added once per event, known by the scripts it runs. The one
+# removal: Bash(git commit:*) leaves the ask list, which older versions put it in (ADR-0013).
 mkdir -p "$target/.claude"
 node - "$src/.claude/settings.json" "$target/.claude/settings.json" "$target" "${optout[@]-}" <<'EOF'
 const fs = require("fs");
@@ -141,6 +143,8 @@ for (const key of ["extraKnownMarketplaces", "enabledPlugins"]) {
     }
 }
 const perms = (theirs.permissions = theirs.permissions || {});
+const retiredAsk = ["Bash(git commit:*)"];
+if (perms.ask) perms.ask = perms.ask.filter((rule) => !retiredAsk.includes(rule));
 for (const kind of ["allow", "ask"]) {
     const have = (perms[kind] = perms[kind] || []);
     for (const rule of ours.permissions[kind]) {

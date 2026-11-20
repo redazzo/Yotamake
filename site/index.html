@@ -96,7 +96,7 @@ Commit and merge into main?</span></div>
       </div>
       <div class="card">
         <h3>You approve what matters, and only that</h3>
-        <p>A session is one branch: Claude checks the change fits, makes it, updates its doc, runs the checks and a review, then reports and asks. For larger work you approve the plan once, and the sessions run without stopping between them, unless you choose to step through. Each commit still asks.</p>
+        <p>A session is one branch: Claude checks the change fits, makes it, updates its doc, runs the checks and a review, then reports and asks. For larger work you approve the plan once, and the sessions run without stopping between them, unless you choose to step through. Nothing is committed without your yes.</p>
       </div>
       <div class="card">
         <h3>Your architecture, not a generic one</h3>
@@ -128,7 +128,7 @@ Commit and merge into main?</span></div>
       </div>
       <div class="card">
         <h3>Commit, merge or push without asking</h3>
-        <p><code>git commit</code>, <code>merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> are under <code>ask</code> rules, so Claude Code prompts for each one.</p>
+        <p><code>git merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> are under <code>ask</code> rules, so Claude Code prompts for each one. A commit waits for your yes, and a hook refuses it until the checks and the review have run.</p>
       </div>
       <div class="card">
         <h3>Skipping hooks and touching secrets</h3>

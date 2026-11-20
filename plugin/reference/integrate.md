@@ -3,8 +3,9 @@
 The `simple-session` skill sends you here ("On yes: commit, bump, integrate") once the user
 says yes to the commit.
 
-Only after the user says yes. Claude Code will also ask before `git commit`, `git merge` and
-`git push` when the project's settings put them under `ask`; that is expected. Stage the files
+Only after the user says yes. Claude Code will also ask before `git merge` and `git push`
+(and before `git commit` in an older install) when the project's settings put them under
+`ask`; that is expected. Stage the files
 you changed by name, not `git add -A`. If the pre-commit hook fails, fix the cause; never pass
 `--no-verify`. The plugin's Bash hook refuses it; if the user wants the hook skipped, they run
 the command themselves with `! <command>`. If the plugin's commit gate refuses, do the step

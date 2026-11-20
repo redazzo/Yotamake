@@ -19,7 +19,7 @@ as it happens: an edit on the main branch, an edit or read of a protected file, 
 with `--no-verify`. Two gate a step: the `Stop` hook and the commit gate ask one step
 evaluator, `steps.mjs`, which reads the step order from `steps.json` and the session's event
 log (ADR-0010). Beside them, the repository's `.claude/settings.json` puts risky git commands
-under `ask`, and `.githooks/pre-commit` runs `scripts/check --staged`. A hook that cannot
+under `ask` (not `git commit`, which the commit gate covers), and `.githooks/pre-commit` runs `scripts/check --staged`. A hook that cannot
 decide lets the action through.
 
 ```
@@ -75,14 +75,20 @@ trailer line, used for a trivial branch and for the release bump commit, which c
 the review. The hook reads the message from `-m`, `--message`, `-F`/`--file` and the
 `"$(cat <<'EOF' … EOF)"` form; one it cannot read counts as having no trailer. A commit that
 finishes a merge is not gated, nor is `git merge`. When the evaluator cannot read its input,
-the log or git, the commit goes through; the `ask` rule still asks.
+the log or git, the commit goes through, and nothing else asks: `git commit` is under
+`allow` ([ADR-0013](../decisions/0013-commit-gated-not-prompted.md)).
 
 ### Stop points: the ask rules
 
 Stop points are enforced, not just asked for. The skills stop before commit, version bump,
-merge and deploy. The repo's settings also put `git commit`, `merge`, `push`, `rebase`,
+merge and deploy. The repo's settings also put `git merge`, `push`, `rebase`,
 `reset --hard` and `tag` under `ask`, so Claude Code asks every time, whatever a skill says.
-Add your deploy command there too. An `ask` rule wins over a matching `allow` rule, including
+Add your deploy command there too. `git commit` is under `allow`, so it does not prompt: the
+skill has already asked, and the commit gate above refuses a commit before the check and the
+review ([ADR-0013](../decisions/0013-commit-gated-not-prompted.md)). Older versions put it
+under `ask`; the installer removes that rule when it merges the settings, and it is the only
+rule the installer ever removes. To keep the prompt, put `Bash(git commit:*)` under `ask` in
+`.claude/settings.local.json` or your user settings. An `ask` rule wins over a matching `allow` rule, including
 a broad one such as `Bash(git:*)` and one from a higher-priority settings source (tested
 2026-10-28 with Claude Code 2.1.312, in the same file and across sources). Cutting or
 switching branches with `git switch`, staging files and a fast-forward pull are under
@@ -170,7 +176,7 @@ still asked in a test (one run, Claude Code 2.1.312).
 | You want | Read |
 |---|---|
 | Each `CLAUDE.md` rule and what enforces it | [rules-and-enforcers.md](./rules-and-enforcers.md) |
-| Why stop points are `ask` rules | [ADR-0003](../decisions/0003-stop-points-enforced-by-ask-rules.md) |
+| Why stop points are `ask` rules, and `git commit` is not | [ADR-0013](../decisions/0013-commit-gated-not-prompted.md) |
 | Why the gates read a step table | [ADR-0010](../decisions/0010-commit-gate-by-step-table.md) |
 | Why hooks read facts from `project.conf` | [ADR-0008](../decisions/0008-facts-hooks-read-in-project-conf.md) |
 | How the hooks behave in worktrees | [ADR-0005](../decisions/0005-parallel-sessions-in-worktrees.md) |

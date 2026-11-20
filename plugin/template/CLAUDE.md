@@ -141,9 +141,11 @@ this next month?" An endpoint for a single use is permanent attack surface.
 survives `/clear`: git-ignored under `.scratchpad/`, or committed under `.sessions/` in an
 ephemeral environment. See the `yotamake:multi-session` skill.
 
-**Stop points are enforced.** `.claude/settings.json` puts `git commit`, `merge`, `push`,
-`rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks before each one. Do not
-work around this with other commands that have the same effect.
+**Stop points are enforced.** `.claude/settings.json` puts `git merge`, `push`, `rebase`,
+`reset --hard` and `tag` under `ask`, so Claude Code asks before each one. `git commit` is
+under `allow`: the skill asks the user first, and the plugin's commit gate refuses a commit
+until `scripts/check` and the review have run. Do not work around the `ask` rules with other
+commands that have the same effect.
 
 <!-- FILL IN: project conventions — naming, style, anything Architecture does not cover. -->
 

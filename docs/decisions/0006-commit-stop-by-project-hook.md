@@ -1,13 +1,12 @@
 ---
 kind: decision
 date: 2026-11-12
-status: current
+status: superseded
 ---
 
 # ADR-0006: A project hook asks before commits, in place of the `ask` rule
 
-- **Status:** Proposed. Nothing is built. It waits for the backlog trigger, and for the tests
-  under "Before acceptance" to pass.
+- **Status:** Superseded by [ADR-0013](./0013-commit-gated-not-prompted.md) (2026-11-20). Was Proposed, never built.
 - **Date:** 2026-11-12
 - **Work record:** none (effort "Low-priority backlog items")
 - **Supersedes / amends:** would amend [ADR-0003](./0003-stop-points-enforced-by-ask-rules.md)

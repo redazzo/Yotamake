@@ -21,12 +21,12 @@
       "Bash(git switch:*)",
       "Bash(git add:*)",
       "Bash(git pull --ff-only:*)",
+      "Bash(git commit:*)",
       "Bash(scripts/check:*)",
       "Bash(node scripts/docs/lint-docs.mjs:*)",
       "Bash(node scripts/docs/generate-records-index.mjs:*)"
     ],
     "ask": [
-      "Bash(git commit:*)",
       "Bash(git merge:*)",
       "Bash(git push:*)",
       "Bash(git rebase:*)",

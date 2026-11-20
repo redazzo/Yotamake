@@ -20,6 +20,18 @@ Each entry has:
 Newest first; apply pending entries oldest first. Add an entry whenever a version changes a
 project-owned template file.
 
+## 0.42.0 — Commits no longer prompt
+
+- **Check:** the `allow` list in `.claude/settings.json` has `Bash(git commit:*)` and its
+  `ask` list does not, and the "Stop points are enforced" paragraph in `CLAUDE.md`,
+  Conventions, does not list `git commit` among the `ask` rules.
+- **Apply:** re-run the plugin's `install.sh` on the repository. It moves
+  `Bash(git commit:*)` from `ask` to `allow`. In `CLAUDE.md`, replace the "Stop points are
+  enforced" paragraph with the template's, which says `git commit` is allowed and gated by
+  the skill and the commit gate. If the user wants the commit prompt kept, put
+  `Bash(git commit:*)` under `ask` in `.claude/settings.local.json` instead, and leave the
+  paragraph saying so.
+
 ## 0.41.0 — Docs linter anchors and inventory blocks; what an overview owns; ADR index by status
 
 - **Check:** `node scripts/docs/lint-docs.mjs` passes, the linter line under "Adding a
