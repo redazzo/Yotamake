@@ -28,11 +28,12 @@ dated amendment section at the end.
 | [0004](./0004-project-session-start-hook-sets-hooks-path.md) | A project SessionStart hook points git at .githooks/ when nothing else is set | Accepted |
 | [0005](./0005-parallel-sessions-in-worktrees.md) | Independent sessions of one effort may run in parallel worktrees | Accepted |
 | [0006](./0006-commit-stop-by-project-hook.md) | A project hook asks before commits, in place of the `ask` rule | Proposed |
-| [0007](./0007-autopilot-runs-sessions-in-subagents.md) | Autopilot runs an approved effort's sessions in subagents on one branch | Accepted |
+| [0007](./0007-autopilot-runs-sessions-in-subagents.md) | Autopilot runs an approved effort's sessions in subagents on one branch | Superseded by [0012](./0012-autopilot-one-commit-per-effort.md) |
 | [0008](./0008-facts-hooks-read-in-project-conf.md) | Hooks and scripts read their project facts from `.claude/yotamake/project.conf` | Accepted |
-| [0009](./0009-autopilot-is-the-default.md) | Autopilot is the default for a multi-session effort once S0 is approved | Accepted |
+| [0009](./0009-autopilot-is-the-default.md) | Autopilot is the default for a multi-session effort once S0 is approved | Superseded by [0012](./0012-autopilot-one-commit-per-effort.md) |
 | [0010](./0010-commit-gate-by-step-table.md) | A plugin hook refuses `git commit` until the check and the review are done, by one step table | Accepted |
 | [0011](./0011-session-sized-by-review-revert-and-decisions.md) | A session is sized by review, revert and decisions, with context as a backstop | Accepted |
+| [0012](./0012-autopilot-one-commit-per-effort.md) | Autopilot runs an approved effort in subagents, and commits and reviews it once | Accepted |
 
 ## Template
 

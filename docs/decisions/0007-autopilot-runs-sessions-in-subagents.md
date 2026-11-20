@@ -1,12 +1,12 @@
 ---
 kind: decision
 date: 2026-11-12
-status: current
+status: superseded
 ---
 
 # ADR-0007: Autopilot runs an approved effort's sessions in subagents on one branch
 
-- **Status:** Accepted (2026-11-12), amended 2026-11-17 and 2026-11-18, with the effort's spec and plan. The tests are below.
+- **Status:** Superseded by [ADR-0012](./0012-autopilot-one-commit-per-effort.md) (2026-11-20). Was Accepted (2026-11-12), amended 2026-11-17 and 2026-11-18, with the effort's spec and plan. The tests are below.
 - **Date:** 2026-11-12
 - **Work record:** [Autopilot for multi-session efforts](../records/2026/2026-11-12-autopilot.md)
 - **Supersedes / amends:** amends [ADR-0005](./0005-parallel-sessions-in-worktrees.md),
