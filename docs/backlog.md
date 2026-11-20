@@ -302,7 +302,7 @@ paths.
 - A Skill call made inside a subagent. A probe (2026-11-12) showed that `tool_used` graders
   count a subagent's Bash call, but not whether a subagent can call `/simplify` or
   `/code-review`. Test it before moving those two out of the main context.
-- Autopilot after S0's approval (ADR-0009): case 22 checks only that S0 states the default
+- Autopilot after S0's approval (ADR-0012): case 22 checks only that S0 states the default
   and starts nothing. No case answers the approval and checks that autopilot starts, or that
   "approve, step through" records `Autopilot: off`. A recorded history, as in case 15, could
   test both, once the eval sandbox allows `git` (see "Eval sandbox denies `git`").
@@ -375,8 +375,9 @@ small changes", which is about cost, not size.
 **Next review date:** 2027-02-18 · **Added:** 2026-11-12 · **Trigger to act:** an autopilot run whose main
 conversation compacts before the end.
 
-Under autopilot the main conversation runs the review of every session, so each review's
-findings and fixes land in its context (ADR-0007). A long effort may fill it. One option:
+Under autopilot the main conversation runs the review: once, on the whole effort, in the
+local setup, and once per session in the committed setup (ADR-0012). Its findings and fixes
+land in the main context, late in a long run. A long effort may fill it. One option:
 hand the review's fixes to a fix agent, and keep only its summary.
 
 ## Let a hook approve commits in opted-in worktrees
@@ -400,11 +401,11 @@ commit.
 
 [ADR-0005](./decisions/0005-parallel-sessions-in-worktrees.md) has the user open a
 conversation in each worktree, so every session keeps its own stop before commit
-(ADR-0003). [ADR-0007](./decisions/0007-autopilot-runs-sessions-in-subagents.md) now lets
+(ADR-0003). [ADR-0012](./decisions/0012-autopilot-one-commit-per-effort.md) now lets
 the main conversation run sessions as subagents under autopilot, but one at a time on one
 branch. What is left: the main conversation starts one `isolation: "worktree"` subagent per
-parallel session. That would need a new ADR, or an amendment of ADR-0007, which rules out
-parallel sessions under autopilot.
+parallel session. That would need a new ADR superseding ADR-0012, which rules out parallel
+sessions under autopilot.
 
 ## Plugin agent definitions
 

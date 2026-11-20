@@ -285,9 +285,10 @@ parallel"). The `Worktree setup` line in `CLAUDE.md` says what a new worktree ne
 **Autopilot.** On by default: approve S0's spec and plan, and the remaining sessions run
 without you, each in a fresh built-in agent. S0's last message lists the open decisions with
 the recommendation autopilot will take for each. Say "approve, step through" to run the
-sessions one at a time instead. It ends with one report and one question: merge. Every
-commit still prompts, and nothing is pushed or merged without your yes (ADR-0007, ADR-0009;
-`multi-session`, "Autopilot").
+sessions one at a time instead. Each session runs `scripts/check`; the review runs once, on
+the whole effort, which lands as one commit. It ends with one report and one question:
+commit and merge. Every commit still prompts, and nothing is pushed or merged without your
+yes (ADR-0012; `multi-session`, "Autopilot").
 
 **Subagents.** A `multi-session` S0 hands its reading to built-in agents, one per area, so
 the main context keeps room for the plan. The review hands its design read to one agent

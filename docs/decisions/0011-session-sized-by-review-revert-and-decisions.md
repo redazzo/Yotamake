@@ -6,7 +6,7 @@ status: current
 
 # ADR-0011: A session is sized by review, revert and decisions, with context as a backstop
 
-- **Status:** Accepted (2026-11-19), at the end of effort "Session sizing".
+- **Status:** Accepted (2026-11-19), at the end of effort "Session sizing"; amended 2026-11-19 and 2026-11-20.
 - **Date:** 2026-11-19
 - **Work record:** [Session sizing by review, revert and decisions](../records/2026/2026-11-19-session-sizing.md)
 - **Builds on:** [ADR-0002](./0002-project-facts-in-named-claude-md-sections.md), for the
@@ -135,3 +135,10 @@ Raised in review, before release. Decisions 2 and 3 change as below; the rest st
   session can lose its container, so that part read as always true there.
 - Decision 3, made plain: the estimate, and so the limit, apply to docs-only changes too.
   Only trivial changes skip them: a large docs diff is as hard to review as code.
+
+## Amendment (2026-11-20): sessions under autopilot
+
+[ADR-0012](./0012-autopilot-one-commit-per-effort.md) amends this decision for autopilot in
+the local setup: the effort is reviewed and reverted as one diff, a trade-off against this
+decision's basis that the user accepted. Each session is still sized by "Check the size".
+The rest of this decision stands.

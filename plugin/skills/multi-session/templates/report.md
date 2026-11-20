@@ -1,6 +1,7 @@
 # Report — <Effort title>
 
-Autopilot run, <yyyy-mm-dd>. Mother branch `<branch>`, <N> commits ahead of `<main-branch>`.
+Autopilot run, <yyyy-mm-dd>. Mother branch `<branch>`; the work is uncommitted until your yes
+(in a committed setup: <N> commits ahead of `<main-branch>`).
 <One or two sentences: what the effort set out to do, and whether it did.>
 
 ## Decisions and design
@@ -11,7 +12,8 @@ Autopilot run, <yyyy-mm-dd>. Mother branch `<branch>`, <N> commits ahead of `<ma
 
 ## Changes
 
-Each with `git diff --stat <main-branch>...HEAD -- <paths>`.
+Each with `git diff --stat <main-branch> -- <paths>` (uncommitted work included; new files
+count once the review's `git add -N` has run).
 
 - **Code:** <a few lines>
   ```
@@ -37,8 +39,9 @@ Each with `git diff --stat <main-branch>...HEAD -- <paths>`.
 ## Checks and review
 
 - **`scripts/check`:** <the summary lines from the last run>
-- **Review:** <per session, from its `log.md` entry: what each part of `simple-session`,
-  "Review", found, fixed and left and why, or why it was skipped (docs-only, trivial)>
+- **Review:** <the one review of the whole effort, from `log.md`: what each part of
+  `simple-session`, "Review", found, fixed and left and why, or why it was skipped
+  (docs-only, trivial)>
 - **From the sessions' reports:** <tests seen failing first (Test-first), root causes of bug
   fixes> or "none"
 
@@ -51,7 +54,8 @@ Questions taken on their recommendation without asking. Confirm or change each.
 
 ## Commits
 
-<`git log --oneline <main-branch>..HEAD`>
+<Local setup: the commits your yes will make (the effort, the bump, the merge). Committed
+setup: `git log --oneline <main-branch>..HEAD`.>
 
 ## Left open
 

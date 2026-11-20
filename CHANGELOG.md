@@ -26,6 +26,12 @@ how a release closes it.
   it. A dropped proposal is **Withdrawn**. The index lists the ADRs in force apart from the
   superseded and withdrawn ones.
 
+## 0.40.0 — 2026-11-20
+
+- `multi-session` autopilot makes one commit per effort, not one per session, and reviews
+  the whole effort once at the end. A committed setup still reviews and commits each
+  session (ADR-0012, which supersedes ADR-0007 and ADR-0009).
+
 ## 0.39.1 — 2026-11-20
 
 - The commit gate no longer counts a subagent's hand-back message as a user prompt, so a
