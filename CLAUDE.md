@@ -131,9 +131,11 @@ report which you updated.
 **Plain English.** Skills and docs use plain English and short sentences (see
 `plugin/output-styles/plain-english.md`).
 
-**Stop points are enforced.** `.claude/settings.json` puts `git commit`, `merge`, `push`,
-`rebase`, `reset --hard` and `tag` under `ask`, so Claude Code asks before each one. Do not
-work around this with other commands that have the same effect.
+**Stop points are enforced.** `.claude/settings.json` puts `git merge`, `push`, `rebase`,
+`reset --hard` and `tag` under `ask`, so Claude Code asks before each one. `git commit` is
+under `allow`: the skill asks the user first, and the commit gate refuses a commit until
+`scripts/check` and the review have run (ADR-0013). Do not work around the `ask` rules with
+other commands that have the same effect.
 
 ## Architecture
 
@@ -162,7 +164,8 @@ not list stops before any edit and is raised with the user, whoever asked for it
   the target's `CLAUDE.md` or `scripts/check` as a `FILL IN` placeholder, never in a skill or
   hook. Skills read project facts only from named `CLAUDE.md` sections. The installer never
   overwrites a project-owned file, and merges `.claude/settings.json` without removing
-  anything. Hooks let the edit through (exit 0) when they cannot decide.
+  anything but the retired `git commit` `ask` rule (ADR-0013). Hooks let the edit through
+  (exit 0) when they cannot decide.
 - **Shared code:** `plugin/hooks/lib.sh` for the bash hooks (reading the tool call, and
   `read_fact` for `project.conf`); `plugin/hooks/steps.mjs` for step events and decisions,
   the docs classifier (`isDoc`) and its own `readFact` (ADR-0010);

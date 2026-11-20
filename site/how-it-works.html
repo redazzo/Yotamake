@@ -77,7 +77,7 @@
       <li><strong>S0 plans.</strong> It writes the findings and the plan, and changes no code. It hands its reading to agents, one per area, so the main context keeps room for the plan. You approve the plan before S1.</li>
       <li><strong>Stepping through,</strong> resume after <code>/clear</code> with "Read .scratchpad/&lt;folder&gt;/README.md and start the next session."</li>
       <li><strong>Parallel sessions.</strong> Two sessions that change different files and need nothing from each other can run at once, each in its own git worktree, and merge one at a time.</li>
-      <li><strong>Autopilot, by default.</strong> Approve the plan and the remaining sessions each run in a fresh agent. The plan's open decisions are listed first, with the choice autopilot will make. Say "approve, step through" to go session by session instead. The review runs once, on the whole effort. It ends with one report and one question: commit and merge? The effort lands as one commit. Each commit still asks, and nothing is pushed or merged without your yes.</li>
+      <li><strong>Autopilot, by default.</strong> Approve the plan and the remaining sessions each run in a fresh agent. The plan's open decisions are listed first, with the choice autopilot will make. Say "approve, step through" to go session by session instead. The review runs once, on the whole effort. It ends with one report and one question: commit and merge? The effort lands as one commit. Nothing is committed, pushed or merged without your yes.</li>
     </ul>
 
     <h2 id="design">Design and reuse</h2>
@@ -115,7 +115,7 @@
     <p>It prints one <code>PASS</code> or <code>FAIL</code> line per check. A person's commit passes the same gate as Claude's. One catch: <code>core.hooksPath</code> is a local git setting and is not cloned. A SessionStart hook sets it at a teammate's first Claude Code session in the clone. Someone who never opens Claude Code there runs <code>git config core.hooksPath .githooks</code> once. CI covers everyone.</p>
 
     <h2 id="stops">Stop points</h2>
-    <p>The skills stop before commit, version bump, merge and deploy. The repository's settings back this up: <code>git commit</code>, <code>merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> are under <code>ask</code>, so Claude Code asks every time. An <code>ask</code> rule wins over a matching <code>allow</code> rule, even a broad one. Add your deploy command to the list too.</p>
+    <p>The skills stop before commit, version bump, merge and deploy. The repository's settings back this up: <code>git merge</code>, <code>push</code>, <code>rebase</code>, <code>reset --hard</code> and <code>tag</code> are under <code>ask</code>, so Claude Code asks every time. An <code>ask</code> rule wins over a matching <code>allow</code> rule, even a broad one. Add your deploy command to the list too. <code>git commit</code> is allowed, so it does not prompt a second time: the skill has already asked, and the commit gate refuses a commit until <code>scripts/check</code> and the review have run.</p>
     <p>Cutting a branch, staging files and a fast-forward pull are allowed, so they do not prompt. Deleting, moving or overwriting a branch (<code>git branch -D</code>, <code>-f</code>, <code>-M</code> and the like) asks.</p>
 
     <h2 id="hooks">The hooks</h2>

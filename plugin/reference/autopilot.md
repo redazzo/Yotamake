@@ -5,8 +5,8 @@ The `multi-session` skill sends you here ("Autopilot") when autopilot starts or 
 Autopilot runs every session after S0 without the user, one after another, on one mother
 branch, then writes one report and asks one question: commit and merge. ADR-0012 has the reasons. Each
 session still does the `simple-session` work and checks; what goes is the stop, the report
-and the `/clear` between sessions. Every `git commit` and `git merge` still
-prompts, and autopilot never pushes, merges into the main branch, tags or deploys without a
+and the `/clear` between sessions. Every `git merge` still prompts, the
+commit waits for the user's yes, and autopilot never pushes, merges into the main branch, tags or deploys without a
 yes.
 
 **Commits and review depend on the setup:**

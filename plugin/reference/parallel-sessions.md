@@ -31,7 +31,8 @@ Inside a worktree session:
   again and redo the edit.
 - **Commits.** If the effort opted in to worktree commits (a row in `decisions.md` saying
   so), commit on the session's branch as soon as the checks and the review pass, then report.
-  Claude Code still prompts for each commit. Without that row, stop and ask as usual.
+  The opt-in is the user's yes, so no prompt follows; the commit gate still refuses a commit
+  before the check and the review. Without that row, stop and ask as usual.
   Merge, push, rebase, `reset --hard`, tag and the release always keep their stop.
 
 Merging, one branch at a time:

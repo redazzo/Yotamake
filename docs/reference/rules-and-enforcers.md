@@ -54,7 +54,9 @@ header comments of `scripts/consistency.mjs` and `scripts/docs/lint-docs.mjs`, n
 | `scripts/check` passes before a commit | Hook: `pre-bash-git.sh` (the commit gate). The git pre-commit hook also runs `scripts/check --staged` |
 | Both review skills run before a commit | Hook: `pre-bash-git.sh` (the commit gate), except on a docs-only branch or with a `Review-skipped:` trailer |
 | Never skip the git hook with `--no-verify` | Hook: `pre-bash-git.sh` |
-| Stop and ask before commit, merge, push, rebase, `reset --hard` and tag | Permission |
+| Stop and ask before merge, push, rebase, `reset --hard` and tag | Permission |
+| Stop and ask before commit | Nothing for the question itself. Hook: `pre-bash-git.sh` (the commit gate) refuses a commit before the check and the review; `git commit` is allowed without a prompt (ADR-0013) |
+| The installer removes nothing from `.claude/settings.json` but the retired `git commit` `ask` rule | Check: `scripts/test-install.sh` |
 | A hook or installer change adds a case to `scripts/test-hooks.sh` or `scripts/test-install.sh` | Nothing. `scripts/check` runs the tests but does not see a missing case |
 | Ask before running the eval cases | Nothing. `scripts/check` notes which cases cover the change |
 

@@ -380,18 +380,6 @@ local setup, and once per session in the committed setup (ADR-0012). Its finding
 land in the main context, late in a long run. A long effort may fill it. One option:
 hand the review's fixes to a fix agent, and keep only its summary.
 
-## Let a hook approve commits in opted-in worktrees
-
-**Priority: Low** · **Category:** Hooks · **Status:** Waiting ·
-**Next review date:** 2027-02-18 · **Added:** 2026-11-11 · **Trigger to act:** the commit prompt in parallel
-worktree sessions is reported as too costly, even with the opt-in that skips the
-stop-and-report exchange (ADR-0005, rule 6).
-
-[ADR-0006](./decisions/0006-commit-stop-by-project-hook.md) (Proposed) has the design: drop
-`Bash(git commit:*)` from the `ask` list and add a project `PreToolUse` hook that fails
-closed, asking for every commit except on an opted-in worktree branch. When the trigger
-fires, run the tests it lists under "Before acceptance" first, then build it.
-
 ## Spawn worktree sessions from the main conversation
 
 **Priority: Low** · **Category:** Skills · **Status:** Waiting ·
@@ -401,7 +389,7 @@ commit.
 
 [ADR-0005](./decisions/0005-parallel-sessions-in-worktrees.md) has the user open a
 conversation in each worktree, so every session keeps its own stop before commit
-(ADR-0003). [ADR-0012](./decisions/0012-autopilot-one-commit-per-effort.md) now lets
+(`simple-session`, "Stop and report"). [ADR-0012](./decisions/0012-autopilot-one-commit-per-effort.md) now lets
 the main conversation run sessions as subagents under autopilot, but one at a time on one
 branch. What is left: the main conversation starts one `isolation: "worktree"` subagent per
 parallel session. That would need a new ADR superseding ADR-0012, which rules out parallel

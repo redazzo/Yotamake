@@ -6,6 +6,13 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
+## Unreleased
+
+- `git commit` no longer prompts: it moves from `ask` to `allow` in `.claude/settings.json`.
+  The skills still ask before committing, and the commit gate still refuses a commit until
+  `scripts/check` and the review have run. A refresh removes the old `ask` rule; merge, push,
+  rebase, `reset --hard` and tag still prompt (ADR-0013).
+
 ## 0.41.0 — 2026-11-20
 
 - The docs linter fails a link whose `#anchor` names no heading in its target, or in its

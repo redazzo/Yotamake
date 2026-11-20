@@ -176,7 +176,7 @@ CLAUDE.md                       facts the skills read, by section name
 scripts/check                   the one gate: skills, the pre-commit hook and CI all run it
 .githooks/pre-commit            runs scripts/check --staged (fast checks only)
 .github/workflows/check.yml     runs scripts/check --all
-.claude/settings.json           enables the plugin; "ask" rules for commit, merge, push, …;
+.claude/settings.json           enables the plugin; "ask" rules for merge, push, …;
                                 SessionStart hooks that run the two scripts below
 .claude/yotamake/
   set-hooks-path.sh             sets core.hooksPath to .githooks in a clone that lacks it
@@ -225,7 +225,7 @@ enforces it is in [rules-and-enforcers.md](./docs/reference/rules-and-enforcers.
 |---|---|
 | [Stop gate](./docs/reference/hooks.md#the-stop-gate) | Blocks the end of a turn once when code changed since `scripts/check` last passed |
 | [Commit gate](./docs/reference/hooks.md#the-commit-gate) | Refuses `git commit` until the check has passed and `/simplify` and `/code-review` have run; a docs-only branch needs only the check |
-| [Stop points](./docs/reference/hooks.md#stop-points-the-ask-rules) | `ask` rules make Claude Code ask before `git commit`, `merge`, `push`, `rebase`, `reset --hard` and `tag` |
+| [Stop points](./docs/reference/hooks.md#stop-points-the-ask-rules) | `ask` rules make Claude Code ask before `git merge`, `push`, `rebase`, `reset --hard` and `tag`; `git commit` waits for your yes and the commit gate |
 | [Main branch](./docs/reference/hooks.md#no-edits-on-the-main-branch) | Refuses Edit and Write while the repository is on its main branch |
 | [Secrets](./docs/reference/hooks.md#no-reading-secrets) | Refuses edits and reads of protected files, such as `.env` and keys |
 | [Skipped hooks](./docs/reference/hooks.md#no-skipped-hooks-no-commits-on-main) | Refuses `--no-verify`, and `git commit` on the main branch |
@@ -287,8 +287,7 @@ without you, each in a fresh built-in agent. S0's last message lists the open de
 the recommendation autopilot will take for each. Say "approve, step through" to run the
 sessions one at a time instead. Each session runs `scripts/check`; the review runs once, on
 the whole effort, which lands as one commit. It ends with one report and one question:
-commit and merge. Every commit still prompts, and nothing is pushed or merged without your
-yes (ADR-0012; `multi-session`, "Autopilot").
+commit and merge. Nothing is committed, pushed or merged without your yes (ADR-0012; `multi-session`, "Autopilot").
 
 **Subagents.** A `multi-session` S0 hands its reading to built-in agents, one per area, so
 the main context keeps room for the plan. The review hands its design read to one agent
