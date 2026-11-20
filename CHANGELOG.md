@@ -6,7 +6,7 @@ What changed in each release of the Yotamake plugin, newest first. Get the lates
 Each change adds its line under `## Unreleased`; CLAUDE.md, "Branching and releases", says
 how a release closes it.
 
-## Unreleased
+## 0.40.0 — 2026-11-20
 
 - `multi-session` autopilot makes one commit per effort, not one per session, and reviews
   the whole effort once at the end. A committed setup still reviews and commits each
